@@ -1,9 +1,7 @@
 package com.dfsek.terrascript.lang.impl.rule.variable.declaration;
 
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.BooleanVariableDeclarationOperation;
-import com.dfsek.terrascript.lang.impl.operations.variable.declaration.NumberVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.rule.variable.assignment.BooleanVariableAssignmentRule;
-import com.dfsek.terrascript.lang.impl.rule.variable.assignment.NumberVariableAssignmentRule;
 import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.Parser;
 import com.dfsek.terrascript.parser.ParserUtil;
@@ -16,9 +14,8 @@ public class BooleanVariableDeclarationRule extends VariableDeclarationRule{
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.BOOLEAN_VARIABLE);
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-        Operation varDec = new BooleanVariableDeclarationOperation(tokenizer.peek());
-        parser.getBuilder().addOperation(parser.expect((initial, view) -> new BooleanVariableAssignmentRule()));
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
-        return varDec;
+        //parser.getBuilder().addOperation(parser.expect((initial, view) -> new BooleanVariableAssignmentRule()));
+        //ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
+        return new BooleanVariableDeclarationOperation(tokenizer.peek());
     }
 }

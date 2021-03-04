@@ -27,6 +27,7 @@ public class Parser {
         }
         while(tokenizer.hasNext()) {
             Token current = tokenizer.peek();
+            System.out.println(current);
             if(!ruleMatcherMap.containsKey(current.getType())) throw new ParseException("Unexpected token: " + current, current.getPosition());
             builder.addOperation(expect(ruleMatcherMap.get(current.getType())));
         }

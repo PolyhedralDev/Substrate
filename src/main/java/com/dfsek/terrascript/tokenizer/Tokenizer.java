@@ -6,10 +6,7 @@ import com.dfsek.terrascript.tokenizer.exceptions.FormatException;
 import com.dfsek.terrascript.tokenizer.exceptions.TokenizerException;
 
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public class Tokenizer {
     public static final Set<Character> syntaxSignificant;
@@ -19,13 +16,15 @@ public class Tokenizer {
         syntaxSignificant.addAll(Arrays.asList(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!')); // Reserved chars
     }
 
-    private final com.dfsek.terrascript.tokenizer.Lookahead reader;
+    private final Lookahead reader;
     private final Stack<Token> brackets = new Stack<>();
     private Token current;
 
+    private final List<Token> cache = new ArrayList<>();
+
     public Tokenizer(String data) throws ParseException {
         reader = new com.dfsek.terrascript.tokenizer.Lookahead(new StringReader(data + '\0'));
-        current = fetchCheck();
+        cache.add(fetchCheck());
     }
 
     /**
@@ -36,7 +35,15 @@ public class Tokenizer {
      */
     public Token peek() throws ParseException {
         if(!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
-        return current;
+        return cache.get(0);
+    }
+
+    public Token peek(int n) throws ParseException {
+        while (cache.size() <= n) {
+            if(!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
+            cache.add(fetchCheck());
+        }
+        return cache.get(n);
     }
 
     /**
@@ -47,9 +54,9 @@ public class Tokenizer {
      */
     public Token consume() throws ParseException {
         if(!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
-        Token temp = current;
-        current = fetchCheck();
-        return temp;
+        cache.add(fetchCheck());
+        current = cache.remove(0);
+        return current;
     }
 
     /**
@@ -58,7 +65,7 @@ public class Tokenizer {
      * @return {@code true} if more tokens are present, otherwise {@code false}
      */
     public boolean hasNext() {
-        return !(current == null);
+        return cache.size() != 0 &&  cache.get(0) != null;
     }
 
     private Token fetchCheck() throws ParseException {

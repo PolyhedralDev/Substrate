@@ -14,4 +14,8 @@ public class TokenView {
     public Token peek() throws ParseException {
         return tokenizer.peek();
     }
+
+    public Token peek(int n) throws ParseException {
+        return tokenizer.peek(n);
+    }
 }

@@ -14,9 +14,8 @@ public class NumberVariableDeclarationRule extends VariableDeclarationRule {
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.NUMBER_VARIABLE);
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-        Operation varDec = new NumberVariableDeclarationOperation(tokenizer.peek());
-        parser.getBuilder().addOperation(parser.expect((initial, view) -> new NumberVariableAssignmentRule()));
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
-        return varDec;
+        //parser.getBuilder().addOperation(parser.expect((initial, view) -> new NumberVariableAssignmentRule()));
+        //ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
+        return new NumberVariableDeclarationOperation(tokenizer.peek());
     }
 }

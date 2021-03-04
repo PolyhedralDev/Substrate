@@ -2,6 +2,8 @@ import com.dfsek.terrascript.lang.Rule;
 import com.dfsek.terrascript.lang.RuleMatcher;
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.rule.IdRule;
+import com.dfsek.terrascript.lang.impl.rule.StatementRule;
+import com.dfsek.terrascript.lang.impl.rule.match.IdentifierRuleMatcher;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.BooleanVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.NumberVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.StringVariableDeclarationRule;
@@ -25,6 +27,10 @@ public class ScriptTest {
         parser.addRule(Token.Type.NUMBER_VARIABLE, (initial, view) -> new NumberVariableDeclarationRule());
         parser.addRule(Token.Type.STRING_VARIABLE, (initial, view) -> new StringVariableDeclarationRule());
         parser.addRule(Token.Type.BOOLEAN_VARIABLE, (initial, view) -> new BooleanVariableDeclarationRule());
+        parser.addRule(Token.Type.IDENTIFIER, new IdentifierRuleMatcher());
+
+
+        parser.addRule(Token.Type.STATEMENT_END, (initial, view) -> new StatementRule());
         parser.parse().execute(null);
     }
 

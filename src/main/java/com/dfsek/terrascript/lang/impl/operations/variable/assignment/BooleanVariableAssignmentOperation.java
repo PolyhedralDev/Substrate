@@ -7,13 +7,13 @@ import com.dfsek.terrascript.parser.exception.ParseException;
 import org.objectweb.asm.MethodVisitor;
 
 public class BooleanVariableAssignmentOperation extends VariableAssignmentOperation {
-    public BooleanVariableAssignmentOperation(Operation value) {
-        super(value);
+    public BooleanVariableAssignmentOperation(Operation value, String id) {
+        super(value, id);
     }
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        visitor.visitVarInsn(ISTORE, ((ScriptBuildData) data).getVarSize());
+        visitor.visitVarInsn(ISTORE, ((ScriptBuildData) data).getVariableIndex(id));
     }
 }

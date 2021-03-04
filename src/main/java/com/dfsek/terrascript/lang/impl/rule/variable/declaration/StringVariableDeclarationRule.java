@@ -16,9 +16,8 @@ public class StringVariableDeclarationRule extends VariableDeclarationRule {
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_VARIABLE);
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-        Operation varDec = new StringVariableDeclarationOperation(tokenizer.peek());
-        parser.getBuilder().addOperation(parser.expect((initial, view) -> new StringVariableAssignmentRule()));
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
-        return varDec;
+        //parser.getBuilder().addOperation(parser.expect((initial, view) -> new StringVariableAssignmentRule()));
+        //ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
+        return new StringVariableDeclarationOperation(tokenizer.peek());
     }
 }

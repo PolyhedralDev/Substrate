@@ -6,17 +6,15 @@ import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.exception.ParseException;
 import org.objectweb.asm.MethodVisitor;
 
-import static org.objectweb.asm.Opcodes.DSTORE;
-
 public class NumberVariableAssignmentOperation extends VariableAssignmentOperation {
 
-    public NumberVariableAssignmentOperation(Operation value) {
-        super(value);
+    public NumberVariableAssignmentOperation(Operation value, String id) {
+        super(value, id);
     }
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        visitor.visitVarInsn(DSTORE, ((ScriptBuildData) data).getVarSize());
+        visitor.visitVarInsn(DSTORE, ((ScriptBuildData) data).getVariableIndex(id));
     }
 }

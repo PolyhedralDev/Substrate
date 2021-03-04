@@ -7,13 +7,13 @@ import com.dfsek.terrascript.parser.exception.ParseException;
 import org.objectweb.asm.MethodVisitor;
 
 public class StringVariableAssignmentOperation extends VariableAssignmentOperation {
-    public StringVariableAssignmentOperation(Operation value) {
-        super(value);
+    public StringVariableAssignmentOperation(Operation value, String id) {
+        super(value, id);
     }
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        visitor.visitVarInsn(ASTORE, ((ScriptBuildData) data).getVarSize());
+        visitor.visitVarInsn(ASTORE, ((ScriptBuildData) data).getVariableIndex(id));
     }
 }

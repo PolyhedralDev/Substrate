@@ -1,4 +1,4 @@
-package com.dfsek.terrascript.lang.impl.rule;
+package com.dfsek.terrascript.lang.impl.rule.match;
 
 import com.dfsek.terrascript.lang.Rule;
 import com.dfsek.terrascript.lang.RuleMatcher;

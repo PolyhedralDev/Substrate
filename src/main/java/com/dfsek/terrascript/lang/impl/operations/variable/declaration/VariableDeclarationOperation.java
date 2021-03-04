@@ -18,6 +18,7 @@ public abstract class VariableDeclarationOperation implements Operation {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+        System.out.println("APP:" +id.getContent());
         ((ScriptBuildData) data).register(id, getType());
     }
 }
