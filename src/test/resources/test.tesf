@@ -1,4 +1,4 @@
-id "thin2g";
+id "thing";
 
 num a = 3;
 num b = 3;
@@ -6,3 +6,7 @@ num c = 3;
 num d = 3;
 num e = 3;
 num f = 3;
+
+str thing = "hello";
+
+bool thing2 = false;

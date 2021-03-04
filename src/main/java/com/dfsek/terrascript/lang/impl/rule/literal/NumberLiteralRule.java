@@ -12,7 +12,6 @@ public class NumberLiteralRule extends LiteralRule {
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.peek(), Token.Type.NUMBER);
-        tokenizer.consume();
-        return new NumberLiteralOperation();
+        return new NumberLiteralOperation(Double.parseDouble(tokenizer.consume().getContent()));
     }
 }

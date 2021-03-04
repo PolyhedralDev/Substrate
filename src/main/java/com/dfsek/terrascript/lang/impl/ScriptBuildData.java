@@ -28,4 +28,8 @@ public class ScriptBuildData implements BuildData {
     public enum VariableType {
         STRING, BOOL, NUM
     }
+
+    public int getVarSize() {
+        return variableTypeMap.size();
+    }
 }

@@ -1,7 +1,10 @@
 import com.dfsek.terrascript.lang.Rule;
 import com.dfsek.terrascript.lang.RuleMatcher;
+import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.rule.IdRule;
+import com.dfsek.terrascript.lang.impl.rule.variable.declaration.BooleanVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.NumberVariableDeclarationRule;
+import com.dfsek.terrascript.lang.impl.rule.variable.declaration.StringVariableDeclarationRule;
 import com.dfsek.terrascript.parser.Parser;
 import com.dfsek.terrascript.parser.TokenView;
 import com.dfsek.terrascript.parser.exception.ParseException;
@@ -17,19 +20,11 @@ public class ScriptTest {
     public void script() throws IOException, ParseException {
         String data = IOUtils.toString(ScriptTest.class.getResource("/test.tesf"), StandardCharsets.UTF_8);
         Parser parser = new Parser(data);
-        parser.expectStart(new RuleMatcher() {
-            @Override
-            public Rule match(Token initial, TokenView view) throws ParseException {
-                return new IdRule();
-            }
-        });
+        parser.expectStart((initial, view) -> new IdRule());
 
-        parser.addRule(Token.Type.NUMBER_VARIABLE, new RuleMatcher() {
-            @Override
-            public Rule match(Token initial, TokenView view) throws ParseException {
-                return new NumberVariableDeclarationRule();
-            }
-        });
+        parser.addRule(Token.Type.NUMBER_VARIABLE, (initial, view) -> new NumberVariableDeclarationRule());
+        parser.addRule(Token.Type.STRING_VARIABLE, (initial, view) -> new StringVariableDeclarationRule());
+        parser.addRule(Token.Type.BOOLEAN_VARIABLE, (initial, view) -> new BooleanVariableDeclarationRule());
         parser.parse().execute(null);
     }
 
