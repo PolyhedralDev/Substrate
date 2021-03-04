@@ -14,7 +14,10 @@ public class StringVariableAssignmentRule extends VariableAssignmentRule {
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token id = tokenizer.consume();
         ParserUtil.checkType(id, Token.Type.IDENTIFIER);
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.ASSIGNMENT);
-        return new StringVariableAssignmentOperation(parser.expect(new ExpressionRuleMatcher()), id.getContent());
+
+        Token assignment = tokenizer.consume();
+
+        ParserUtil.checkType(assignment, Token.Type.ASSIGNMENT);
+        return new StringVariableAssignmentOperation(parser.expect(new ExpressionRuleMatcher()), id.getContent(), assignment.getPosition());
     }
 }

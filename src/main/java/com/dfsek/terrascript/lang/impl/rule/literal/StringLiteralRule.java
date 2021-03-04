@@ -11,7 +11,8 @@ import com.dfsek.terrascript.tokenizer.Tokenizer;
 public class StringLiteralRule extends LiteralRule {
     @Override
     public StringLiteralOperation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.STRING);
-        return new StringLiteralOperation(tokenizer.consume().getContent());
+        Token string = tokenizer.consume();
+        ParserUtil.checkType(string, Token.Type.STRING);
+        return new StringLiteralOperation(string.getContent(), string.getPosition());
     }
 }

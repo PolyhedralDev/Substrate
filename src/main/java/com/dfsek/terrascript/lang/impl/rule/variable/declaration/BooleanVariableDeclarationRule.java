@@ -13,9 +13,9 @@ public class BooleanVariableDeclarationRule extends VariableDeclarationRule{
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.BOOLEAN_VARIABLE);
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-        //parser.getBuilder().addOperation(parser.expect((initial, view) -> new BooleanVariableAssignmentRule()));
-        //ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
-        return new BooleanVariableDeclarationOperation(tokenizer.peek());
+
+        Token identifier = tokenizer.peek();
+        ParserUtil.checkType(identifier, Token.Type.IDENTIFIER);
+        return new BooleanVariableDeclarationOperation(identifier, identifier.getPosition());
     }
 }

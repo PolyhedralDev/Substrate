@@ -16,3 +16,11 @@ bool thing2 = false;
 
 
 thing = "bazinga";
+
+
+thing = "fsdfsdgsdfrg";
+
+if(false) {
+    thing = "fsdfsdfsdfsdfsdfsdfsdfdsf";
+    a = 6;
+}

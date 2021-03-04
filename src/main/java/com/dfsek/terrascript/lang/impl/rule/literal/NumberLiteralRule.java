@@ -11,7 +11,8 @@ import com.dfsek.terrascript.tokenizer.Tokenizer;
 public class NumberLiteralRule extends LiteralRule {
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.NUMBER);
-        return new NumberLiteralOperation(Double.parseDouble(tokenizer.consume().getContent()));
+        Token num = tokenizer.consume();
+        ParserUtil.checkType(num, Token.Type.NUMBER);
+        return new NumberLiteralOperation(Double.parseDouble(num.getContent()), num.getPosition());
     }
 }

@@ -1,5 +1,6 @@
 package com.dfsek.terrascript.lang.impl.rule.variable.declaration;
 
+import com.dfsek.terrascript.lang.impl.operations.variable.declaration.BooleanVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.NumberVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.rule.variable.assignment.NumberVariableAssignmentRule;
@@ -15,9 +16,8 @@ public class StringVariableDeclarationRule extends VariableDeclarationRule {
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_VARIABLE);
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-        //parser.getBuilder().addOperation(parser.expect((initial, view) -> new StringVariableAssignmentRule()));
-        //ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
-        return new StringVariableDeclarationOperation(tokenizer.peek());
+        Token identifier = tokenizer.peek();
+        ParserUtil.checkType(identifier, Token.Type.IDENTIFIER);
+        return new StringVariableDeclarationOperation(identifier, identifier.getPosition());
     }
 }

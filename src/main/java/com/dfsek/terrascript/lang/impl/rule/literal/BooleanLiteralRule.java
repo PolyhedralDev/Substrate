@@ -11,7 +11,8 @@ import com.dfsek.terrascript.tokenizer.Tokenizer;
 public class BooleanLiteralRule extends LiteralRule {
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.BOOLEAN);
-        return new BooleanLiteralOperation(Boolean.parseBoolean(tokenizer.consume().getContent()));
+        Token bool = tokenizer.consume();
+        ParserUtil.checkType(bool, Token.Type.BOOLEAN);
+        return new BooleanLiteralOperation(Boolean.parseBoolean(bool.getContent()), bool.getPosition());
     }
 }

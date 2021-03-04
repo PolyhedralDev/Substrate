@@ -14,8 +14,9 @@ public class IdRule implements Rule {
     private static final StringLiteralRule STRING_LITERAL_RULE = new StringLiteralRule();
     @Override
     public Operation assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.ID);
-        IdOperation operation = new IdOperation(STRING_LITERAL_RULE.assemble(tokenizer, parser).getLiteral());
+        Token id = tokenizer.consume();
+        ParserUtil.checkType(id, Token.Type.ID);
+        IdOperation operation = new IdOperation(STRING_LITERAL_RULE.assemble(tokenizer, parser).getLiteral(), id.getPosition());
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
         return operation;
     }
