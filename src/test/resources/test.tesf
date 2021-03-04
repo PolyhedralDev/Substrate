@@ -1,1 +1,8 @@
 id "thin2g";
+
+num a = 3;
+num b = 3;
+num c = 3;
+num d = 3;
+num e = 3;
+num f = 3;
