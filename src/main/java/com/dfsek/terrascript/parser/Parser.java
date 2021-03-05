@@ -15,6 +15,7 @@ public class Parser {
     private final Map<Token.Type, RuleMatcher> ruleMatcherMap = new HashMap<>();
     private final Tokenizer tokenizer;
     private RuleMatcher start;
+    private RuleMatcher def;
     private final ScriptBuilder builder = new ScriptBuilder();
 
     public Parser(String data) throws ParseException {
@@ -28,8 +29,11 @@ public class Parser {
         while(tokenizer.hasNext()) {
             Token current = tokenizer.peek();
             System.out.println(current);
-            if(!ruleMatcherMap.containsKey(current.getType())) throw new ParseException("Unexpected token: " + current, current.getPosition());
-            builder.addOperation(expect(ruleMatcherMap.get(current.getType())));
+            if(!ruleMatcherMap.containsKey(current.getType())) {
+                builder.addOperation(expect(def));
+            } else {
+                builder.addOperation(expect(ruleMatcherMap.get(current.getType())));
+            }
         }
         return builder.build();
     }
@@ -45,6 +49,10 @@ public class Parser {
     public Operation expect(RuleMatcher matcher) throws ParseException {
         Token current = tokenizer.peek();
         return matcher.match(current, new TokenView(tokenizer)).assemble(tokenizer, this);
+    }
+
+    public void expectDefault(RuleMatcher def) {
+        this.def = def;
     }
 
     public ScriptBuilder getBuilder() {
