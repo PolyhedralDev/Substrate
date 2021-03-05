@@ -15,7 +15,7 @@ public class BooleanVariableAssignmentOperation extends VariableAssignmentOperat
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        if(((ScriptBuildData) data).getVariableType(id) != ScriptBuildData.VariableType.BOOL) {
+        if(((ScriptBuildData) data).getVariableType(id) != ReturnType.BOOL) {
             throw new ParseException("Expected BOOL, found " + ((ScriptBuildData) data).getVariableType(id), position);
         }
         visitor.visitVarInsn(ISTORE, ((ScriptBuildData) data).getVariableIndex(id));

@@ -20,6 +20,8 @@ public class IfOperation implements Operation {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+        if(conditional.getType() != ReturnType.BOOL) throw new ParseException("If statement conditional must be of type BOOL.", conditional.getPosition());
+
         Label end = new Label();
 
         conditional.apply(visitor, data);
@@ -33,6 +35,6 @@ public class IfOperation implements Operation {
 
     @Override
     public Position getPosition() {
-        return null;
+        return position;
     }
 }

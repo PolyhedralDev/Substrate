@@ -10,7 +10,7 @@ public class BooleanVariableDeclarationOperation extends VariableDeclarationOper
     }
 
     @Override
-    public ScriptBuildData.VariableType getVariableType() {
-        return ScriptBuildData.VariableType.BOOL;
+    public ReturnType getVariableType() {
+        return ReturnType.BOOL;
     }
 }

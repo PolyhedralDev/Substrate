@@ -18,14 +18,22 @@ public class ScriptRuleMatcher implements RuleMatcher {
     @Override
     public Rule match(Token initial, TokenView view) throws ParseException {
         switch(initial.getType()) {
-            case IF_STATEMENT: return new IfStatementRule();
-            case STRING_VARIABLE: return new StringVariableDeclarationRule();
-            case NUMBER_VARIABLE: return new NumberVariableDeclarationRule();
-            case BOOLEAN_VARIABLE: return new BooleanVariableDeclarationRule();
-            case BOOLEAN: return new BooleanLiteralRule();
-            case STRING: return new StringLiteralRule();
-            case NUMBER: return new NumberLiteralRule();
-            case STATEMENT_END: return new StatementRule();
+            case IF_STATEMENT:
+                return new IfStatementRule();
+            case STRING_VARIABLE:
+                return new StringVariableDeclarationRule();
+            case NUMBER_VARIABLE:
+                return new NumberVariableDeclarationRule();
+            case BOOLEAN_VARIABLE:
+                return new BooleanVariableDeclarationRule();
+            case BOOLEAN:
+                return new BooleanLiteralRule();
+            case STRING:
+                return new StringLiteralRule();
+            case NUMBER:
+                return new NumberLiteralRule();
+            case STATEMENT_END:
+                return new StatementRule();
         }
         if(view.peek(1).getType() == Token.Type.ASSIGNMENT) {
             return new IdentifierRuleMatcher().match(initial, view);

@@ -13,6 +13,7 @@ import org.objectweb.asm.MethodVisitor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,9 +97,9 @@ public class ScriptBuilder {
 
         builds++;
         try {
-            Object instance = clazz.newInstance();
+            Object instance = clazz.getDeclaredConstructor().newInstance();
             return (TerraScript) instance;
-        } catch(InstantiationException | IllegalAccessException e) {
+        } catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

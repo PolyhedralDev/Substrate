@@ -15,7 +15,7 @@ public abstract class VariableDeclarationOperation implements Operation {
         this.id = id;
     }
 
-    public abstract ScriptBuildData.VariableType getVariableType();
+    public abstract ReturnType getVariableType();
 
     private final Token id;
 

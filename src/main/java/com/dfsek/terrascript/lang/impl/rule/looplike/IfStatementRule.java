@@ -3,6 +3,7 @@ package com.dfsek.terrascript.lang.impl.rule.looplike;
 import com.dfsek.terrascript.lang.Rule;
 import com.dfsek.terrascript.lang.impl.operations.looplike.IfOperation;
 import com.dfsek.terrascript.lang.impl.rule.BlockRule;
+import com.dfsek.terrascript.lang.impl.rule.match.ExpressionRuleMatcher;
 import com.dfsek.terrascript.lang.impl.rule.match.ScriptRuleMatcher;
 import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.Parser;
@@ -21,7 +22,7 @@ public class IfStatementRule implements Rule {
         ParserUtil.checkType(ifStatement, Token.Type.IF_STATEMENT);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
-        Operation condition = new ScriptRuleMatcher().match(tokenizer.peek(), new TokenView(tokenizer)).assemble(tokenizer, parser);
+        Operation condition = new ExpressionRuleMatcher(Operation.ReturnType.BOOL).match(tokenizer.peek(), new TokenView(tokenizer)).assemble(tokenizer, parser);
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
 

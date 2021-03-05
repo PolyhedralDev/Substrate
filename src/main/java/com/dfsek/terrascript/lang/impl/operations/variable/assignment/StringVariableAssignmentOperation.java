@@ -15,7 +15,7 @@ public class StringVariableAssignmentOperation extends VariableAssignmentOperati
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        if(((ScriptBuildData) data).getVariableType(id) != ScriptBuildData.VariableType.STRING) {
+        if(((ScriptBuildData) data).getVariableType(id) != ReturnType.STR) {
             throw new ParseException("Expected STR, found " + ((ScriptBuildData) data).getVariableType(id), position);
         }
         visitor.visitVarInsn(ASTORE, ((ScriptBuildData) data).getVariableIndex(id));

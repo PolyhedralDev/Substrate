@@ -16,7 +16,7 @@ public class NumberVariableAssignmentOperation extends VariableAssignmentOperati
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         value.apply(visitor, data);
-        if(((ScriptBuildData) data).getVariableType(id) != ScriptBuildData.VariableType.NUM) {
+        if(((ScriptBuildData) data).getVariableType(id) != ReturnType.NUM) {
             throw new ParseException("Expected NUM, found " + ((ScriptBuildData) data).getVariableType(id), position);
         }
         visitor.visitVarInsn(DSTORE, ((ScriptBuildData) data).getVariableIndex(id));

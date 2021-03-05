@@ -1,6 +1,7 @@
 package com.dfsek.terrascript.lang.impl;
 
 import com.dfsek.terrascript.lang.internal.BuildData;
+import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.exception.ParseException;
 import com.dfsek.terrascript.tokenizer.Token;
 
@@ -21,7 +22,7 @@ public class ScriptBuildData implements BuildData {
         return generatedName;
     }
 
-    public void register(Token id, VariableType type) throws ParseException {
+    public void register(Token id, Operation.ReturnType type) throws ParseException {
         if(variableTypeMap.containsKey(id.getContent())) throw new ParseException("Duplicate variable ID: " + id, id.getPosition());
         System.out.println(id.getContent());
         variableTypeMap.put(id.getContent(), new VariableMeta(type, index++));
@@ -32,12 +33,8 @@ public class ScriptBuildData implements BuildData {
         return variableTypeMap.get(id).index;
     }
 
-    public VariableType getVariableType(String id) {
+    public Operation.ReturnType getVariableType(String id) {
         return variableTypeMap.get(id).type;
-    }
-
-    public enum VariableType {
-        STRING, BOOL, NUM
     }
 
     public int getVarSize() {
@@ -45,10 +42,10 @@ public class ScriptBuildData implements BuildData {
     }
 
     public static class VariableMeta {
-        private final VariableType type;
+        private final Operation.ReturnType type;
         private final int index;
 
-        public VariableMeta(VariableType type, int index) {
+        public VariableMeta(Operation.ReturnType type, int index) {
             this.type = type;
             this.index = index;
         }

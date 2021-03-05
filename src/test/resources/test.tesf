@@ -20,7 +20,7 @@ thing = "bazinga";
 
 thing = "fsdfsdgsdfrg";
 
-if(false) {
+if(thing2) {
     thing = "fsdfsdfsdfsdfsdfsdfsdfdsf";
     a = 6;
 }

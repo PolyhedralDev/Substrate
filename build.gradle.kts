@@ -18,9 +18,7 @@ dependencies {
     implementation("org.ow2.asm:asm:9.0")
 }
 
-
-val jar by tasks.getting(Jar::class) {
-    manifest {
-        attributes["Main-Class"] = "com.dfsek.noise.NoiseTool"
-    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

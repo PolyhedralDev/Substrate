@@ -10,7 +10,7 @@ public class StringVariableDeclarationOperation extends VariableDeclarationOpera
     }
 
     @Override
-    public ScriptBuildData.VariableType getVariableType() {
-        return ScriptBuildData.VariableType.STRING;
+    public ReturnType getVariableType() {
+        return ReturnType.STR;
     }
 }

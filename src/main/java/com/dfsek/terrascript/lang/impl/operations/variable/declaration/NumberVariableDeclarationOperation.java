@@ -10,7 +10,7 @@ public class NumberVariableDeclarationOperation extends VariableDeclarationOpera
     }
 
     @Override
-    public ScriptBuildData.VariableType getVariableType() {
-        return ScriptBuildData.VariableType.NUM;
+    public ReturnType getVariableType() {
+        return ReturnType.NUM;
     }
 }
