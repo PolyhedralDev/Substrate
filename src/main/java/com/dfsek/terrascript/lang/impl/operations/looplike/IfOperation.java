@@ -7,7 +7,7 @@ import com.dfsek.terrascript.tokenizer.Position;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-public class IfOperation implements Operation {
+public class IfOperation implements Operation, BlockedOperation {
     private final Operation conditional;
     private final Operation statement;
     private final Position position;

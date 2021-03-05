@@ -1,6 +1,8 @@
 package com.dfsek.terrascript.lang.impl.rule.variable.declaration;
 
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.BooleanVariableDeclarationOperation;
+import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVariableDeclarationOperation;
+import com.dfsek.terrascript.lang.impl.rule.match.ExpressionRuleMatcher;
 import com.dfsek.terrascript.lang.impl.rule.variable.assignment.BooleanVariableAssignmentRule;
 import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.Parser;
@@ -16,6 +18,10 @@ public class BooleanVariableDeclarationRule extends VariableDeclarationRule{
 
         Token identifier = tokenizer.peek();
         ParserUtil.checkType(identifier, Token.Type.IDENTIFIER);
-        return new BooleanVariableDeclarationOperation(identifier, identifier.getPosition());
+        Operation value = null;
+        if(tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
+            value = new BooleanVariableAssignmentRule().assemble(tokenizer, parser);
+        } else tokenizer.consume();
+        return new BooleanVariableDeclarationOperation(identifier, identifier.getPosition(), value);
     }
 }

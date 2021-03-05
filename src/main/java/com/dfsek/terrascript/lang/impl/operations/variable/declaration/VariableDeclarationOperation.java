@@ -10,8 +10,10 @@ import org.objectweb.asm.MethodVisitor;
 
 public abstract class VariableDeclarationOperation implements Operation {
     private final Position position;
-    protected VariableDeclarationOperation(Position position, Token id) {
+    private final Operation value;
+    protected VariableDeclarationOperation(Position position, Token id, Operation value) {
         this.position = position;
+        this.value = value;
         this.id = id;
     }
 
@@ -23,6 +25,9 @@ public abstract class VariableDeclarationOperation implements Operation {
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         System.out.println("APP:" +id.getContent());
         ((ScriptBuildData) data).register(id, getVariableType());
+        if(value != null) {
+            value.apply(visitor, data);
+        }
     }
 
     @Override

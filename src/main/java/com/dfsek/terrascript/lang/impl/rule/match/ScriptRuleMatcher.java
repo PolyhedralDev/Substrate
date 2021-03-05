@@ -35,8 +35,6 @@ public class ScriptRuleMatcher implements RuleMatcher {
                 return new StringLiteralRule();
             case NUMBER:
                 return new NumberLiteralRule();
-            case STATEMENT_END:
-                return new StatementRule();
         }
         if(view.peek(1).getType() == Token.Type.ASSIGNMENT) {
             return new IdentifierRuleMatcher().match(initial, view);

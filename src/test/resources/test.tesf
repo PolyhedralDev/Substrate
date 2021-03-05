@@ -3,10 +3,11 @@ id "thing";
 num a = 3;
 num b = 3.5;
 num c = 4;
-num d = 4.5;
+num d;
 num e = 5;
 num f = 5.5;
 
+d = 3423454534253245234.234;
 
 f = 4;
 
@@ -20,11 +21,7 @@ thing = "bazinga";
 
 thing = "fsdfsdgsdfrg";
 
-if(thing2) {
-    thing = "fsdfsdfsdfsdfsdfsdfsdfdsf";
-    a = 6;
-}
 
-while(thing2) {
-    thing2 = false;
+if(thing2) {
+thing = "dsdf";
 }

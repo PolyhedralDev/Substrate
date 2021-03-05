@@ -33,6 +33,8 @@ public class VariableReferenceOperation implements Operation {
             }
             case BOOL: {
                 visitor.visitVarInsn(ILOAD, index);
+                System.out.println(index);
+                System.out.println(((ScriptBuildData) data).getVariableType(id));
                 break;
             }
             case STR: {

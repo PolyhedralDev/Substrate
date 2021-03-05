@@ -26,15 +26,15 @@ public class ScriptTest {
         Parser parser = new Parser(data);
         parser.expectStart((initial, view) -> new IdRule());
 
-        parser.addRule(Token.Type.NUMBER_VARIABLE, (initial, view) -> new NumberVariableDeclarationRule());
-        parser.addRule(Token.Type.STRING_VARIABLE, (initial, view) -> new StringVariableDeclarationRule());
-        parser.addRule(Token.Type.BOOLEAN_VARIABLE, (initial, view) -> new BooleanVariableDeclarationRule());
-        parser.addRule(Token.Type.IDENTIFIER, new IdentifierRuleMatcher());
+        parser.addRule(Token.Type.NUMBER_VARIABLE, (initial, view) -> new StatementRule());
+        parser.addRule(Token.Type.STRING_VARIABLE, (initial, view) -> new StatementRule());
+        parser.addRule(Token.Type.BOOLEAN_VARIABLE, (initial, view) -> new StatementRule());
+        parser.addRule(Token.Type.IDENTIFIER, (initial, view) -> new StatementRule());
 
 
         parser.addRule(Token.Type.STATEMENT_END, (initial, view) -> new StatementRule());
-        parser.addRule(Token.Type.IF_STATEMENT, (initial, view) -> new IfStatementRule());
-        parser.addRule(Token.Type.WHILE_LOOP, (initial, view) -> new WhileLoopRule());
+        parser.addRule(Token.Type.IF_STATEMENT, (initial, view) -> new StatementRule());
+        parser.addRule(Token.Type.WHILE_LOOP, (initial, view) -> new StatementRule());
         parser.parse().execute(null);
     }
 

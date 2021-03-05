@@ -22,7 +22,7 @@ public class BlockRule implements Rule {
 
         List<Operation> ops = new ArrayList<>();
         while(tokenizer.peek().getType() != Token.Type.BLOCK_END) {
-            ops.add(new ScriptRuleMatcher().match(tokenizer.peek(), new TokenView(tokenizer)).assemble(tokenizer, parser));
+            ops.add(new StatementRule().assemble(tokenizer, parser));
         }
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_END);
