@@ -4,6 +4,7 @@ import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVar
 import com.dfsek.terrascript.lang.impl.rule.IdRule;
 import com.dfsek.terrascript.lang.impl.rule.StatementRule;
 import com.dfsek.terrascript.lang.impl.rule.looplike.IfStatementRule;
+import com.dfsek.terrascript.lang.impl.rule.looplike.WhileLoopRule;
 import com.dfsek.terrascript.lang.impl.rule.match.IdentifierRuleMatcher;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.BooleanVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.NumberVariableDeclarationRule;
@@ -33,6 +34,7 @@ public class ScriptTest {
 
         parser.addRule(Token.Type.STATEMENT_END, (initial, view) -> new StatementRule());
         parser.addRule(Token.Type.IF_STATEMENT, (initial, view) -> new IfStatementRule());
+        parser.addRule(Token.Type.WHILE_LOOP, (initial, view) -> new WhileLoopRule());
         parser.parse().execute(null);
     }
 

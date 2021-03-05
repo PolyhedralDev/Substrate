@@ -7,6 +7,7 @@ import com.dfsek.terrascript.lang.impl.rule.literal.BooleanLiteralRule;
 import com.dfsek.terrascript.lang.impl.rule.literal.NumberLiteralRule;
 import com.dfsek.terrascript.lang.impl.rule.literal.StringLiteralRule;
 import com.dfsek.terrascript.lang.impl.rule.looplike.IfStatementRule;
+import com.dfsek.terrascript.lang.impl.rule.looplike.WhileLoopRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.BooleanVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.NumberVariableDeclarationRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.declaration.StringVariableDeclarationRule;
@@ -20,6 +21,8 @@ public class ScriptRuleMatcher implements RuleMatcher {
         switch(initial.getType()) {
             case IF_STATEMENT:
                 return new IfStatementRule();
+            case WHILE_LOOP:
+                return new WhileLoopRule();
             case STRING_VARIABLE:
                 return new StringVariableDeclarationRule();
             case NUMBER_VARIABLE:
