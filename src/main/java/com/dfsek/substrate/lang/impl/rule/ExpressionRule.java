@@ -1,7 +1,14 @@
 package com.dfsek.substrate.lang.impl.rule;
 
 import com.dfsek.substrate.lang.Rule;
-import com.dfsek.substrate.lang.impl.operations.comparison.EqualsOperation;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.EqualsOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.GreaterThanOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.GreaterThanOrEqualsOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.LessThanOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.LessThanOrEqualsOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.number.NotEqualsOperationNumber;
+import com.dfsek.substrate.lang.impl.operations.comparison.string.EqualsOperationString;
+import com.dfsek.substrate.lang.impl.operations.comparison.string.NotEqualsOperationString;
 import com.dfsek.substrate.lang.impl.operations.number.binary.*;
 import com.dfsek.substrate.lang.impl.rule.match.LiteralRuleMatcher;
 import com.dfsek.substrate.lang.internal.Operation;
@@ -44,7 +51,30 @@ public class ExpressionRule implements Rule {
                     expression = new ModuloOperation(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
                     break;
                 case EQUALS_OPERATOR:
-                    expression = new EqualsOperation(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    if(expression.getType() == Operation.ReturnType.NUM) {
+                        expression = new EqualsOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    } else if(expression.getType() == Operation.ReturnType.STR) {
+                        expression = new EqualsOperationString(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    }
+                    break;
+                case NOT_EQUALS_OPERATOR:
+                    if(expression.getType() == Operation.ReturnType.NUM) {
+                        expression = new NotEqualsOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    } else if(expression.getType() == Operation.ReturnType.STR) {
+                        expression = new NotEqualsOperationString(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    }
+                    break;
+                case GREATER_THAN_OPERATOR:
+                    expression = new GreaterThanOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    break;
+                case GREATER_THAN_OR_EQUALS_OPERATOR:
+                    expression = new GreaterThanOrEqualsOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    break;
+                case LESS_THAN_OPERATOR:
+                    expression = new LessThanOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    break;
+                case LESS_THAN_OR_EQUALS_OPERATOR:
+                    expression = new LessThanOrEqualsOperationNumber(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
                     break;
             }
         }

@@ -82,7 +82,7 @@ public class ScriptBuilder {
         byte[] bytes = writer.toByteArray();
 
         if(true) {
-            File dump = new File("./dumps/TerraScriptIMPL_" + builds + ".class");
+            File dump = new File("./dumps/ScriptIMPL_" + builds + ".class");
             dump.getParentFile().mkdirs();
             System.out.println("Dumping to " + dump.getAbsolutePath());
             try {

@@ -21,6 +21,6 @@ thing = "bazinga";
 
 thing = "fsdfsdgsdfrg";
 
-if(d == 4) {
+if(3 > f) {
 thing = "dsdf";
 }
