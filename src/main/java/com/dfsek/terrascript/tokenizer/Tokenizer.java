@@ -70,6 +70,7 @@ public class Tokenizer {
 
     private Token fetchCheck() throws ParseException {
         Token fetch = fetch();
+        System.out.println(fetch);
         if(fetch != null) {
             if(fetch.getType().equals(Token.Type.BLOCK_BEGIN)) brackets.push(fetch); // Opening bracket
             else if(fetch.getType().equals(Token.Type.BLOCK_END)) {

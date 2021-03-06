@@ -1,7 +1,7 @@
 package com.dfsek.terrascript.lang.impl.rule.variable.assignment;
 
 import com.dfsek.terrascript.lang.impl.operations.variable.assignment.StringVariableAssignmentOperation;
-import com.dfsek.terrascript.lang.impl.rule.match.ExpressionRuleMatcher;
+import com.dfsek.terrascript.lang.impl.rule.ExpressionRule;
 import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.Parser;
 import com.dfsek.terrascript.parser.ParserUtil;
@@ -18,6 +18,6 @@ public class StringVariableAssignmentRule extends VariableAssignmentRule {
         Token assignment = tokenizer.consume();
 
         ParserUtil.checkType(assignment, Token.Type.ASSIGNMENT);
-        return new StringVariableAssignmentOperation(parser.expect(new ExpressionRuleMatcher()), id.getContent(), assignment.getPosition());
+        return new StringVariableAssignmentOperation(new ExpressionRule().assemble(tokenizer, parser), id.getContent(), assignment.getPosition());
     }
 }

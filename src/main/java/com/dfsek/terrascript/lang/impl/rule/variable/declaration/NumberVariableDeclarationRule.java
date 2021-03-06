@@ -1,11 +1,6 @@
 package com.dfsek.terrascript.lang.impl.rule.variable.declaration;
 
-import com.dfsek.terrascript.lang.impl.operations.variable.assignment.NumberVariableAssignmentOperation;
-import com.dfsek.terrascript.lang.impl.operations.variable.declaration.BooleanVariableDeclarationOperation;
 import com.dfsek.terrascript.lang.impl.operations.variable.declaration.NumberVariableDeclarationOperation;
-import com.dfsek.terrascript.lang.impl.operations.variable.declaration.StringVariableDeclarationOperation;
-import com.dfsek.terrascript.lang.impl.rule.match.ExpressionRuleMatcher;
-import com.dfsek.terrascript.lang.impl.rule.variable.assignment.BooleanVariableAssignmentRule;
 import com.dfsek.terrascript.lang.impl.rule.variable.assignment.NumberVariableAssignmentRule;
 import com.dfsek.terrascript.lang.internal.Operation;
 import com.dfsek.terrascript.parser.Parser;

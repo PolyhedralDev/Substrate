@@ -29,12 +29,6 @@ public class ScriptRuleMatcher implements RuleMatcher {
                 return new NumberVariableDeclarationRule();
             case BOOLEAN_VARIABLE:
                 return new BooleanVariableDeclarationRule();
-            case BOOLEAN:
-                return new BooleanLiteralRule();
-            case STRING:
-                return new StringLiteralRule();
-            case NUMBER:
-                return new NumberLiteralRule();
         }
         if(view.peek(1).getType() == Token.Type.ASSIGNMENT) {
             return new IdentifierRuleMatcher().match(initial, view);

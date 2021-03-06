@@ -28,7 +28,6 @@ public class Parser {
         }
         while(tokenizer.hasNext()) {
             Token current = tokenizer.peek();
-            System.out.println(current);
             if(!ruleMatcherMap.containsKey(current.getType())) {
                 builder.addOperation(expect(def));
             } else {

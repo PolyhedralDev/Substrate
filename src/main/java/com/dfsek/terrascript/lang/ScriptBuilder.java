@@ -71,7 +71,6 @@ public class ScriptBuilder {
 
         ScriptBuildData data = new ScriptBuildData(implementationClassName);
         for (Operation op : ops) {
-            System.out.println(op);
             op.apply(absMethod, data);
         }
 

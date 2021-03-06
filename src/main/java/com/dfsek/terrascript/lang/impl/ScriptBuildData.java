@@ -24,12 +24,10 @@ public class ScriptBuildData implements BuildData {
 
     public void register(Token id, Operation.ReturnType type) throws ParseException {
         if(variableTypeMap.containsKey(id.getContent())) throw new ParseException("Duplicate variable ID: " + id, id.getPosition());
-        System.out.println(id.getContent());
         variableTypeMap.put(id.getContent(), new VariableMeta(type, index++));
     }
 
     public int getVariableIndex(String id) {
-        System.out.println(id);
         return variableTypeMap.get(id).index;
     }
 

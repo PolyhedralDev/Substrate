@@ -2,6 +2,7 @@ package com.dfsek.terrascript.lang.impl.rule.match;
 
 import com.dfsek.terrascript.lang.Rule;
 import com.dfsek.terrascript.lang.RuleMatcher;
+import com.dfsek.terrascript.lang.impl.rule.ExpressionRule;
 import com.dfsek.terrascript.lang.impl.rule.literal.BooleanLiteralRule;
 import com.dfsek.terrascript.lang.impl.rule.literal.NumberLiteralRule;
 import com.dfsek.terrascript.lang.impl.rule.literal.StringLiteralRule;
@@ -11,14 +12,14 @@ import com.dfsek.terrascript.parser.TokenView;
 import com.dfsek.terrascript.parser.exception.ParseException;
 import com.dfsek.terrascript.tokenizer.Token;
 
-public class ExpressionRuleMatcher implements RuleMatcher {
+public class LiteralRuleMatcher implements RuleMatcher {
     private final Operation.ReturnType type;
 
-    public ExpressionRuleMatcher() {
+    public LiteralRuleMatcher() {
         this.type = null;
     }
 
-    public ExpressionRuleMatcher(Operation.ReturnType req) {
+    public LiteralRuleMatcher(Operation.ReturnType req) {
         this.type = req;
     }
 
