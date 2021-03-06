@@ -1,7 +1,7 @@
-import com.dfsek.terrascript.lang.impl.rule.IdRule;
-import com.dfsek.terrascript.lang.impl.rule.StatementRule;
-import com.dfsek.terrascript.parser.Parser;
-import com.dfsek.terrascript.parser.exception.ParseException;
+import com.dfsek.substrate.lang.impl.rule.IdRule;
+import com.dfsek.substrate.lang.impl.rule.StatementRule;
+import com.dfsek.substrate.parser.Parser;
+import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
