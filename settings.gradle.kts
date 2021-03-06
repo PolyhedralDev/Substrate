@@ -1,2 +1,2 @@
-rootProject.name = "TerraScript"
+rootProject.name = "Substrate"
 

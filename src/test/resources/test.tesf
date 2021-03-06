@@ -7,13 +7,13 @@ num d;
 num e = 5;
 num f = 5.5 *2 + 2 * 2 / 2;
 
-d = 3423454534253245234.234;
+d = 3245234.234;
 
 f = 4;
 
 str thing = "hello";
 
-bool thing2 = true;
+//bool thing2 = true;
 
 
 thing = "bazinga";
@@ -21,7 +21,6 @@ thing = "bazinga";
 
 thing = "fsdfsdgsdfrg";
 
-
-if(thing2) {
+if(d == 4) {
 thing = "dsdf";
 }

@@ -1,6 +1,7 @@
 package com.dfsek.terrascript.lang.impl.rule;
 
 import com.dfsek.terrascript.lang.Rule;
+import com.dfsek.terrascript.lang.impl.operations.comparison.EqualsOperation;
 import com.dfsek.terrascript.lang.impl.operations.number.binary.*;
 import com.dfsek.terrascript.lang.impl.rule.match.LiteralRuleMatcher;
 import com.dfsek.terrascript.lang.internal.Operation;
@@ -41,6 +42,9 @@ public class ExpressionRule implements Rule {
                     break;
                 case MODULO_OPERATOR:
                     expression = new ModuloOperation(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
+                    break;
+                case EQUALS_OPERATOR:
+                    expression = new EqualsOperation(expression, new ExpressionRule(type).assemble(tokenizer, parser), op.getPosition());
                     break;
             }
         }

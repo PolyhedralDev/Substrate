@@ -22,8 +22,6 @@ public class VariableReferenceOperation implements Operation {
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         ReturnType type = ((ScriptBuildData) data).getVariableType(id);
 
-        if(type != expect) throw new ParseException("Unexpected type: expected " + expect + ", found " + type, position);
-
         int index = ((ScriptBuildData) data).getVariableIndex(id);
 
         switch(type) {
