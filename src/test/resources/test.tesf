@@ -6,6 +6,7 @@ num c = 4;
 num d;
 num e = 5;
 num f = 5.5 *2 + 2 * 2 / 2;
+bool fdsfds = false;
 
 d = 3245234.234;
 
@@ -21,6 +22,11 @@ thing = "bazinga";
 
 thing = "fsdfsdgsdfrg";
 
-if(3 > f) {
+if(3 > a) {
 thing = "dsdf";
+
+if("gdsgdsfgsd" != thing) {
+a = 4;
+}
+
 }

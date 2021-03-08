@@ -70,9 +70,13 @@ public class ScriptBuilder {
         absMethod.visitCode();
 
         ScriptBuildData data = new ScriptBuildData(implementationClassName);
+        data.initialize(absMethod);
+
         for (Operation op : ops) {
             op.apply(absMethod, data);
         }
+
+        data.finalize(absMethod);
 
         absMethod.visitInsn(RETURN); // Return double at top of stack (operation leaves one double on stack)
 
