@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
-import com.dfsek.substrate.lang.internal.Operation;
+import com.dfsek.substrate.lang.internal.Node;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
@@ -19,14 +19,14 @@ import java.util.List;
 import static org.objectweb.asm.Opcodes.*;
 
 public class ScriptBuilder {
-    private final List<Operation> ops = new ArrayList<>();
+    private final List<Node> ops = new ArrayList<>();
     private static int builds = 0;
 
     private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));
     private static final String INTERFACE_CLASS_NAME = Script.class.getCanonicalName().replace('.', '/');
     private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
 
-    public void addOperation(Operation op) {
+    public void addOperation(Node op) {
         ops.add(op);
     }
 
