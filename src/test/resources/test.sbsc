@@ -5,12 +5,3 @@ foo, bar = doStuff(1, 2, 3);
 
 println(foo);
 println(bar);
-
-
-
-range = (0..5);
-
-(i: range) -> println(i);
-
-iterate(range, i -> println(i));
-
