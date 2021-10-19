@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.node;
 
-import com.dfsek.substrate.lang.internal.BuildData;
-import com.dfsek.substrate.lang.internal.Node;
+import com.dfsek.substrate.lang.BuildData;
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;

@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.internal;
+package com.dfsek.substrate.lang;
 
 import org.objectweb.asm.MethodVisitor;
 

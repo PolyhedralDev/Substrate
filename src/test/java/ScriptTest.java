@@ -1,3 +1,4 @@
+import com.dfsek.substrate.lang.internal.TupleFactory;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -23,6 +24,14 @@ public class ScriptTest {
 
         while(tokenizer.hasNext()) {
             System.out.println(tokenizer.consume());
+        }
+    }
+
+    @Test
+    public void tupleGen() {
+        TupleFactory factory = new TupleFactory();
+        for (int i = 1; i < 6; i++) {
+            factory.generate(i);
         }
     }
 }

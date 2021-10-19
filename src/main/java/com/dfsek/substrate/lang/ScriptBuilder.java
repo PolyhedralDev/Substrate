@@ -2,7 +2,6 @@ package com.dfsek.substrate.lang;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
-import com.dfsek.substrate.lang.internal.Node;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
@@ -35,8 +34,6 @@ public class ScriptBuilder {
         String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
 
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-
-        //functions.forEach((id, function) -> writer.visitField(ACC_PUBLIC, id, "L" + DynamicFunction.class.getCanonicalName().replace('.', '/') + ";", null, null));
 
         writer.visit(V1_8,
                 ACC_PUBLIC,
