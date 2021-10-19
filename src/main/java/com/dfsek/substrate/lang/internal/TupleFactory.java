@@ -31,13 +31,6 @@ public class TupleFactory {
             StringBuilder constructorSig = new StringBuilder("(");
             for (int i = 0; i < args; i++) {
                 constructorSig.append("Ljava/lang/Object;");
-
-                writer.visitField(ACC_PRIVATE | ACC_FINAL,
-                        "param" + i,
-                        "Ljava/lang/Object;",
-                        null,
-                        null);
-
             }
             constructorSig.append(")V");
 
@@ -54,6 +47,31 @@ public class TupleFactory {
                     "<init>",
                     "()V",
                     false);
+
+            for (int i = 0; i < args; i++) {
+                String param = "param" + i;
+                writer.visitField(ACC_PRIVATE | ACC_FINAL,
+                        param,
+                        "Ljava/lang/Object;",
+                        null,
+                        null);
+                constructor.visitVarInsn(ALOAD, 0);
+                constructor.visitVarInsn(ALOAD, i+1);
+                constructor.visitFieldInsn(PUTFIELD, name, param, "Ljava/lang/Object;");
+
+
+                MethodVisitor paramGetter = writer.visitMethod(ACC_PUBLIC | ACC_FINAL,
+                        param, // Constructor method name is <init>
+                        "()Ljava/lang/Object;",
+                        null,
+                        null);
+                paramGetter.visitCode();
+                paramGetter.visitVarInsn(ALOAD, 0);
+                paramGetter.visitFieldInsn(GETFIELD, name, param, "Ljava/lang/Object;");
+                paramGetter.visitInsn(ARETURN);
+                paramGetter.visitMaxs(0, 0);
+            }
+
             constructor.visitInsn(RETURN); // Void return
             constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
 

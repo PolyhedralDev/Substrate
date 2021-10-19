@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 
 public class ScriptTest {
@@ -28,10 +29,12 @@ public class ScriptTest {
     }
 
     @Test
-    public void tupleGen() {
+    public void tupleGen() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         TupleFactory factory = new TupleFactory();
         for (int i = 1; i < 6; i++) {
             factory.generate(i);
         }
+
+        System.out.println(factory.generate(2).getConstructor(Object.class, Object.class).newInstance(new Object(), new Object()));
     }
 }
