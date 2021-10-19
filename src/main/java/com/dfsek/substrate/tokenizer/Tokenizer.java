@@ -13,7 +13,7 @@ public class Tokenizer {
 
     static {
         syntaxSignificant = new HashSet<>();
-        syntaxSignificant.addAll(Arrays.asList(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!')); // Reserved chars
+        syntaxSignificant.addAll(Arrays.asList(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.')); // Reserved chars
     }
 
     private final Lookahead reader;
