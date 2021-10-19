@@ -197,6 +197,27 @@ public class Token {
         /**
          * Type specification token ":"
          */
-        TYPE
+        TYPE,
+        /**
+         * Decimal number type "num
+         */
+        NUM_TYPE,
+        /**
+         * Integer number type "int"
+         */
+        INT_TYPE,
+        /**
+         * Boolean type "bool"
+         */
+        BOOL_TYPE,
+        /**
+         * String type "str"
+         */
+        STRING_TYPE,
+        /**
+         * Function type "fun"
+         */
+        FUN_TYPE
+
     }
 }

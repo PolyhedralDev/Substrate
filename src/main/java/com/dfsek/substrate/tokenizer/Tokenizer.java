@@ -83,35 +83,52 @@ public class Tokenizer {
     }
 
     private Token fetch() throws TokenizerException {
-        while(!reader.current().isEOF() && reader.current().isWhitespace()) reader.consume();
+        while(!reader.current().isEOF() && reader.current().isWhitespace()) {
+            reader.consume();
+        }
 
-        while(reader.matches("//", true)) skipLine(); // Skip line if comment
+        while(reader.matches("//", true)) {
+            skipLine(); // Skip line if comment
+        }
 
-        if(reader.matches("/*", true)) skipTo("*/"); // Skip multi line comment
+        if(reader.matches("/*", true)) {
+            skipTo("*/"); // Skip multi line comment
+        }
 
-        if(reader.current().isEOF()) return null; // EOF
+        if(reader.current().isEOF()) {
+            return null; // EOF
+        }
 
-        if(reader.matches("==", true))
+        if(reader.matches("==", true)) {
             return new Token("==", Token.Type.EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches("!=", true))
+        }
+        if(reader.matches("!=", true)) {
             return new Token("!=", Token.Type.NOT_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches(">=", true))
+        }
+        if(reader.matches(">=", true)) {
             return new Token(">=", Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches("<=", true))
+        }
+        if(reader.matches("<=", true)) {
             return new Token("<=", Token.Type.LESS_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches(">", true))
+        }
+        if(reader.matches(">", true)) {
             return new Token(">", Token.Type.GREATER_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches("<", true))
+        }
+        if(reader.matches("<", true)) {
             return new Token("<", Token.Type.LESS_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+        }
 
 
-        if(reader.matches("||", true))
+        if(reader.matches("||", true)) {
             return new Token("||", Token.Type.BOOLEAN_OR, new Position(reader.getLine(), reader.getIndex()));
-        if(reader.matches("&&", true))
+        }
+        if(reader.matches("&&", true)) {
             return new Token("&&", Token.Type.BOOLEAN_AND, new Position(reader.getLine(), reader.getIndex()));
+        }
 
-        if(reader.matches("->", true))
+        if(reader.matches("->", true)) {
             return new Token("->", Token.Type.ARROW, new Position(reader.getLine(), reader.getIndex()));
+        }
 
         if(reader.matches("..", true)) {
             return new Token("..", Token.Type.RANGE, new Position(reader.getLine(), reader.getIndex()));
@@ -186,20 +203,39 @@ public class Tokenizer {
 
         String tokenString = token.toString();
 
-        if(tokenString.equals("true"))
+        if(tokenString.equals("true")) {
             return new Token(tokenString, Token.Type.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
-        if(tokenString.equals("false"))
+        }
+        if(tokenString.equals("false")) {
             return new Token(tokenString, Token.Type.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
+        }
 
-        if(tokenString.equals("return"))
+        if(tokenString.equals("return")) {
             return new Token(tokenString, Token.Type.RETURN, new Position(reader.getLine(), reader.getIndex()));
-        if(tokenString.equals("continue"))
+        }
+        if(tokenString.equals("continue")) {
             return new Token(tokenString, Token.Type.CONTINUE, new Position(reader.getLine(), reader.getIndex()));
-        if(tokenString.equals("break"))
+        }
+        if(tokenString.equals("break")) {
             return new Token(tokenString, Token.Type.BREAK, new Position(reader.getLine(), reader.getIndex()));
-        if(tokenString.equals("fail"))
+        }
+        if(tokenString.equals("fail")) {
             return new Token(tokenString, Token.Type.FAIL, new Position(reader.getLine(), reader.getIndex()));
+        }
 
+
+        if(tokenString.equals("num")) {
+            return new Token(tokenString, Token.Type.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
+        if(tokenString.equals("bool")) {
+            return new Token(tokenString, Token.Type.BOOL_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
+        if(tokenString.equals("str")) {
+            return new Token(tokenString, Token.Type.STRING_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
+        if(tokenString.equals("fun")) {
+            return new Token(tokenString, Token.Type.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
 
 
         return new Token(tokenString, Token.Type.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
