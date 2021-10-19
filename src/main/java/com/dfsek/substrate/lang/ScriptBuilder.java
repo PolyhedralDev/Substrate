@@ -2,7 +2,6 @@ package com.dfsek.substrate.lang;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
-import com.dfsek.substrate.lang.impl.ScriptBuildData;
 import com.dfsek.substrate.lang.internal.Operation;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -69,14 +68,7 @@ public class ScriptBuilder {
                 null);
         absMethod.visitCode();
 
-        ScriptBuildData data = new ScriptBuildData(implementationClassName);
-        data.initialize(absMethod);
 
-        for (Operation op : ops) {
-            op.apply(absMethod, data);
-        }
-
-        data.finalize(absMethod);
 
         absMethod.visitInsn(RETURN); // Return double at top of stack (operation leaves one double on stack)
 

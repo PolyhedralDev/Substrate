@@ -64,25 +64,13 @@ public class Token {
                 || type.equals(Type.BOOLEAN_OR);
     }
 
-    public boolean isVariableDeclaration() {
-        return type.equals(Type.STRING_VARIABLE)
-                || type.equals(Type.BOOLEAN_VARIABLE)
-                || type.equals(Type.NUMBER_VARIABLE);
-    }
-
-    public boolean isLoopLike() {
-        return type.equals(Type.IF_STATEMENT)
-                || type.equals(Type.WHILE_LOOP)
-                || type.equals(Type.FOR_LOOP);
-    }
-
     public boolean isIdentifier() {
         return type.equals(Type.IDENTIFIER);
     }
 
     public enum Type {
         /**
-         * Function identifier or language keyword
+         * Value identifier
          */
         IDENTIFIER,
 
@@ -99,109 +87,89 @@ public class Token {
          */
         BOOLEAN,
         /**
-         * Beginning of group
+         * Beginning of group "("
          */
         GROUP_BEGIN,
         /**
-         * Ending of group
+         * Ending of group ")"
          */
         GROUP_END,
         /**
-         * End of statement
+         * End of statement ";"
          */
         STATEMENT_END,
         /**
-         * Argument separator
+         * Argument separator ","
          */
         SEPARATOR,
         /**
-         * Beginning of code block
+         * Beginning of code block "{"
          */
         BLOCK_BEGIN,
         /**
-         * End of code block
+         * End of code block "}"
          */
         BLOCK_END,
         /**
-         * assignment operator
+         * assignment operator "="
          */
         ASSIGNMENT,
         /**
-         * Boolean equals operator
+         * Boolean equals operator "=="
          */
         EQUALS_OPERATOR,
         /**
-         * Boolean not equals operator
+         * Boolean not equals operator "!="
          */
         NOT_EQUALS_OPERATOR,
         /**
-         * Boolean greater than operator
+         * Boolean greater than operator ">"
          */
         GREATER_THAN_OPERATOR,
         /**
-         * Boolean less than operator
+         * Boolean less than operator "<"
          */
         LESS_THAN_OPERATOR,
         /**
-         * Boolean greater than or equal to operator
+         * Boolean greater than or equal to operator ">="
          */
         GREATER_THAN_OR_EQUALS_OPERATOR,
         /**
-         * Boolean less than or equal to operator
+         * Boolean less than or equal to operator "<="
          */
         LESS_THAN_OR_EQUALS_OPERATOR,
         /**
-         * Addition/concatenation operator
+         * Addition/concatenation operator "+"
          */
         ADDITION_OPERATOR,
         /**
-         * Subtraction operator
+         * Subtraction operator "-"
          */
         SUBTRACTION_OPERATOR,
         /**
-         * Multiplication operator
+         * Multiplication operator "*"
          */
         MULTIPLICATION_OPERATOR,
         /**
-         * Division operator
+         * Division operator "/"
          */
         DIVISION_OPERATOR,
         /**
-         * Modulo operator.
+         * Modulo operator. "%"
          */
         MODULO_OPERATOR,
         /**
-         * Boolean not operator
+         * Boolean not operator "!"
          */
         BOOLEAN_NOT,
         /**
-         * Boolean or
+         * Boolean or "||"
          */
         BOOLEAN_OR,
         /**
-         * Boolean and
+         * Boolean and "&&
          */
         BOOLEAN_AND,
-        /**
-         * Numeric variable declaration
-         */
-        NUMBER_VARIABLE,
-        /**
-         * String variable declaration
-         */
-        STRING_VARIABLE,
-        /**
-         * Boolean variable declaration
-         */
-        BOOLEAN_VARIABLE,
-        /**
-         * If statement declaration
-         */
-        IF_STATEMENT,
-        /**
-         * While loop declaration
-         */
-        WHILE_LOOP,
         /**
          * Return statement
          */
@@ -219,16 +187,16 @@ public class Token {
          */
         FAIL,
         /**
-         * ID declaration
+         * Arrow token "->"
          */
-        ID,
+        ARROW,
         /**
-         * For loop initializer token
+         * Range token ".."
          */
-        FOR_LOOP,
+        RANGE,
         /**
-         * Else keyword
+         * Type specification token ":"
          */
-        ELSE
+        TYPE
     }
 }

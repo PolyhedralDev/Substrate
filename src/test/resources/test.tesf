@@ -1,32 +1,16 @@
-id "thing";
-
-num a = 3;
-num b = 3.5;
-num c = 4;
-num d;
-num e = 5;
-num f = 5.5 *2 + 2 * 2 / 2;
-bool fdsfds = false;
-
-d = 3245234.234;
-
-f = 4;
-
-str thing = "hello";
-
-//bool thing2 = true;
+doStuff = (a: num, b: num, c: num) -> ((a+b+c), (a > b));
 
 
-thing = "bazinga";
+foo, bar = doStuff(1, 2, 3);
+
+println(foo);
+println(bar);
 
 
-thing = "fsdfsdgsdfrg";
 
-if(3 > a) {
-thing = "dsdf";
+range = (0..5);
 
-if("gdsgdsfgsd" != thing) {
-a = 4;
-}
+(i: range) -> println(i);
 
-}
+iterate(range, i -> println(i));
+
