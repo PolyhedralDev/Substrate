@@ -15,7 +15,10 @@ public class Println implements Function {
 
     @Override
     public void preArgsPrep(MethodVisitor visitor, BuildData data) {
-        visitor.visitFieldInsn(GETSTATIC,  "java/lang/System", "out", "Ljava/io/PrintStream;");
+        visitor.visitFieldInsn(GETSTATIC,
+                "java/lang/System",
+                "out",
+                "Ljava/io/PrintStream;");
     }
 
     @Override
