@@ -19,7 +19,8 @@ public class BlockNode implements Node {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        contents.forEach(node -> node.apply(visitor, data));
+        BuildData scope = data.sub();
+        contents.forEach(node -> node.apply(visitor, scope));
     }
 
     @Override
