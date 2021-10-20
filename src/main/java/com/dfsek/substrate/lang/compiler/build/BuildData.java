@@ -38,6 +38,10 @@ public class BuildData {
         };
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
     private BuildData(DynamicClassLoader classLoader,
                       ClassWriter classWriter,
                       TupleFactory tupleFactory,

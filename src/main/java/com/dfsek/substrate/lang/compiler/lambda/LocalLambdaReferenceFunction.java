@@ -8,14 +8,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
 public class LocalLambdaReferenceFunction implements Function {
-    private final Class<?> lambda;
     private final Signature args;
     private final Signature returnType;
 
     private final int offset;
 
-    public LocalLambdaReferenceFunction(Class<?> lambda, Signature args, Signature returnType, int offset) {
-        this.lambda = lambda;
+    public LocalLambdaReferenceFunction(Signature args, Signature returnType, int offset) {
         this.args = args;
         this.returnType = returnType;
         this.offset = offset;
@@ -40,11 +38,11 @@ public class LocalLambdaReferenceFunction implements Function {
             else ret = "L" + ReflectionUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
         }
 
-        visitor.visitMethodInsn(INVOKEVIRTUAL,
-                ReflectionUtil.internalName(lambda),
+        visitor.visitMethodInsn(INVOKEINTERFACE,
+                ReflectionUtil.internalName(data.lambdaFactory().generate(args, returnType)),
                 "apply",
                 "(" + args.internalDescriptor() + ")" + ret,
-                false);
+                true);
     }
 
     @Override

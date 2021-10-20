@@ -15,26 +15,26 @@ import java.util.List;
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
     private final List<ImmutablePair<String, DataType>> types;
+
+    private final Signature parameters;
     private final Position start;
 
     public LambdaExpressionNode(ExpressionNode content, List<ImmutablePair<String, DataType>> types, Position start) {
         this.content = content;
         this.types = types;
         this.start = start;
-    }
-
-    @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Signature signature = Signature.empty();
 
         for (ImmutablePair<String, DataType> type : types) {
             signature = signature.and(new Signature(type.getRight()));
         }
+        this.parameters = signature;
+    }
 
-        Class<?> lambda = data.lambdaFactory().implement(signature, content.returnType(data), (method, clazz) -> {
-
+    @Override
+    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, content.returnType(data), (method, clazz) -> {
             content.apply(method, data.detach((a, b) -> {}));
-
             method.visitInsn(RETURN);
         });
 
@@ -45,6 +45,9 @@ public class LambdaExpressionNode extends ExpressionNode {
                 "<init>",
                 "()V",
                 false);
+    }
+    public Signature getParameters() {
+        return parameters;
     }
 
     @Override
