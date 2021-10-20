@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ExpressionRule implements Rule {
     private final BasicExpressionRule basicExpressionRule = new BasicExpressionRule();
+    private final TupleRule tupleRule = new TupleRule();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token test = tokenizer.peek();
@@ -21,16 +22,6 @@ public class ExpressionRule implements Rule {
             return basicExpressionRule.assemble(tokenizer, parser);
         }
         // Tuple expression
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
-
-        List<ExpressionNode> args = new ArrayList<>();
-        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-            args.add(assemble(tokenizer, parser));
-            if(ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
-                tokenizer.consume(); // consume separator
-            }
-        }
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END); // Tuples must end with )
-        return new TupleNode(args, test.getPosition());
+        return tupleRule.assemble(tokenizer, parser);
     }
 }

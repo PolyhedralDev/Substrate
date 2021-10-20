@@ -1,0 +1,32 @@
+package com.dfsek.substrate.lang.rules.expression;
+
+import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.TupleNode;
+import com.dfsek.substrate.parser.Parser;
+import com.dfsek.substrate.parser.ParserUtil;
+import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.tokenizer.Tokenizer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TupleRule implements Rule {
+    private final BasicExpressionRule basicExpressionRule = new BasicExpressionRule();
+    @Override
+    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+        Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
+
+        List<ExpressionNode> args = new ArrayList<>();
+        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
+            args.add(basicExpressionRule.assemble(tokenizer, parser));
+            if(ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
+                tokenizer.consume(); // consume separator
+            }
+        }
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END); // Tuples must end with )
+        return new TupleNode(args, begin.getPosition());
+    }
+}
