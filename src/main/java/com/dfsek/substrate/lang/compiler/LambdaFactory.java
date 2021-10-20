@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.internal;
+package com.dfsek.substrate.lang.compiler;
 
 public class LambdaFactory {
     public static final class Signature {

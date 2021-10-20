@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.internal;
+package com.dfsek.substrate.lang.compiler;
 
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import org.apache.commons.io.IOUtils;

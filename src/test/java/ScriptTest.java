@@ -1,6 +1,6 @@
-import com.dfsek.substrate.lang.internal.DataType;
-import com.dfsek.substrate.lang.internal.Signature;
-import com.dfsek.substrate.lang.internal.TupleFactory;
+import com.dfsek.substrate.lang.compiler.DataType;
+import com.dfsek.substrate.lang.compiler.Signature;
+import com.dfsek.substrate.lang.compiler.TupleFactory;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
