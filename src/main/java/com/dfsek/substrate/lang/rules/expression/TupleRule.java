@@ -20,13 +20,25 @@ public class TupleRule implements Rule {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
 
         List<ExpressionNode> args = new ArrayList<>();
-        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
+
+        int groups = 1;
+        while (groups > 0) {
+            while (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) { // sub-groups should just be expanded
+                groups++;
+                tokenizer.consume();
+            }
             args.add(basicExpressionRule.assemble(tokenizer, parser));
-            if(ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
+            while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
+                groups--;
+                if(groups < 0) {
+                    ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // too many close parentheses
+                }
+                tokenizer.consume();
+            }
+            if(ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END, Token.Type.STATEMENT_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }
         }
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END); // Tuples must end with )
         return new TupleNode(args, begin.getPosition());
     }
 }
