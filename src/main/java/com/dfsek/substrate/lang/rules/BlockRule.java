@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.rules;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.BlockNode;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -15,8 +16,10 @@ import java.util.List;
 
 public class BlockRule implements Rule {
     private final StatementRule statementRule = new StatementRule();
+
+    private static final BlockRule INSTANCE = new BlockRule();
     @Override
-    public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         Position begin = tokenizer.peek().getPosition();
@@ -32,6 +35,10 @@ public class BlockRule implements Rule {
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_END); // Block must end.
 
-        return new BlockNode(contents, begin);
+        return new BlockNode(contents, null, begin);
+    }
+
+    public static BlockRule getInstance() {
+        return INSTANCE;
     }
 }

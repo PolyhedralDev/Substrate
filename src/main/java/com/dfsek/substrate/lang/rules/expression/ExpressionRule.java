@@ -10,7 +10,7 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 public class ExpressionRule implements Rule {
     private final BasicExpressionRule basicExpressionRule = new BasicExpressionRule();
     private final TupleRule tupleRule = new TupleRule();
-    private final LambdaExpressionRule lambdaExpressionRule = new LambdaExpressionRule();
+    private final LambdaExpressionRule lambdaExpressionRule = LambdaExpressionRule.getInstance();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token test = tokenizer.peek();
@@ -18,7 +18,7 @@ public class ExpressionRule implements Rule {
             return basicExpressionRule.assemble(tokenizer, parser);
         }
         // Tuple or lambda expression
-        if(tokenizer.peek().isIdentifier()) { // lambda
+        if(tokenizer.peek(1).isIdentifier()) { // lambda
             return lambdaExpressionRule.assemble(tokenizer, parser);
         }
         return tupleRule.assemble(tokenizer, parser);

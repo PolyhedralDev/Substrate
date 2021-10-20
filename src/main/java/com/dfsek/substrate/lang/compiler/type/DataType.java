@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.compiler.type;
 
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
+import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.Opcodes;
 
@@ -118,5 +119,20 @@ public enum DataType {
 
     public int returnInsn() {
         return Opcodes.ARETURN;
+    }
+
+    public static DataType fromToken(Token token) {
+        if(token.getType() == Token.Type.BOOL_TYPE) {
+            return BOOL;
+        } else if(token.getType() == Token.Type.INT_TYPE) {
+            return INT;
+        } else if(token.getType() == Token.Type.STRING_TYPE) {
+            return STR;
+        } else if(token.getType() == Token.Type.NUM_TYPE) {
+            return NUM;
+        } else if(token.getType() == Token.Type.FUN_TYPE) {
+            return FUN;
+        }
+        throw new IllegalArgumentException("Invalid token: " + token);
     }
 }

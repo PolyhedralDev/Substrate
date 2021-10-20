@@ -4,7 +4,6 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.BlockNode;
 import com.dfsek.substrate.parser.Parser;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
@@ -33,6 +32,6 @@ public class BaseRule implements Rule {
             }
         }
 
-        return new BlockNode(contents, begin);
+        return new BlockNode(contents, null, begin);
     }
 }
