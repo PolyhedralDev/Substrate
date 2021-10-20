@@ -84,8 +84,8 @@ public class ScriptBuilder {
         data.getValues().forEach((id, value) -> {
             if(value.ephemeral()) return;
             String descriptor;
-            if(value.type().isSimple()) {
-                descriptor = value.type().getType(0).descriptor();
+            if(value.returnType().isSimple()) {
+                descriptor = value.returnType().getType(0).descriptor();
             } else {
                 descriptor = "Lcom/dfsek/substrate/lang/internal/Tuple;";
             }

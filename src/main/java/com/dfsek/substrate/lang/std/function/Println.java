@@ -30,7 +30,7 @@ public class Println implements Function {
     }
 
     @Override
-    public Signature type() {
+    public Signature returnType() {
         return new Signature();
     }
 }

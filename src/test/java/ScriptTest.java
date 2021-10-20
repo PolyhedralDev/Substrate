@@ -8,6 +8,7 @@ import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +40,9 @@ public class ScriptTest {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         LambdaFactory lambdaFactory = new LambdaFactory(classLoader, new TupleFactory(classLoader));
 
-        lambdaFactory.generate(new Signature(DataType.NUM, DataType.STR, DataType.BOOL), new Signature(DataType.STR, DataType.NUM));
+        lambdaFactory.implement(new Signature(DataType.NUM, DataType.STR, DataType.BOOL), new Signature(DataType.NUM), (method, clazz) -> {
+            method.visitLdcInsn(1.5);
+            method.visitInsn(Opcodes.DRETURN);
+        });
     }
 }

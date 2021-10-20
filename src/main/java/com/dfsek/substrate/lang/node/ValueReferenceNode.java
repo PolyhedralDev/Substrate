@@ -23,16 +23,16 @@ public class ValueReferenceNode extends ExpressionNode {
         }
         Value value = data.getValue(id.getContent());
         int offset = data.offset(id.getContent());
-        if(value.type().isSimple()) {
-            visitor.visitVarInsn(value.type().getType(0).loadInsn(), offset);
+        if(value.returnType().isSimple()) {
+            visitor.visitVarInsn(value.returnType().getType(0).loadInsn(), offset);
         } else {
-            for (int i = 0; i < value.type().size(); i++) {
+            for (int i = 0; i < value.returnType().size(); i++) {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        "com/dfsek/substrate/lang/internal/tuple/TupleIMPL" + value.type().classDescriptor(),
+                        "com/dfsek/substrate/lang/internal/tuple/TupleIMPL" + value.returnType().classDescriptor(),
                         "param" + i,
-                        "()" + value.type().getType(i).descriptor(),
+                        "()" + value.returnType().getType(i).descriptor(),
                         false);
             }
         }
@@ -48,6 +48,6 @@ public class ValueReferenceNode extends ExpressionNode {
         if(!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
-        return data.getValue(id.getContent()).type();
+        return data.getValue(id.getContent()).returnType();
     }
 }

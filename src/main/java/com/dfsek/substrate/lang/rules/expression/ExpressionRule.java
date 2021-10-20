@@ -15,13 +15,17 @@ import java.util.List;
 public class ExpressionRule implements Rule {
     private final BasicExpressionRule basicExpressionRule = new BasicExpressionRule();
     private final TupleRule tupleRule = new TupleRule();
+    private final LambdaExpressionRule lambdaExpressionRule = new LambdaExpressionRule();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token test = tokenizer.peek();
         if(test.isConstant() || test.isIdentifier()) { // simple expression
             return basicExpressionRule.assemble(tokenizer, parser);
         }
-        // Tuple expression
+        // Tuple or lambda expression
+        if(tokenizer.peek().isIdentifier()) { // lambda
+            return lambdaExpressionRule.assemble(tokenizer, parser);
+        }
         return tupleRule.assemble(tokenizer, parser);
     }
 }

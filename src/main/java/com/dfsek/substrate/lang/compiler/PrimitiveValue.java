@@ -10,7 +10,7 @@ public class PrimitiveValue implements Value {
     }
 
     @Override
-    public Signature type() {
+    public Signature returnType() {
         return signature;
     }
 
