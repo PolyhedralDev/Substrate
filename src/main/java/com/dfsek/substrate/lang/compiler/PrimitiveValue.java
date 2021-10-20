@@ -13,4 +13,9 @@ public class PrimitiveValue implements Value {
     public Signature type() {
         return signature;
     }
+
+    @Override
+    public boolean ephemeral() {
+        return false;
+    }
 }

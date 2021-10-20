@@ -1,3 +1,9 @@
+foo = "hello";
+
+bar = 1;
+
+baz = false;
+
 
 println("Hello, World!");
 

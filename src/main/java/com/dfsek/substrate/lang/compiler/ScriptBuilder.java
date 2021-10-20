@@ -1,13 +1,15 @@
-package com.dfsek.substrate.lang;
+package com.dfsek.substrate.lang.compiler;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.BuildData;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import java.io.File;
@@ -68,9 +70,24 @@ public class ScriptBuilder {
         absMethod.visitCode();
 
 
+        Label begin = new Label();
+
         BuildData data = new BuildData(writer);
         data.registerValue("println", new Println());
         ops.forEach(op -> op.apply(absMethod, data));
+
+        Label end = new Label();
+
+        data.getValues().forEach((id, value) -> {
+            if(value.ephemeral()) return;
+            String descriptor;
+            if(value.type().isSimple()) {
+                descriptor = value.type().getType(0).descriptor();
+            } else {
+                descriptor = "Lcom/dfsek/substrate/lang/internal/Tuple;";
+            }
+            absMethod.visitLocalVariable(id, descriptor, null, begin, end, data.offset(id));
+        });
 
         absMethod.visitInsn(RETURN); // Return double at top of stack (operation leaves one double on stack)
 

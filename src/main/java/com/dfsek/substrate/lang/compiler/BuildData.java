@@ -33,6 +33,10 @@ public class BuildData {
         valueOffsets.put(id, offset);
     }
 
+    protected Map<String, Value> getValues() {
+        return values;
+    }
+
     public void registerValue(String id, Value value, int frames) {
         registerValue(id, value);
         offset+=frames;

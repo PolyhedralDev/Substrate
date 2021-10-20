@@ -2,7 +2,7 @@ package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
-import com.dfsek.substrate.lang.ScriptBuilder;
+import com.dfsek.substrate.lang.compiler.ScriptBuilder;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
