@@ -72,7 +72,7 @@ public enum DataType {
     FUN {
         @Override
         public String descriptor() {
-            return "Ljava/lang/Object;";
+            return "Lcom/dfsek/substrate/lang/internal/Lambda;";
         }
     };
 
