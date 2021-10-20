@@ -26,7 +26,7 @@ public class TupleFactory {
                     name,
                     null,
                     "java/lang/Object",
-                    new String[0]);
+                    new String[]{"com/dfsek/substrate/lang/internal/Tuple"});
 
             StringBuilder constructorSig = new StringBuilder("(");
 
