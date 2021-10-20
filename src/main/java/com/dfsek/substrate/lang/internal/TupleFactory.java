@@ -14,12 +14,12 @@ import java.util.Map;
 import static org.objectweb.asm.Opcodes.*;
 
 public class TupleFactory {
-    private static final Map<Integer, Class<?>> generated = new HashMap<>();
+    private static final Map<Signature, Class<?>> generated = new HashMap<>();
 
-    public Class<?> generate(int args) {
+    public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
             ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = "com/dfsek/substrate/lang/internal/tuple/TupleIMPL_" + args;
+            String name = "com/dfsek/substrate/lang/internal/tuple/TupleIMPL" + args;
 
             writer.visit(V1_8,
                     ACC_PUBLIC,
@@ -29,9 +29,9 @@ public class TupleFactory {
                     new String[0]);
 
             StringBuilder constructorSig = new StringBuilder("(");
-            for (int i = 0; i < args; i++) {
-                constructorSig.append("Ljava/lang/Object;");
-            }
+
+            args.forEach( type -> constructorSig.append(type.descriptor()));
+
             constructorSig.append(")V");
 
             MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
@@ -48,27 +48,36 @@ public class TupleFactory {
                     "()V",
                     false);
 
-            for (int i = 0; i < args; i++) {
+            int offset = 1;
+            for (int i = 0; i < args.size(); i++) {
                 String param = "param" + i;
+                DataType argType = args.getType(i);
+
                 writer.visitField(ACC_PRIVATE | ACC_FINAL,
                         param,
-                        "Ljava/lang/Object;",
+                        argType.descriptor(),
                         null,
                         null);
                 constructor.visitVarInsn(ALOAD, 0);
-                constructor.visitVarInsn(ALOAD, i+1);
-                constructor.visitFieldInsn(PUTFIELD, name, param, "Ljava/lang/Object;");
+                constructor.visitVarInsn(argType.loadInsn(), offset++);
+
+                if(argType == DataType.NUM) {
+                    offset++;
+                }
+
+
+                constructor.visitFieldInsn(PUTFIELD, name, param, argType.descriptor());
 
 
                 MethodVisitor paramGetter = writer.visitMethod(ACC_PUBLIC | ACC_FINAL,
                         param, // Constructor method name is <init>
-                        "()Ljava/lang/Object;",
+                        "()" + argType.descriptor(),
                         null,
                         null);
                 paramGetter.visitCode();
                 paramGetter.visitVarInsn(ALOAD, 0);
-                paramGetter.visitFieldInsn(GETFIELD, name, param, "Ljava/lang/Object;");
-                paramGetter.visitInsn(ARETURN);
+                paramGetter.visitFieldInsn(GETFIELD, name, param, argType.descriptor());
+                paramGetter.visitInsn(argType.returnInsn());
                 paramGetter.visitMaxs(0, 0);
             }
 

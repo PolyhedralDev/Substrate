@@ -1,3 +1,5 @@
+import com.dfsek.substrate.lang.internal.DataType;
+import com.dfsek.substrate.lang.internal.Signature;
 import com.dfsek.substrate.lang.internal.TupleFactory;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.Parser;
@@ -31,10 +33,9 @@ public class ScriptTest {
     @Test
     public void tupleGen() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         TupleFactory factory = new TupleFactory();
-        for (int i = 1; i < 6; i++) {
-            factory.generate(i);
-        }
+        factory.generate(new Signature(DataType.BOOL, DataType.FUN, DataType.INT, DataType.NUM, DataType.STR))
+                .getConstructor(boolean.class, Object.class, int.class, double.class, String.class);
 
-        System.out.println(factory.generate(2).getConstructor(Object.class, Object.class).newInstance(new Object(), new Object()));
+        System.out.println(factory.generate(new Signature(DataType.STR, DataType.BOOL)).getConstructor(String.class, boolean.class).newInstance("bazinga", false));
     }
 }
