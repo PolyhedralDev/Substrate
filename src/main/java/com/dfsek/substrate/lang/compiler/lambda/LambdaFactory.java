@@ -48,7 +48,8 @@ public class LambdaFactory {
             String ret = returnType.internalDescriptor();
 
             if(!returnType.isSimple()) {
-                ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
+                if(returnType.equals(Signature.empty())) ret = "V";
+                else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
             MethodVisitor apply = writer.visitMethod(ACC_PUBLIC | ACC_ABSTRACT,
@@ -91,11 +92,9 @@ public class LambdaFactory {
                 "java/lang/Object",
                 new String[]{ReflectionUtil.internalName(pair.getLeft())});
 
-        String constructorSig = "(" + args.internalDescriptor() + ")V";
-
         MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
                 "<init>", // Constructor method name is <init>
-                constructorSig,
+                "()V",
                 null,
                 null);
 
@@ -113,7 +112,8 @@ public class LambdaFactory {
         String ret = returnType.internalDescriptor();
 
         if(!returnType.isSimple()) {
-            ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
+            if(returnType.equals(Signature.empty())) ret = "V";
+            else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
         MethodVisitor apply = writer.visitMethod(ACC_PUBLIC,
