@@ -19,8 +19,6 @@ import java.util.List;
 
 public class LambdaExpressionRule implements Rule {
     private static final LambdaExpressionRule INSTANCE = new LambdaExpressionRule();
-    private final BlockRule blockRule = BlockRule.getInstance();
-    private final ExpressionRule expressionRule = new ExpressionRule();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
@@ -45,9 +43,9 @@ public class LambdaExpressionRule implements Rule {
 
         ExpressionNode expression;
         if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            expression = blockRule.assemble(tokenizer, parser);
+            expression = BlockRule.getInstance().assemble(tokenizer, parser);
         } else {
-            expression = expressionRule.assemble(tokenizer, parser);
+            expression = ExpressionRule.getInstance().assemble(tokenizer, parser);
         }
 
 

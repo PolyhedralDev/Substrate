@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TupleRule implements Rule {
-    private final BasicExpressionRule basicExpressionRule = new BasicExpressionRule();
+    private static final TupleRule INSTANCE = new TupleRule();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
@@ -27,7 +27,7 @@ public class TupleRule implements Rule {
                 groups++;
                 tokenizer.consume();
             }
-            args.add(basicExpressionRule.assemble(tokenizer, parser));
+            args.add(BasicExpressionRule.getInstance().assemble(tokenizer, parser));
             while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
                 groups--;
                 if(groups < 0) {
@@ -40,5 +40,9 @@ public class TupleRule implements Rule {
             }
         }
         return new TupleNode(args, begin.getPosition());
+    }
+
+    public static TupleRule getInstance() {
+        return INSTANCE;
     }
 }

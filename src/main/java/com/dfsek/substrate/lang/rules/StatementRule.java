@@ -10,8 +10,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
 public class StatementRule implements Rule {
-    private final ValueAssignmentRule valueAssignmentRule = new ValueAssignmentRule();
-    private final FunctionInvocationRule functionInvocationRule = new FunctionInvocationRule();
+    private static final StatementRule INSTANCE = new StatementRule();
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token current = tokenizer.peek();
@@ -20,12 +19,16 @@ public class StatementRule implements Rule {
             Token next = tokenizer.peek(1);
             ParserUtil.checkType(next, Token.Type.GROUP_BEGIN, Token.Type.ASSIGNMENT);
             if(next.getType() == Token.Type.GROUP_BEGIN) { // Invoking a function.
-                node = functionInvocationRule.assemble(tokenizer, parser);
+                node = FunctionInvocationRule.getInstance().assemble(tokenizer, parser);
             } else {
-                node = valueAssignmentRule.assemble(tokenizer, parser);
+                node = ValueAssignmentRule.getInstance().assemble(tokenizer, parser);
             }
         } else throw new IllegalArgumentException("not implemented yet");
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // Must finish with statement end token
         return node;
+    }
+
+    public static StatementRule getInstance() {
+        return INSTANCE;
     }
 }

@@ -12,12 +12,16 @@ import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
 public class ValueAssignmentRule implements Rule {
-    private final ExpressionRule expressionRule = new ExpressionRule();
+    private static final ValueAssignmentRule INSTANCE = new ValueAssignmentRule();
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.ASSIGNMENT); // next token should be =
-        ExpressionNode value = expressionRule.assemble(tokenizer, parser);
+        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer, parser);
         return new ValueAssignmentNode(id, value);
+    }
+
+    public static ValueAssignmentRule getInstance() {
+        return INSTANCE;
     }
 }

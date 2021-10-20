@@ -1,6 +1,10 @@
 println("Hello, World!");
 
 thing = (a: num, b: str, c: bool) -> {
+
+    another = (a: str) -> {
+        println(a);
+    }
     println("Test Function");
     println(b);
 };

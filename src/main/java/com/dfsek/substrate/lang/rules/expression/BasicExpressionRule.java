@@ -14,6 +14,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
 public class BasicExpressionRule implements Rule {
+    private static final BasicExpressionRule INSTANCE = new BasicExpressionRule();
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER, Token.Type.STRING, Token.Type.BOOLEAN, Token.Type.NUMBER);
@@ -27,5 +28,9 @@ public class BasicExpressionRule implements Rule {
             ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
             return new ValueReferenceNode(tokenizer.consume());
         }
+    }
+
+    public static BasicExpressionRule getInstance() {
+        return INSTANCE;
     }
 }

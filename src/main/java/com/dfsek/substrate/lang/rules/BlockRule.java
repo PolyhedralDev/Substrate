@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockRule implements Rule {
-    private final StatementRule statementRule = new StatementRule();
 
     private static final BlockRule INSTANCE = new BlockRule();
     @Override
@@ -29,7 +28,7 @@ public class BlockRule implements Rule {
             if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
                 contents.add(this.assemble(tokenizer, parser));
             } else { // Parse a statement.
-                contents.add(statementRule.assemble(tokenizer, parser));
+                contents.add(StatementRule.getInstance().assemble(tokenizer, parser));
             }
         }
 
