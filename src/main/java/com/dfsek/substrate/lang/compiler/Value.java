@@ -1,5 +1,7 @@
 package com.dfsek.substrate.lang.compiler;
 
-public interface Value {
+import org.objectweb.asm.Opcodes;
+
+public interface Value extends Opcodes {
     Signature type();
 }

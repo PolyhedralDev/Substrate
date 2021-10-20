@@ -9,11 +9,15 @@ import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.List;
+
 public class FunctionInvocationNode implements Node {
     private final Token id;
+    private final List<ExpressionNode> arguments;
 
-    public FunctionInvocationNode(Token id) {
+    public FunctionInvocationNode(Token id, List<ExpressionNode> arguments) {
         this.id = id;
+        this.arguments = arguments;
     }
 
     @Override
@@ -25,6 +29,9 @@ public class FunctionInvocationNode implements Node {
         if(!(value instanceof Function)) {
             throw new ParseException("Value \"" + id.getContent() + "\" is not a function.", id.getPosition());
         }
+
+        arguments.forEach(arg -> arg.apply(visitor, data));
+
         ((Function) value).invoke(visitor, data);
     }
 
