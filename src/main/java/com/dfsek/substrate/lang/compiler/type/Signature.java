@@ -83,7 +83,7 @@ public class Signature {
     }
 
     public int frames() {
-        if (this == decimal()) return 2;
+        if (this.equals(decimal())) return 2;
         return 1;
     }
 

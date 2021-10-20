@@ -18,7 +18,7 @@ public class BuildData {
     private final Map<ImmutablePair<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
-    private int offset = 2;
+    private int offset;
 
     private final DynamicClassLoader classLoader;
 
@@ -36,6 +36,7 @@ public class BuildData {
         parent = null;
         interceptor = (a, b) -> {
         };
+        this.offset = 2;
     }
 
     public int getOffset() {
@@ -58,6 +59,7 @@ public class BuildData {
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
+        this.offset = 1;
     }
 
     public LambdaFactory lambdaFactory() {
