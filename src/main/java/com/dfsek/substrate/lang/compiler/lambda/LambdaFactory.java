@@ -35,7 +35,7 @@ public class LambdaFactory {
     public Class<?> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
             ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$" + returnType.classDescriptor();
+            String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor();
 
             writer.visit(V1_8,
                     ACC_PUBLIC | ACC_ABSTRACT | ACC_INTERFACE,
@@ -83,7 +83,7 @@ public class LambdaFactory {
         ImmutablePair<Class<?>, List<Class<?>>> pair = generated.get(args).get(returnType);
 
         ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-        String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$" + returnType.classDescriptor() + "$" + pair.getRight().size();
+        String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().size();
 
         writer.visit(V1_8,
                 ACC_PUBLIC,
