@@ -7,10 +7,9 @@ import com.dfsek.substrate.lang.compiler.Signature;
 import org.objectweb.asm.MethodVisitor;
 
 public class Println implements Function {
-    private final Signature signature = new Signature(DataType.STR);
     @Override
     public Signature arguments() {
-        return signature;
+        return Signature.string();
     }
 
     @Override

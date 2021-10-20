@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.node;
 import com.dfsek.substrate.lang.compiler.BuildData;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.Function;
+import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.lang.compiler.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -32,6 +33,22 @@ public class FunctionInvocationNode implements Node {
         }
 
         Function function = (Function) value;
+
+        Signature argSignature;
+        if(arguments.isEmpty()) {
+            argSignature = Signature.empty();
+        } else if(arguments.size() == 1) {
+            argSignature = arguments.get(0).returnType();
+        } else {
+            argSignature = arguments.get(0).returnType();
+            for (int i = 1; i < arguments.size(); i++) {
+                argSignature = argSignature.and(arguments.get(i).returnType());
+            }
+        }
+
+        if(!argSignature.equals(function.arguments())) {
+            throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
+        }
 
         function.preArgsPrep(visitor, data);
 

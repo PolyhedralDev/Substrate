@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -9,10 +10,16 @@ public class Signature {
     private static final Signature INT = new Signature(DataType.INT);
     private static final Signature DECIMAL = new Signature(DataType.NUM);
     private static final Signature STRING = new Signature(DataType.STR);
+
+    private static final Signature VOID = new Signature();
     private final List<DataType> types;
 
     public Signature(DataType... types) {
         this.types = Arrays.asList(types);
+    }
+
+    public Signature(List<DataType> types) {
+        this.types = types;
     }
 
     public DataType getType(int index) {
@@ -53,6 +60,29 @@ public class Signature {
 
     @Override
     public String toString() {
+        StringBuilder builder = new StringBuilder("(");
+        for (int i = 0; i < types.size(); i++) {
+            builder.append(types.get(i));
+            if(i != types.size()-1) builder.append(',');
+        }
+        return builder.append(')').toString();
+    }
+
+    public Signature and(Signature other) {
+        List<DataType> copy = new ArrayList<>(types);
+        copy.addAll(other.types);
+        return new Signature(copy);
+    }
+
+    public Signature and(Signature... more) {
+        Signature run = this;
+        for (Signature signature : more) {
+            run = run.and(signature);
+        }
+        return run;
+    }
+
+    public String classDescriptor() {
         StringBuilder sig = new StringBuilder();
         types.forEach(type -> sig.append('_').append(type.toString()));
         return sig.toString();
@@ -72,5 +102,9 @@ public class Signature {
 
     public static Signature string() {
         return STRING;
+    }
+
+    public static Signature empty() {
+        return VOID;
     }
 }
