@@ -14,16 +14,17 @@ public class StatementRule implements Rule {
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token current = tokenizer.peek();
+        Node node;
         if(current.getType() == Token.Type.IDENTIFIER) { // We're declaring a value or invoking a function.
-            Token identifier = tokenizer.consume();
             Token next = tokenizer.peek();
             ParserUtil.checkType(next, Token.Type.GROUP_BEGIN, Token.Type.ASSIGNMENT);
             if(next.getType() == Token.Type.GROUP_BEGIN) { // Invoking a function.
-
+                node = functionInvocationRule.assemble(tokenizer, parser);
             } else {
-
+                node = valueAssignmentRule.assemble(tokenizer, parser);
             }
-        }
-        return null;
+        } else throw new IllegalArgumentException("not implemented yet");
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // Must finish with statement end token
+        return node;
     }
 }
