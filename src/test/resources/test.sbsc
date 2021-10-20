@@ -1,7 +1,4 @@
-doStuff = (a: num, b: num, c: num) -> ((a+b+c), (a > b));
-
-
-foo, bar = doStuff(1, 2, 3);
+foo = (1.5, true);
 
 println(foo);
-println(bar);
+

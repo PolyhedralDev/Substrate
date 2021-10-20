@@ -13,24 +13,25 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockRule implements Rule {
+/**
+ * The base rule of the parser.
+ */
+public class BaseRule implements Rule {
     private final StatementRule statementRule = new StatementRule();
+    private final BlockRule blockRule = new BlockRule();
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         Position begin = tokenizer.peek().getPosition();
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_BEGIN); // Block beginning
 
-        while (tokenizer.peek().getType() != Token.Type.BLOCK_END) {
+        while (tokenizer.hasNext()) {
             if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(this.assemble(tokenizer, parser));
+                contents.add(blockRule.assemble(tokenizer, parser));
             } else { // Parse a statement.
                 contents.add(statementRule.assemble(tokenizer, parser));
             }
         }
-
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_END); // Block must end.
 
         return new BlockNode(contents, begin);
     }
