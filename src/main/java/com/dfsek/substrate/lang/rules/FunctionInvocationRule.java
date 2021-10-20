@@ -17,7 +17,7 @@ import java.util.List;
 public class FunctionInvocationRule implements Rule {
     private static final FunctionInvocationRule INSTANCE = new FunctionInvocationRule();
     @Override
-    public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 

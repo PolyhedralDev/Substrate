@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -13,7 +14,11 @@ public class ExpressionRule implements Rule {
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token test = tokenizer.peek();
         if(test.isConstant() || test.isIdentifier()) { // simple expression
-            return BasicExpressionRule.getInstance().assemble(tokenizer, parser);
+            if(tokenizer.peek(1).getType() == Token.Type.GROUP_BEGIN) {
+                return FunctionInvocationRule.getInstance().assemble(tokenizer, parser);
+            } else {
+                return BasicExpressionRule.getInstance().assemble(tokenizer, parser);
+            }
         }
         // Tuple or lambda expression
         if(tokenizer.peek(1).isIdentifier()) { // lambda

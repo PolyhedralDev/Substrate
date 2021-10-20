@@ -12,7 +12,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
 
-public class FunctionInvocationNode implements Node {
+public class FunctionInvocationNode extends ExpressionNode {
     private final Token id;
     private final List<ExpressionNode> arguments;
 
@@ -59,5 +59,10 @@ public class FunctionInvocationNode implements Node {
     @Override
     public Position getPosition() {
         return id.getPosition();
+    }
+
+    @Override
+    public Signature returnType(BuildData data) {
+        return data.getValue(id.getContent()).returnType();
     }
 }
