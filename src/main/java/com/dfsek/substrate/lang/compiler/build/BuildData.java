@@ -24,6 +24,8 @@ public class BuildData {
 
     private final ClassWriter classWriter;
 
+    private final ValueInterceptor interceptor;
+
     public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
@@ -32,6 +34,8 @@ public class BuildData {
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
+        interceptor = (a, b) -> {
+        };
     }
 
     private BuildData(DynamicClassLoader classLoader,
@@ -40,7 +44,8 @@ public class BuildData {
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
                       Map<ImmutablePair<BuildData, String>, Integer> valueOffsets,
-                      BuildData parent) {
+                      BuildData parent,
+                      ValueInterceptor interceptor) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
@@ -48,6 +53,7 @@ public class BuildData {
         this.values = values;
         this.valueOffsets = valueOffsets;
         this.parent = parent;
+        this.interceptor = interceptor;
     }
 
     public LambdaFactory lambdaFactory() {
@@ -59,9 +65,11 @@ public class BuildData {
     }
 
     public void registerValue(String id, Value value) {
-        if(values.containsKey(id)) throw new IllegalArgumentException("Value with identifier \"" + id + "\" already registered.");
+        if (values.containsKey(id))
+            throw new IllegalArgumentException("Value with identifier \"" + id + "\" already registered.");
         values.put(id, value);
         valueOffsets.put(ImmutablePair.of(this, id), offset);
+        interceptor.register(id, value);
     }
 
     protected Map<String, Value> getValues() {
@@ -70,16 +78,16 @@ public class BuildData {
 
     public void registerValue(String id, Value value, int frames) {
         registerValue(id, value);
-        offset+=frames;
+        offset += frames;
     }
 
     public Value getValue(String id) {
-        if(!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
+        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
         return values.get(id);
     }
 
     public int offset(String id) {
-        if(!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
+        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
 
         BuildData test = this;
         while (!valueOffsets.containsKey(ImmutablePair.of(test, id))) test = test.parent;
@@ -102,16 +110,19 @@ public class BuildData {
                 lambdaFactory,
                 new HashMap<>(values), // new scope
                 valueOffsets, // but same JVM scope
-                this);
+                this,
+                (a, b) -> {
+                });
     }
 
-    public BuildData detach() {
+    public BuildData detach(ValueInterceptor interceptor) {
         return new BuildData(classLoader,
                 classWriter,
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
                 new HashMap<>(), // *and* different JVM scope
-                this);
+                this,
+                interceptor);
     }
 }
