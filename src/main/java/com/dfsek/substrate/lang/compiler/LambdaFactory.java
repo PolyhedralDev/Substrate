@@ -76,12 +76,12 @@ public class LambdaFactory {
     }
 
     public Class<?> implement(Signature args, Signature returnType, BiConsumer<MethodVisitor, ClassWriter> consumer) {
-        Class<?> iface = generate(args, returnType);
+        generate(args, returnType);
 
         ImmutablePair<Class<?>, List<Class<?>>> pair = generated.get(args).get(returnType);
 
         ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-        String name = ReflectionUtil.internalName(Lambda.class) + "IMPL" + args.classDescriptor() + "$" + returnType.classDescriptor() + "$" + pair.getRight().size();
+        String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$" + returnType.classDescriptor() + "$" + pair.getRight().size();
 
         writer.visit(V1_8,
                 ACC_PUBLIC,
