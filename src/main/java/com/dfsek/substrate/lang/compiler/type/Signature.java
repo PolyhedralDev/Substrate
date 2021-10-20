@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.type;
 
 import java.util.ArrayList;
 import java.util.Arrays;

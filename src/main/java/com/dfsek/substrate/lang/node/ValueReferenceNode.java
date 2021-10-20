@@ -1,8 +1,8 @@
 package com.dfsek.substrate.lang.node;
 
-import com.dfsek.substrate.lang.compiler.BuildData;
-import com.dfsek.substrate.lang.compiler.Signature;
-import com.dfsek.substrate.lang.compiler.Value;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;

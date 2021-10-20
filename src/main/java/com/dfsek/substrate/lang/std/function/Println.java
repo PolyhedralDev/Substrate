@@ -1,9 +1,8 @@
 package com.dfsek.substrate.lang.std.function;
 
-import com.dfsek.substrate.lang.compiler.BuildData;
-import com.dfsek.substrate.lang.compiler.DataType;
-import com.dfsek.substrate.lang.compiler.Function;
-import com.dfsek.substrate.lang.compiler.Signature;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import org.objectweb.asm.MethodVisitor;
 
 public class Println implements Function {

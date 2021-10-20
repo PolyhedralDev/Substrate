@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.build;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;

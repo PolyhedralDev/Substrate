@@ -1,5 +1,7 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.tuple;
 
+import com.dfsek.substrate.lang.compiler.type.DataType;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.ReflectionUtil;

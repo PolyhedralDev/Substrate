@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.node;
 
 import com.dfsek.substrate.lang.Node;
-import com.dfsek.substrate.lang.compiler.BuildData;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;

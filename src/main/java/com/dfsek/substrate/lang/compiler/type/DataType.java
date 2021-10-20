@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.type;
 
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;

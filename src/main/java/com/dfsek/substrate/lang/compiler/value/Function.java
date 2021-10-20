@@ -1,5 +1,7 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.value;
 
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 

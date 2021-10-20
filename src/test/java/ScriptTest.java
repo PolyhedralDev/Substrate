@@ -1,7 +1,7 @@
-import com.dfsek.substrate.lang.compiler.DataType;
-import com.dfsek.substrate.lang.compiler.LambdaFactory;
-import com.dfsek.substrate.lang.compiler.Signature;
-import com.dfsek.substrate.lang.compiler.TupleFactory;
+import com.dfsek.substrate.lang.compiler.type.DataType;
+import com.dfsek.substrate.lang.compiler.lambda.LambdaFactory;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.Parser;
