@@ -63,10 +63,9 @@ public class TupleFactory {
                 constructor.visitVarInsn(ALOAD, 0);
                 constructor.visitVarInsn(argType.loadInsn(), offset++);
 
-                if(argType == DataType.NUM) {
+                if(argType == DataType.NUM) { // double takes up 2 frames
                     offset++;
                 }
-
 
                 constructor.visitFieldInsn(PUTFIELD, name, param, argType.descriptor());
 
