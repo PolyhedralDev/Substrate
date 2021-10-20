@@ -16,7 +16,7 @@ public class StatementRule implements Rule {
         Token current = tokenizer.peek();
         Node node;
         if(current.getType() == Token.Type.IDENTIFIER) { // We're declaring a value or invoking a function.
-            Token next = tokenizer.peek();
+            Token next = tokenizer.peek(1);
             ParserUtil.checkType(next, Token.Type.GROUP_BEGIN, Token.Type.ASSIGNMENT);
             if(next.getType() == Token.Type.GROUP_BEGIN) { // Invoking a function.
                 node = functionInvocationRule.assemble(tokenizer, parser);

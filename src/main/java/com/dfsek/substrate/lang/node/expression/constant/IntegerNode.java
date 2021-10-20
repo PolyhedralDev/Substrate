@@ -6,7 +6,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
 public class IntegerNode extends ConstantExpressionNode {
-    protected IntegerNode(Token token) {
+    public IntegerNode(Token token) {
         super(token);
     }
 

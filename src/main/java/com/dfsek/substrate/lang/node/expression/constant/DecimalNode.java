@@ -6,7 +6,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
 public class DecimalNode extends ConstantExpressionNode {
-    protected DecimalNode(Token token) {
+    public DecimalNode(Token token) {
         super(token);
     }
 

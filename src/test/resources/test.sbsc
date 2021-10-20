@@ -1,4 +1,2 @@
-foo = (1.5, true);
-
-println(foo);
+println("foo");
 

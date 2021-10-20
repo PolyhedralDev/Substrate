@@ -2,6 +2,7 @@ import com.dfsek.substrate.lang.compiler.DataType;
 import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.lang.compiler.TupleFactory;
 import com.dfsek.substrate.lang.internal.Lambda;
+import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -17,7 +18,7 @@ public class ScriptTest {
     @Test
     public void script() throws IOException, ParseException {
         String data = IOUtils.toString(ScriptTest.class.getResource("/test.sbsc"), StandardCharsets.UTF_8);
-        Parser parser = new Parser(data, new BlockRule());
+        Parser parser = new Parser(data, new BaseRule());
 
         parser.parse().execute(null);
     }

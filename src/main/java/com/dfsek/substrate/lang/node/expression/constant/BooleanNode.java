@@ -6,7 +6,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
 public class BooleanNode extends ConstantExpressionNode {
-    protected BooleanNode(Token token) {
+    public BooleanNode(Token token) {
         super(token);
     }
 
