@@ -122,8 +122,12 @@ public class LambdaFactory {
                 null,
                 null);
 
+        int size = pair.getRight().size();
+        pair.getRight().add(null); // temp value
+
         consumer.accept(apply, writer);
         apply.visitMaxs(0, 0);
+
 
         byte[] bytes = writer.toByteArray();
 
@@ -139,7 +143,7 @@ public class LambdaFactory {
         }
 
         Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), writer.toByteArray());
-        pair.getRight().add(clazz);
+        pair.getRight().set(size, clazz);
         return clazz;
     }
 }

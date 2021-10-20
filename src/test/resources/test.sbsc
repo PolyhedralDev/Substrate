@@ -1,6 +1,7 @@
 println("Hello, World!");
 
-
+third1 = (f: str) -> println(f);
+third2 = (f: str) -> println(f);
 
 thing = (a: num, b: str, c: bool) -> {
     another = (d: str) -> {
