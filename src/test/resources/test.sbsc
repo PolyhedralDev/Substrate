@@ -1,23 +1,20 @@
-println("Hello, World!");
 
-third1 = (f: str) -> println(f);
-third2 = (f: str) -> println(f);
+g = 3;
+
+h = "bazinga";
 
 thing = (a: num, b: str, c: bool) -> {
-    another = (d: str) -> {
-        third = (f: str) -> println(f);
-        println(d);
-
-
-
-        third(d);
-    };
-
-    another(b);
-
-    println("Test Function");
+    testVar = 3;
     println(b);
+
+    thing2 = (d: str) -> println(d);
+
+    thing2("bazinga");
+    thing2(b);
 };
 
-thing(1.2, "hello", false);
+tupleTest = (5, "hello");
 
+thing(tupleTest, false);
+
+println(h);
