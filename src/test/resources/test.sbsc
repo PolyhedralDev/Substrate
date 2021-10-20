@@ -4,7 +4,6 @@ bar = 1;
 
 baz = false;
 
-
 println("Hello, World!");
 
 println("bazinga");

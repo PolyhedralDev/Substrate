@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.rules;
+package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.ValueReferenceNode;
