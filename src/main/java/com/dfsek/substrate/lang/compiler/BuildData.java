@@ -22,7 +22,7 @@ public class BuildData {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
-        lambdaFactory = new LambdaFactory(classLoader);
+        lambdaFactory = new LambdaFactory(classLoader, tupleFactory);
     }
 
     public LambdaFactory lambdaFactory() {

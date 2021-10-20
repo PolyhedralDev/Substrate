@@ -1,17 +1,15 @@
 import com.dfsek.substrate.lang.compiler.DataType;
+import com.dfsek.substrate.lang.compiler.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.lang.compiler.TupleFactory;
-import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Tokenizer;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 
 public class ScriptTest {
@@ -34,5 +32,13 @@ public class ScriptTest {
     @Test
     public void scope() throws IOException {
         script("/scope.sbsc");
+    }
+
+    @Test
+    public void lambda() {
+        DynamicClassLoader classLoader = new DynamicClassLoader();
+        LambdaFactory lambdaFactory = new LambdaFactory(classLoader, new TupleFactory(classLoader));
+
+        lambdaFactory.generate(new Signature(DataType.NUM, DataType.STR, DataType.BOOL), new Signature(DataType.STR, DataType.NUM));
     }
 }
