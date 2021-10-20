@@ -12,10 +12,6 @@ public interface Node extends Opcodes {
 
     }
 
-    default ReturnType getType() {
-        return ReturnType.VOID;
-    }
-
     enum ReturnType {
         VOID, STR, BOOL, NUM, INT, FUN, TUP, LIST, DICT
     }
