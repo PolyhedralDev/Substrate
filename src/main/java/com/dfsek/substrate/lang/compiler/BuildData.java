@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class BuildData {
     private final TupleFactory tupleFactory;
-    private final LambdaFactory lambdaFactory = new LambdaFactory();
+    private final LambdaFactory lambdaFactory;
 
     private final Map<String, Value> values = new HashMap<>();
     private final Map<String, Integer> valueOffsets = new HashMap<>();
@@ -22,6 +22,7 @@ public class BuildData {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
+        lambdaFactory = new LambdaFactory(classLoader);
     }
 
     public LambdaFactory lambdaFactory() {
