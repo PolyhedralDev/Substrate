@@ -5,3 +5,4 @@ thing = (a: num, b: str, c: bool) -> {
     println("bazinga");
 };
 
+thing(1.2, "hello", false);
