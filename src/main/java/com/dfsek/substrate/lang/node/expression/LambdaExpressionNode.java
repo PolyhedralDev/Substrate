@@ -32,6 +32,9 @@ public class LambdaExpressionNode extends ExpressionNode {
         }
 
         Class<?> lambda = data.lambdaFactory().implement(signature, content.returnType(data), (method, clazz) -> {
+
+            content.apply(method, data.detach((a, b) -> {}));
+
             method.visitInsn(RETURN);
         });
 
