@@ -68,7 +68,7 @@ public class ScriptBuilder {
         absMethod.visitCode();
 
 
-        BuildData data = new BuildData();
+        BuildData data = new BuildData(writer);
         data.registerValue("println", new Println());
         ops.forEach(op -> op.apply(absMethod, data));
 

@@ -82,6 +82,15 @@ public class Signature {
         return run;
     }
 
+    public int frames() {
+        if(this == decimal()) return 2;
+        return 1;
+    }
+
+    public boolean isSimple() {
+        return this.types.size() == 1;
+    }
+
     public String classDescriptor() {
         StringBuilder sig = new StringBuilder();
         types.forEach(type -> sig.append('_').append(type.toString()));
