@@ -1,6 +1,8 @@
 package com.dfsek.substrate.lang.compiler;
 
+import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
+import com.dfsek.substrate.util.ReflectionUtil;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -25,14 +27,14 @@ public class TupleFactory {
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
             ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = "com/dfsek/substrate/lang/internal/tuple/TupleIMPL" + args.classDescriptor();
+            String name = ReflectionUtil.internalName(Tuple.class) + "IMPL_" + args.classDescriptor();
 
             writer.visit(V1_8,
                     ACC_PUBLIC,
                     name,
                     null,
                     "java/lang/Object",
-                    new String[]{"com/dfsek/substrate/lang/internal/Tuple"});
+                    new String[]{ReflectionUtil.internalName(Tuple.class)});
 
             String constructorSig = "(" + args.internalDescriptor() + ")V";
 

@@ -1,5 +1,8 @@
 package com.dfsek.substrate.lang.compiler;
 
+import com.dfsek.substrate.lang.internal.Lambda;
+import com.dfsek.substrate.lang.internal.Tuple;
+import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.Opcodes;
 
 public enum DataType {
@@ -7,6 +10,11 @@ public enum DataType {
         @Override
         public String descriptor() {
             return "I";
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'I';
         }
 
         @Override
@@ -30,6 +38,11 @@ public enum DataType {
         }
 
         @Override
+        public char descriptorChar() {
+            return 'N';
+        }
+
+        @Override
         public int loadInsn() {
             return Opcodes.DLOAD;
         }
@@ -48,11 +61,21 @@ public enum DataType {
         public String descriptor() {
             return "Ljava/lang/String;";
         }
+
+        @Override
+        public char descriptorChar() {
+            return 'S';
+        }
     },
     BOOL {
         @Override
         public String descriptor() {
             return "Z";
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'Z';
         }
 
         @Override
@@ -72,11 +95,18 @@ public enum DataType {
     FUN {
         @Override
         public String descriptor() {
-            return "Lcom/dfsek/substrate/lang/internal/Lambda;";
+            return ReflectionUtil.internalName(Lambda.class);
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'F';
         }
     };
 
     public abstract String descriptor();
+
+    public abstract char descriptorChar();
 
     public int loadInsn() {
         return Opcodes.ALOAD;

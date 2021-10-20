@@ -93,7 +93,7 @@ public class Signature {
 
     public String classDescriptor() {
         StringBuilder sig = new StringBuilder();
-        types.forEach(type -> sig.append('_').append(type.toString()));
+        types.forEach(type -> sig.append(type.descriptorChar()));
         return sig.toString();
     }
 
