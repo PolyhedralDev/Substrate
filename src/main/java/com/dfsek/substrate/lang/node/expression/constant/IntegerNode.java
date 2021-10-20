@@ -38,7 +38,7 @@ public class IntegerNode extends ConstantExpressionNode {
     }
 
     @Override
-    public Signature returnType() {
+    public Signature returnType(BuildData data) {
         return Signature.integer();
     }
 }

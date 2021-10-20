@@ -8,3 +8,5 @@ baz = false;
 println("Hello, World!");
 
 println("bazinga");
+
+println(foo);

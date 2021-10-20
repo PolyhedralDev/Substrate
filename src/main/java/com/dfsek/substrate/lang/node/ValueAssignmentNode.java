@@ -24,11 +24,11 @@ public class ValueAssignmentNode implements Node {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
 
-        data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(), id.getContent()), value.returnType().frames());
+        data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data), id.getContent()), value.returnType(data).frames());
         value.apply(visitor, data);
         int offset = data.offset(id.getContent());
-        if(value.returnType().isSimple()) {
-            visitor.visitVarInsn(value.returnType().getType(0).storeInsn(), offset);
+        if(value.returnType(data).isSimple()) {
+            visitor.visitVarInsn(value.returnType(data).getType(0).storeInsn(), offset);
         } else {
             visitor.visitVarInsn(ASTORE, offset);
         }

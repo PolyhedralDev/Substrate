@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.node;
+package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.BuildData;
 import com.dfsek.substrate.lang.Node;
@@ -38,11 +38,11 @@ public class FunctionInvocationNode implements Node {
         if(arguments.isEmpty()) {
             argSignature = Signature.empty();
         } else if(arguments.size() == 1) {
-            argSignature = arguments.get(0).returnType();
+            argSignature = arguments.get(0).returnType(data);
         } else {
-            argSignature = arguments.get(0).returnType();
+            argSignature = arguments.get(0).returnType(data);
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).returnType());
+                argSignature = argSignature.and(arguments.get(i).returnType(data));
             }
         }
 

@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.node.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
@@ -20,6 +21,8 @@ public class ExpressionRule implements Rule {
             return new BooleanNode(tokenizer.consume());
         } else if(test.getType() == Token.Type.NUMBER) {
             return new DecimalNode(tokenizer.consume());
+        } else if(test.getType() == Token.Type.IDENTIFIER) {
+            return new ValueReferenceNode(tokenizer.consume());
         }
         throw new IllegalArgumentException("todo");
     }

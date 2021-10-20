@@ -21,7 +21,7 @@ public class BooleanNode extends ConstantExpressionNode {
         }
     }
 
-    public Signature returnType() {
+    public Signature returnType(BuildData data) {
         return Signature.bool();
     }
 }
