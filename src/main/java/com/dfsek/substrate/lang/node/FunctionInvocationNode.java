@@ -31,6 +31,8 @@ public class FunctionInvocationNode implements Node {
             throw new ParseException("Value \"" + id.getContent() + "\" is not a function.", id.getPosition());
         }
 
+        ((Function) value).preArgsPrep(visitor, data);
+
         arguments.forEach(arg -> arg.apply(visitor, data));
 
         ((Function) value).invoke(visitor, data);

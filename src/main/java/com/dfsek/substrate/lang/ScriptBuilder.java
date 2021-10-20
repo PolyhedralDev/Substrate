@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.compiler.BuildData;
+import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
@@ -68,6 +69,7 @@ public class ScriptBuilder {
 
 
         BuildData data = new BuildData();
+        data.registerValue("println", new Println());
         ops.forEach(op -> op.apply(absMethod, data));
 
         absMethod.visitInsn(RETURN); // Return double at top of stack (operation leaves one double on stack)

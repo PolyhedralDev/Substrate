@@ -14,10 +14,14 @@ public class Println implements Function {
     }
 
     @Override
+    public void preArgsPrep(MethodVisitor visitor, BuildData data) {
+        visitor.visitFieldInsn(GETSTATIC,  "java/lang/System", "out", "Ljava/io/PrintStream;");
+    }
+
+    @Override
     public void invoke(MethodVisitor visitor, BuildData data) {
-        visitor.visitFieldInsn(GETSTATIC, "Ljava/lang/System;", "out", null);
         visitor.visitMethodInsn(INVOKEVIRTUAL,
-                "Ljava/io/PrintStream",
+                "java/io/PrintStream",
                 "println",
                 "(Ljava/lang/String;)V",
                 false);
