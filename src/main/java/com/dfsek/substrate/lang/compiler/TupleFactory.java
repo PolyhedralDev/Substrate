@@ -28,15 +28,11 @@ public class TupleFactory {
                     "java/lang/Object",
                     new String[]{"com/dfsek/substrate/lang/internal/Tuple"});
 
-            StringBuilder constructorSig = new StringBuilder("(");
-
-            args.forEach( type -> constructorSig.append(type.descriptor()));
-
-            constructorSig.append(")V");
+            String constructorSig = "(" + args.internalDescriptor() + ")V";
 
             MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
                     "<init>", // Constructor method name is <init>
-                    constructorSig.toString(),
+                    constructorSig,
                     null,
                     null);
 

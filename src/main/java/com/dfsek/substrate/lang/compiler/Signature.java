@@ -46,13 +46,13 @@ public class Signature {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Signature)) return false;
+        if (!(obj instanceof Signature)) return false;
         Signature that = (Signature) obj;
 
-        if(this.size() != that.size()) return false;
+        if (this.size() != that.size()) return false;
 
         for (int i = 0; i < this.types.size(); i++) {
-            if(this.types.get(i) != that.types.get(i)) return false;
+            if (this.types.get(i) != that.types.get(i)) return false;
         }
 
         return true;
@@ -63,7 +63,7 @@ public class Signature {
         StringBuilder builder = new StringBuilder("(");
         for (int i = 0; i < types.size(); i++) {
             builder.append(types.get(i));
-            if(i != types.size()-1) builder.append(',');
+            if (i != types.size() - 1) builder.append(',');
         }
         return builder.append(')').toString();
     }
@@ -83,7 +83,7 @@ public class Signature {
     }
 
     public int frames() {
-        if(this == decimal()) return 2;
+        if (this == decimal()) return 2;
         return 1;
     }
 
@@ -94,6 +94,14 @@ public class Signature {
     public String classDescriptor() {
         StringBuilder sig = new StringBuilder();
         types.forEach(type -> sig.append('_').append(type.toString()));
+        return sig.toString();
+    }
+
+    public String internalDescriptor() {
+        StringBuilder sig = new StringBuilder();
+
+        types.forEach(type -> sig.append(type.descriptor()));
+
         return sig.toString();
     }
 
