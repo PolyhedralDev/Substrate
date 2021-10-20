@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -34,7 +35,14 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.returnType(data), (method, clazz) -> {
-            content.apply(method, data.detach((a, b) -> {}));
+            BuildData delegate = data.detach((a, b) -> {});
+
+            types.forEach(pair -> {
+                Signature signature = new Signature(pair.getRight());
+                delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+            });
+
+            content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
 

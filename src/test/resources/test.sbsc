@@ -2,7 +2,7 @@ println("Hello, World!");
 
 thing = (a: num, b: str, c: bool) -> {
     println("Test Function");
-    println("bazinga");
+    println(b);
 };
 
 thing(1.2, "hello", false);
