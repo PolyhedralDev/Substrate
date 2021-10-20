@@ -1,22 +1,27 @@
 package com.dfsek.substrate.lang.compiler;
 
+import com.dfsek.substrate.parser.DynamicClassLoader;
 import org.objectweb.asm.ClassWriter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BuildData {
-    private final TupleFactory tupleFactory = new TupleFactory();
+    private final TupleFactory tupleFactory;
     private final LambdaFactory lambdaFactory = new LambdaFactory();
 
     private final Map<String, Value> values = new HashMap<>();
     private final Map<String, Integer> valueOffsets = new HashMap<>();
     private int offset = 2;
 
+    private final DynamicClassLoader classLoader;
+
     private final ClassWriter classWriter;
 
-    public BuildData(ClassWriter classWriter) {
+    public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter) {
+        this.classLoader = classLoader;
         this.classWriter = classWriter;
+        tupleFactory = new TupleFactory(classLoader);
     }
 
     public LambdaFactory lambdaFactory() {

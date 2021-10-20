@@ -14,7 +14,13 @@ import java.util.Map;
 import static org.objectweb.asm.Opcodes.*;
 
 public class TupleFactory {
-    private static final Map<Signature, Class<?>> generated = new HashMap<>();
+    private final Map<Signature, Class<?>> generated = new HashMap<>();
+
+    private final DynamicClassLoader classLoader;
+
+    public TupleFactory(DynamicClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
 
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
@@ -94,7 +100,7 @@ public class TupleFactory {
                 }
             }
 
-            return new DynamicClassLoader().defineClass(name.replace('/', '.'), writer.toByteArray());
+            return classLoader.defineClass(name.replace('/', '.'), writer.toByteArray());
         });
     }
 }

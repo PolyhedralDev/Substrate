@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.compiler;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
-import com.dfsek.substrate.lang.compiler.BuildData;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -72,7 +71,9 @@ public class ScriptBuilder {
 
         Label begin = new Label();
 
-        BuildData data = new BuildData(writer);
+        DynamicClassLoader classLoader = new DynamicClassLoader();
+
+        BuildData data = new BuildData(classLoader, writer);
         data.registerValue("println", new Println());
         ops.forEach(op -> op.apply(absMethod, data));
 
@@ -107,7 +108,7 @@ public class ScriptBuilder {
             }
         }
 
-        Class<?> clazz = new DynamicClassLoader().defineClass(implementationClassName.replace('/', '.'), writer.toByteArray());
+        Class<?> clazz = classLoader.defineClass(implementationClassName.replace('/', '.'), writer.toByteArray());
 
         builds++;
         try {

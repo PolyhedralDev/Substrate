@@ -3,7 +3,7 @@ import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.lang.compiler.TupleFactory;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.lang.rules.BlockRule;
+import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Tokenizer;
@@ -34,7 +34,7 @@ public class ScriptTest {
 
     @Test
     public void tupleGen() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        TupleFactory factory = new TupleFactory();
+        TupleFactory factory = new TupleFactory(new DynamicClassLoader());
         factory.generate(new Signature(DataType.BOOL, DataType.FUN, DataType.INT, DataType.NUM, DataType.STR))
                 .getConstructor(boolean.class, Lambda.class, int.class, double.class, String.class);
 
