@@ -12,9 +12,5 @@ public interface Node extends Opcodes {
 
     }
 
-    enum ReturnType {
-        VOID, STR, BOOL, NUM, INT, FUN, TUP, LIST, DICT
-    }
-
     Position getPosition();
 }

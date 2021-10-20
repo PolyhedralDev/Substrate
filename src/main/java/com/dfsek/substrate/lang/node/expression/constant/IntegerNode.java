@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression.constant;
 
 import com.dfsek.substrate.lang.compiler.BuildData;
+import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
@@ -34,5 +35,10 @@ public class IntegerNode extends ConstantExpressionNode {
         } else {
             visitor.visitLdcInsn(i); // constant pool
         }
+    }
+
+    @Override
+    public Signature returnType() {
+        return Signature.integer();
     }
 }

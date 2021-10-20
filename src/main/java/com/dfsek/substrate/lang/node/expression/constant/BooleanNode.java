@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression.constant;
 
 import com.dfsek.substrate.lang.compiler.BuildData;
+import com.dfsek.substrate.lang.compiler.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
@@ -18,5 +19,9 @@ public class BooleanNode extends ConstantExpressionNode {
         } else {
             visitor.visitInsn(ICONST_0); // false
         }
+    }
+
+    public Signature returnType() {
+        return Signature.bool();
     }
 }
