@@ -1,21 +1,18 @@
 println("Hello, World!");
 
-third = (f: str) -> println(f);
 
-third("bazinga");
 
 thing = (a: num, b: str, c: bool) -> {
-    another = (d: str, e: num) -> {
+    another = (d: str) -> {
+        third = (f: str) -> println(f);
         println(d);
-        //println(b);
 
 
 
-        //third(d);
-
+        third(d);
     };
 
-    another(b, 2);
+    another(b);
 
     println("Test Function");
     println(b);

@@ -10,13 +10,12 @@ import org.objectweb.asm.MethodVisitor;
 public class LocalLambdaReferenceFunction implements Function {
     private final Signature args;
     private final Signature returnType;
+    private final String id;
 
-    private final int offset;
-
-    public LocalLambdaReferenceFunction(Signature args, Signature returnType, int offset) {
+    public LocalLambdaReferenceFunction(Signature args, Signature returnType, String id) {
         this.args = args;
         this.returnType = returnType;
-        this.offset = offset;
+        this.id = id;
     }
 
     @Override
@@ -26,7 +25,7 @@ public class LocalLambdaReferenceFunction implements Function {
 
     @Override
     public void preArgsPrep(MethodVisitor visitor, BuildData data) {
-        visitor.visitVarInsn(ALOAD, offset);
+        visitor.visitVarInsn(ALOAD, data.offset(id));
     }
 
     @Override
