@@ -1,13 +1,14 @@
-foo = "hello";
-
-bazinga = ("hello", 3.2);
-
-bar = 1;
-
-baz = false;
-
 println("Hello, World!");
 
 println("bazinga");
 
-println(foo);
+
+foo = ("hello", 1.2, false, 2.4, "bazinga");
+test(foo);
+
+bar = ("hello", 1.2);
+bar2 = (2.4, "bazinga");
+test(bar, false, bar2);
+
+baz = (1.2, false);
+test("hello", baz, bar2);

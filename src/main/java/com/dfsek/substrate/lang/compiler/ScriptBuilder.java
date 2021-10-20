@@ -4,6 +4,7 @@ import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.std.function.Println;
+import com.dfsek.substrate.lang.std.function.PrintlnTest;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +76,7 @@ public class ScriptBuilder {
 
         BuildData data = new BuildData(classLoader, writer);
         data.registerValue("println", new Println());
+        data.registerValue("test", new PrintlnTest());
         ops.forEach(op -> op.apply(absMethod, data));
 
         Label end = new Label();

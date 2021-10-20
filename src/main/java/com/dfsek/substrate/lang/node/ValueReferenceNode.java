@@ -26,7 +26,15 @@ public class ValueReferenceNode extends ExpressionNode {
         if(value.type().isSimple()) {
             visitor.visitVarInsn(value.type().getType(0).loadInsn(), offset);
         } else {
-            visitor.visitVarInsn(ALOAD, offset);
+            for (int i = 0; i < value.type().size(); i++) {
+                visitor.visitVarInsn(ALOAD, offset);
+
+                visitor.visitMethodInsn(INVOKEVIRTUAL,
+                        "com/dfsek/substrate/lang/internal/tuple/TupleIMPL" + value.type().classDescriptor(),
+                        "param" + i,
+                        "()" + value.type().getType(i).descriptor(),
+                        false);
+            }
         }
     }
 
