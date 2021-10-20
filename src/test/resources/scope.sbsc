@@ -1,0 +1,12 @@
+foo = "foo";
+
+{
+  bar = "bar";
+  println(foo);
+  println(bar);
+}
+
+{
+  bar = "bar2";
+  println(bar);
+}

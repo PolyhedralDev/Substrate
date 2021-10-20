@@ -1,9 +1,3 @@
-println("Hello, World!");
-
-{
-println("bazinga");
-}
-
 h = (2.4, "bazinga");
 foo = ("hello", ((((1.2, false)), (h))));
 test(foo);

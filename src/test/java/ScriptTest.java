@@ -15,29 +15,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 
 public class ScriptTest {
-    @Test
-    public void script() throws IOException, ParseException {
-        String data = IOUtils.toString(ScriptTest.class.getResource("/test.sbsc"), StandardCharsets.UTF_8);
+    public void script(String file) throws IOException, ParseException {
+        String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
         Parser parser = new Parser(data, new BaseRule());
-
         parser.parse().execute(null);
     }
 
     @Test
-    public void tokenStream() throws ParseException, IOException {
-        Tokenizer tokenizer = new Tokenizer(IOUtils.toString(ScriptTest.class.getResource("/test.sbsc"), StandardCharsets.UTF_8));
-
-        while(tokenizer.hasNext()) {
-            System.out.println(tokenizer.consume());
-        }
+    public void script() throws IOException {
+        script("/test.sbsc");
     }
 
     @Test
-    public void tupleGen() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        TupleFactory factory = new TupleFactory(new DynamicClassLoader());
-        factory.generate(new Signature(DataType.BOOL, DataType.FUN, DataType.INT, DataType.NUM, DataType.STR))
-                .getConstructor(boolean.class, Lambda.class, int.class, double.class, String.class);
+    public void tuple() throws IOException {
+        script("/tuple.sbsc");
+    }
 
-        System.out.println(factory.generate(new Signature(DataType.STR, DataType.BOOL)).getConstructor(String.class, boolean.class).newInstance("bazinga", false));
+    @Test
+    public void scope() throws IOException {
+        script("/scope.sbsc");
     }
 }
