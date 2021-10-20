@@ -34,13 +34,8 @@ public class BuildData {
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
-        interceptor = (a, b) -> {
-        };
+        interceptor = (a, b) -> {};
         this.offset = 2;
-    }
-
-    public int getOffset() {
-        return offset;
     }
 
     private BuildData(DynamicClassLoader classLoader,
@@ -76,7 +71,6 @@ public class BuildData {
             throw new IllegalArgumentException("Value with identifier \"" + id + "\" already registered.");
         values.put(id, value);
         valueOffsets.put(ImmutablePair.of(this, id), offset);
-        interceptor.register(id, value);
     }
 
     protected Map<String, Value> getValues() {
@@ -89,11 +83,13 @@ public class BuildData {
     }
 
     public Value getValue(String id) {
+        interceptor.fetch(id, this);
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
         return values.get(id);
     }
 
     public int offset(String id) {
+        interceptor.fetch(id, this);
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
 
         BuildData test = this;
@@ -103,6 +99,7 @@ public class BuildData {
     }
 
     public boolean valueExists(String id) {
+        interceptor.fetch(id, this);
         return values.containsKey(id);
     }
 
@@ -118,8 +115,7 @@ public class BuildData {
                 new HashMap<>(values), // new scope
                 valueOffsets, // but same JVM scope
                 this,
-                (a, b) -> {
-                },
+                (a, b) -> {},
                 offset);
     }
 

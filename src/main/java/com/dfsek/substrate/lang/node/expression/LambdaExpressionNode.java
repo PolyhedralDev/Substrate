@@ -10,7 +10,9 @@ import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.util.ReflectionUtil;
 import com.dfsek.substrate.util.pair.ImmutablePair;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LambdaExpressionNode extends ExpressionNode {
@@ -34,15 +36,32 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.returnType(data), (method, clazz) -> {
-            BuildData delegate = data.detach((a, b) -> {
-                System.out.println("Registering: " + a + ": ");
-            });
+        List<ImmutablePair<String, Signature>> extra = new ArrayList<>();
 
+        BuildData delegate = data.detach((id, buildData) -> {
+            if(data.valueExists(id) && !data.getValue(id).ephemeral()) {
+               extra.add(ImmutablePair.of(id, data.getValue(id).returnType()));
+            }
+        });
+
+        Signature merged = parameters;
+
+        for (ImmutablePair<String, Signature> signature : extra) {
+            merged = merged.and(signature.getRight());
+        }
+
+        content.apply(new MethodVisitor(Opcodes.ASM5) {}, delegate); // dummy for creating values to pass.
+
+        Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(data), (method, clazz) -> {
             types.forEach(pair -> {
                 Signature signature = new Signature(pair.getRight());
                 delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
             });
+
+            extra.forEach(pair -> {
+                delegate.registerValue(pair.getLeft(), new EphemeralValue(pair.getRight()), pair.getRight().frames());
+            });
+
 
             content.apply(method, delegate);
             method.visitInsn(RETURN);
