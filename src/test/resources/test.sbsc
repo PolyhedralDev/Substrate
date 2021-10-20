@@ -5,12 +5,15 @@ h = "bazinga";
 
 thing = (a: num, b: str, c: bool) -> {
     testVar = 3;
-    println(b);
+    test2 = 4;
+    test4 = 5;
+    test5 = "fs";
+    println(test5);
 
-    thing2 = (d: str) -> println(d);
+    //thing2 = (d: str) -> println(d);
 
-    thing2("bazinga");
-    thing2(b);
+    //thing2("bazinga");
+    //thing2(b);
 };
 
 tupleTest = (5, "hello");

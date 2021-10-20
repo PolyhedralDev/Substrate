@@ -50,7 +50,8 @@ public class BuildData {
                       Map<String, Value> values,
                       Map<ImmutablePair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
-                      ValueInterceptor interceptor) {
+                      ValueInterceptor interceptor,
+                      int offset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
@@ -59,7 +60,7 @@ public class BuildData {
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
-        this.offset = 1;
+        this.offset = offset;
     }
 
     public LambdaFactory lambdaFactory() {
@@ -118,7 +119,8 @@ public class BuildData {
                 valueOffsets, // but same JVM scope
                 this,
                 (a, b) -> {
-                });
+                },
+                offset);
     }
 
     public BuildData detach(ValueInterceptor interceptor) {
@@ -129,6 +131,7 @@ public class BuildData {
                 new HashMap<>(values), // new scope
                 new HashMap<>(), // *and* different JVM scope
                 this,
-                interceptor);
+                interceptor,
+                1);
     }
 }

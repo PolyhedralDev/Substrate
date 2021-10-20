@@ -28,7 +28,7 @@ public class ValueAssignmentNode implements Node {
 
         if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
-            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent()), 1);
+            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent()), value.returnType(data).frames());
         } else {
             data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data), id.getContent()), 1);
         }

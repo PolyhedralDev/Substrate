@@ -35,7 +35,9 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.returnType(data), (method, clazz) -> {
-            BuildData delegate = data.detach((a, b) -> {});
+            BuildData delegate = data.detach((a, b) -> {
+                System.out.println("Registering: " + a + ": ");
+            });
 
             types.forEach(pair -> {
                 Signature signature = new Signature(pair.getRight());
