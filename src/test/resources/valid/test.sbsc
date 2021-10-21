@@ -3,4 +3,4 @@ test1 = (a: str, b: int) -> {
     return b + 2;
 };
 
-test1("aaa", 4);
+println(str(test1("aaa", 4)));

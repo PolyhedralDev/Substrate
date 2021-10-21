@@ -54,6 +54,11 @@ public class ScriptTest {
     }
 
     @Test
+    public void addition() {
+        script("/valid/addition.sbsc");
+    }
+
+    @Test
     public void noStatementEnd() {
         invalidScript("/invalid/noStatementEnd.sbsc");
     }
