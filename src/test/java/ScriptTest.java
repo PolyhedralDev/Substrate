@@ -22,37 +22,37 @@ public class ScriptTest {
 
     @Test
     public void script() throws IOException {
-        script("/test.sbsc");
+        script("/valid/test.sbsc");
     }
 
     @Test
     public void tuple() throws IOException {
-        script("/tuple.sbsc");
+        script("/valid/tuple.sbsc");
     }
 
     @Test
     public void scope() throws IOException {
-        script("/scope.sbsc");
+        script("/valid/scope.sbsc");
     }
 
     @Test
     public void functionSimple() throws IOException {
-        script("/functionSimple.sbsc");
+        script("/valid/functionSimple.sbsc");
     }
 
     @Test
     public void functionNesting() throws IOException {
-        script("/functionNesting.sbsc");
+        script("/valid/functionNesting.sbsc");
     }
 
     @Test
     public void functionReturn() throws IOException {
-        script("/functionReturn.sbsc");
+        script("/valid/functionReturn.sbsc");
     }
 
     @Test
     public void functionTuple() throws IOException {
-        script("/functionTuple.sbsc");
+        script("/valid/functionTuple.sbsc");
     }
 
     @Test
