@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Value;
@@ -10,6 +11,7 @@ import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionInvocationNode extends ExpressionNode {
@@ -45,13 +47,28 @@ public class FunctionInvocationNode extends ExpressionNode {
             }
         }
 
-        if(!argSignature.equals(function.arguments())) {
-            throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
+        List<String> internalParameters = new ArrayList<>();
+        if(function instanceof LocalLambdaReferenceFunction) {
+            LocalLambdaReferenceFunction lambda = (LocalLambdaReferenceFunction) function;
+            internalParameters = lambda.getInternalParameters();
         }
+
 
         function.preArgsPrep(visitor, data);
 
         arguments.forEach(arg -> arg.apply(visitor, data));
+
+        for (String internalParameter : internalParameters) {
+            argSignature = argSignature.and(data.getValue(internalParameter).returnType());
+            visitor.visitVarInsn(data.getValue(internalParameter).returnType().getType(0).loadInsn(), data.offset(internalParameter));
+        }
+
+        if(!argSignature.equals(function.arguments())) {
+            throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
+        }
+
+
+
 
         function.invoke(visitor, data);
     }

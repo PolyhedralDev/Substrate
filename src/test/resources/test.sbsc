@@ -3,3 +3,6 @@ h = "bazinga";
 thing = (b: str) -> {
     println(h);
 };
+
+
+thing("asdasd");

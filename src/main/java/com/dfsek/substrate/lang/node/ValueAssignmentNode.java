@@ -26,14 +26,14 @@ public class ValueAssignmentNode implements Node {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
 
+        value.apply(visitor, data);
+
         if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
-            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent()), value.returnType(data).frames());
+            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent(), lambdaExpressionNode.internalParameters()), value.returnType(data).frames());
         } else {
             data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data), id.getContent()), 1);
         }
-
-        value.apply(visitor, data);
 
         int offset = data.offset(id.getContent());
         if (value.returnType(data).isSimple()) {

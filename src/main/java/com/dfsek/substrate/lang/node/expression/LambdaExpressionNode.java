@@ -19,8 +19,10 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
     private final List<ImmutablePair<String, DataType>> types;
 
-    private final Signature parameters;
+    private Signature parameters;
     private final Position start;
+
+    private final List<String> internalParameters = new ArrayList<>();
 
     public LambdaExpressionNode(ExpressionNode content, List<ImmutablePair<String, DataType>> types, Position start) {
         this.content = content;
@@ -40,12 +42,12 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         BuildData delegate = data.detach((id, buildData) -> {
             if(data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
-                System.out.println("Registering external value: " + id);
                 Signature sig = data.getValue(id).returnType();
-                System.out.println(sig);
                 extra.add(sig);
                 buildData.shadowValue(id, new EphemeralValue(sig), sig.frames());
-                System.out.println(buildData.getValue(id));
+                if(!internalParameters.contains(id)) {
+                    internalParameters.add(id);
+                }
             }
         });
 
@@ -58,8 +60,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             merged = merged.and(signature);
         }
 
-        System.out.println(extra);
-        System.out.println("Merged signature: " + merged);
+        this.parameters = merged;
 
 
         Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(data), (method, clazz) -> {
@@ -82,6 +83,10 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
     public Signature getParameters() {
         return parameters;
+    }
+
+    public List<String> internalParameters() {
+        return internalParameters;
     }
 
     @Override

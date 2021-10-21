@@ -7,15 +7,20 @@ import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.List;
+
 public class LocalLambdaReferenceFunction implements Function {
     private final Signature args;
     private final Signature returnType;
     private final String id;
 
-    public LocalLambdaReferenceFunction(Signature args, Signature returnType, String id) {
+    private final List<String> internalParameters;
+
+    public LocalLambdaReferenceFunction(Signature args, Signature returnType, String id, List<String> internalParameters) {
         this.args = args;
         this.returnType = returnType;
         this.id = id;
+        this.internalParameters = internalParameters;
     }
 
     @Override
@@ -47,6 +52,10 @@ public class LocalLambdaReferenceFunction implements Function {
     @Override
     public void generate(ClassWriter writer, BuildData data) {
 
+    }
+
+    public List<String> getInternalParameters() {
+        return internalParameters;
     }
 
     @Override
