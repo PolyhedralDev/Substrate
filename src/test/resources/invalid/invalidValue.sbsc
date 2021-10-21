@@ -1,0 +1,7 @@
+// nonexistent value reference should cause parser error
+
+a = "bazinga";
+
+println(a);
+
+println(b); // b does not exist

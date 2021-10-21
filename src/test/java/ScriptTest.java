@@ -69,6 +69,11 @@ public class ScriptTest {
     }
 
     @Test
+    public void invalidValue() {
+        invalidScript("/invalid/invalidValue.sbsc");
+    }
+
+    @Test
     public void casts() {
         script("/valid/casts.sbsc");
     }
