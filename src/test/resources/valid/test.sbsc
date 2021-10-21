@@ -1,15 +1,6 @@
-test1 = (a: str) -> {
+test1 = (a: str, b: int) -> {
     println(a);
-    return a;
+    return b + 2;
 };
 
-test2 = (a: str, b: int) -> {
-    return (test1(a), b);
-};
-
-test3 = (a: str, b: int, c: str) -> {
-    println(a);
-    println(c);
-};
-
-test3(test2("bazinga2", 5), test1("bazinga"));
+test1("aaa", 4);
