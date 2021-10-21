@@ -1,0 +1,8 @@
+// test a void function
+
+test = (a: str, b: num, c: bool, d: str) -> {
+    println(a);
+    println(d);
+};
+
+test("bazinga", 1.2, false, "bazinga2");

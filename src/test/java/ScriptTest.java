@@ -36,6 +36,26 @@ public class ScriptTest {
     }
 
     @Test
+    public void functionSimple() throws IOException {
+        script("/functionSimple.sbsc");
+    }
+
+    @Test
+    public void functionNesting() throws IOException {
+        script("/functionNesting.sbsc");
+    }
+
+    @Test
+    public void functionReturn() throws IOException {
+        script("/functionReturn.sbsc");
+    }
+
+    @Test
+    public void functionTuple() throws IOException {
+        script("/functionTuple.sbsc");
+    }
+
+    @Test
     public void lambda() {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         LambdaFactory lambdaFactory = new LambdaFactory(classLoader, new TupleFactory(classLoader));

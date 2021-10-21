@@ -1,3 +1,5 @@
+// test variable scopes
+
 foo = "foo";
 
 {

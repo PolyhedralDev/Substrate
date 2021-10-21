@@ -1,0 +1,8 @@
+// test a simple function that returns a value
+
+test = (a: str) -> {
+    return a;
+};
+
+
+println(test("bazinga"));

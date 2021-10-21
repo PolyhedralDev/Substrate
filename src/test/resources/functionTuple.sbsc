@@ -1,0 +1,10 @@
+// test deconstructing a tuple into parameters for a void function
+
+test = (a: str, b: num, c: bool, d: str) -> {
+    println(a);
+    println(d);
+};
+
+tuple = ("bazinga", 1.2);
+
+test(tuple, false, "bazinga2");
