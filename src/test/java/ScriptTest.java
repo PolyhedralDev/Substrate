@@ -1,14 +1,8 @@
-import com.dfsek.substrate.lang.compiler.lambda.LambdaFactory;
-import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
-import com.dfsek.substrate.lang.compiler.type.DataType;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,29 +10,6 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.fail;
 
 public class ScriptTest {
-    public void script(String file) {
-        try {
-            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
-            Parser parser = new Parser(data, new BaseRule());
-            parser.parse().execute(null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void invalidScript(String file) {
-        try {
-            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
-            Parser parser = new Parser(data, new BaseRule());
-            parser.parse().execute(null);
-        } catch (ParseException e) {
-            return; // These scripts should fail to parse
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        fail(); // If it parsed, something is wrong.
-    }
-
     @Test
     public void script() {
         script("/valid/test.sbsc");
@@ -82,5 +53,28 @@ public class ScriptTest {
     @Test
     public void danglingCloseBrace() {
         invalidScript("/invalid/danglingCloseBrace.sbsc");
+    }
+
+    public void script(String file) {
+        try {
+            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            Parser parser = new Parser(data, new BaseRule());
+            parser.parse().execute(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void invalidScript(String file) {
+        try {
+            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            Parser parser = new Parser(data, new BaseRule());
+            parser.parse().execute(null);
+        } catch (ParseException e) {
+            return; // These scripts should fail to parse
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fail(); // If it parsed, something is wrong.
     }
 }
