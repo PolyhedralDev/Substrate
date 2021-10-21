@@ -13,13 +13,13 @@ import java.util.List;
 public class BlockNode extends ExpressionNode {
     private final List<Node> contents;
 
-    private final ExpressionNode returnNode;
+    private final List<ReturnNode> returnType;
     private final Position position;
 
-    public BlockNode(List<Node> contents, ExpressionNode returnNode, Position position) {
+    public BlockNode(List<Node> contents, List<ReturnNode> returnType, Position position) {
         this.contents = contents;
-        this.returnNode = returnNode;
         this.position = position;
+        this.returnType = returnType;
     }
 
     @Override
@@ -42,9 +42,13 @@ public class BlockNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        if (returnNode == null) {
-            return Signature.empty();
-        }
-        return returnNode.returnType(data);
+        if(returnType.isEmpty()) return Signature.empty();
+        Signature test = returnType.get(0).type(data);
+        returnType.forEach(type -> {
+            if(!test.equals(type.type(data))) {
+                throw new ParseException("Mismatched return types in block: expected " + test + ", got " + type.type(data), type.getPosition());
+            }
+        });
+        return test;
     }
 }

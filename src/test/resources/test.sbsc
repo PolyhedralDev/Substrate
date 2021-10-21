@@ -16,6 +16,8 @@ thing = (a: num, b: str, c: bool) -> {
 
     thing2("bazinga");
     thing2(b);
+
+    return 4;
 };
 
 tupleTest = (5, "hello");

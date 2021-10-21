@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.BlockNode;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -10,6 +11,7 @@ import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,6 +35,6 @@ public class BaseRule implements Rule {
             }
         }
 
-        return new BlockNode(contents, null, begin);
+        return new BlockNode(contents, Collections.emptyList(), begin);
     }
 }
