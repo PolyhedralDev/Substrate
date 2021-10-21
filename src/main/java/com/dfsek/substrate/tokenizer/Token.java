@@ -68,14 +68,6 @@ public class Token {
         return type.equals(Type.IDENTIFIER);
     }
 
-    public boolean isType() {
-        return type.equals(Type.BOOL_TYPE)
-                || type.equals(Type.STRING_TYPE)
-                || type.equals(Type.NUM_TYPE)
-                || type.equals(Type.INT_TYPE)
-                || type.equals(Type.FUN_TYPE);
-    }
-
     public enum Type {
         /**
          * Value identifier

@@ -7,18 +7,13 @@ public class ParseException extends RuntimeException {
     private final Position position;
 
     public ParseException(String message, Position position) {
-        super(message);
+        super(message + ": " + position);
         this.position = position;
     }
 
     public ParseException(String message, Position position, Throwable cause) {
         super(message, cause);
         this.position = position;
-    }
-
-    @Override
-    public String getMessage() {
-        return super.getMessage() + ": " + position;
     }
 
     public Position getPosition() {

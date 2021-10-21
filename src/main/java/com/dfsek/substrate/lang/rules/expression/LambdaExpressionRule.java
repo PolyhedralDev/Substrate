@@ -31,10 +31,7 @@ public class LambdaExpressionRule implements Rule {
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
             Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
-            DataType type = DataType
-                    .fromToken(
-                            ParserUtil
-                                    .checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.FUN_TYPE));
+            DataType type = DataType.fromToken(ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.FUN_TYPE));
             types.add(ImmutablePair.of(id.getContent(), type));
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume();
