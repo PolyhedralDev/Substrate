@@ -1,0 +1,5 @@
+// Parser should fail if there is a dangling closing brace.
+
+{
+    println("bazinga");
+}}
