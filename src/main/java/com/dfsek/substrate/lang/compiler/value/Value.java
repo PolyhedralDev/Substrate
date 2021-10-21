@@ -6,9 +6,7 @@ import org.objectweb.asm.Opcodes;
 public interface Value extends Opcodes {
     Signature returnType();
 
-    default Signature reference() {
-        return Signature.tup();
-    }
+    Signature reference();
 
     default boolean ephemeral() {
         return true;
