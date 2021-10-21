@@ -1,0 +1,9 @@
+// test a simple function that returns void
+
+test = (a: str) -> {
+    println(a);
+    return;
+};
+
+
+test("bazinga");

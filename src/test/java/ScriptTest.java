@@ -49,6 +49,11 @@ public class ScriptTest {
     }
 
     @Test
+    public void voidReturn() {
+        script("/valid/voidReturn.sbsc");
+    }
+
+    @Test
     public void noStatementEnd() {
         invalidScript("/invalid/noStatementEnd.sbsc");
     }

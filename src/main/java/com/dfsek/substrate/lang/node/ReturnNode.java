@@ -35,6 +35,7 @@ public class ReturnNode implements Node {
     }
 
     public Signature type(BuildData data) {
+        if(value == null) return Signature.empty();
         return value.returnType(data);
     }
 }
