@@ -22,8 +22,4 @@ public class Parser {
         }
         return builder.build();
     }
-
-    public ScriptBuilder getBuilder() {
-        return builder;
-    }
 }
