@@ -1,8 +1,10 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
+import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -47,6 +49,22 @@ public class LocalLambdaReferenceFunction implements Function {
                 "apply",
                 "(" + args.internalDescriptor() + ")" + ret,
                 true);
+        if(!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
+            String internal = "$$i" + args.internalDescriptor() + "$" + ret;
+            data.registerValue(internal, new EphemeralValue(returnType));
+            int offset = data.offset(internal);
+            visitor.visitVarInsn(ASTORE, offset);
+
+            for (int i = 0; i < returnType.size(); i++) {
+                visitor.visitVarInsn(ALOAD, offset);
+
+                visitor.visitMethodInsn(INVOKEVIRTUAL,
+                        ReflectionUtil.internalName(Tuple.class) + "IMPL_" + returnType.classDescriptor(),
+                        "param" + i,
+                        "()" + returnType.getType(i).descriptor(),
+                        false);
+            }
+        }
     }
 
     @Override
