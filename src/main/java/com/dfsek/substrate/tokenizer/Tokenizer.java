@@ -231,6 +231,9 @@ public class Tokenizer {
         if (tokenString.equals("num")) {
             return new Token(tokenString, Token.Type.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
+        if (tokenString.equals("int")) {
+            return new Token(tokenString, Token.Type.INT_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
         if (tokenString.equals("bool")) {
             return new Token(tokenString, Token.Type.BOOL_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }

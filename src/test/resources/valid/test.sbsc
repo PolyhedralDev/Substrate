@@ -3,11 +3,11 @@ test1 = (a: str) -> {
     return a;
 };
 
-test2 = (a: str, b: num) -> {
+test2 = (a: str, b: int) -> {
     return (test1(a), b);
 };
 
-test3 = (a: str, b: num, c: str) -> {
+test3 = (a: str, b: int, c: str) -> {
     println(a);
     println(c);
 };

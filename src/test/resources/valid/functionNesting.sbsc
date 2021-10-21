@@ -14,4 +14,4 @@ test3 = (a: str, b: num, c: str) -> {
     println(c);
 };
 
-test3(test2("bazinga2", 5), test1("bazinga"));
+test3(test2("bazinga2", 5.2), test1("bazinga"));
