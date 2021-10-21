@@ -63,8 +63,14 @@ public class ScriptTest {
         invalidScript("/invalid/noStatementEnd.sbsc");
     }
 
+    @Test
     public void noKeywordID() {
         invalidScript("/invalid/noKeywordID.sbsc");
+    }
+
+    @Test
+    public void casts() {
+        script("/valid/casts.sbsc");
     }
 
     @Test

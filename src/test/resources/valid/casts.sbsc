@@ -1,0 +1,11 @@
+// test casts.
+
+a = 3.2;
+
+b = int(a); // num -> int
+
+c = str(b); // int -> str
+
+d = str(a); // num -> str
+
+e = num(b); // int -> num
