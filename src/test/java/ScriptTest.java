@@ -89,6 +89,11 @@ public class ScriptTest {
     }
 
     @Test
+    public void noMultiCast() {
+        invalidScript("/invalid/noMultiCast.sbsc");
+    }
+
+    @Test
     public void casts() {
         script("/valid/casts.sbsc");
     }
