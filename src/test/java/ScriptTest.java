@@ -74,6 +74,21 @@ public class ScriptTest {
     }
 
     @Test
+    public void badIntCast() {
+        invalidScript("/invalid/badIntCast.sbsc");
+    }
+
+    @Test
+    public void badNumCast() {
+        invalidScript("/invalid/badNumCast.sbsc");
+    }
+
+    @Test
+    public void badStringCast() {
+        invalidScript("/invalid/badStringCast.sbsc");
+    }
+
+    @Test
     public void casts() {
         script("/valid/casts.sbsc");
     }
