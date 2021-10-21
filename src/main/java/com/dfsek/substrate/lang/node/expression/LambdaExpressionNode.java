@@ -51,6 +51,12 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
         });
 
+        types.forEach(pair -> {
+            Signature signature = new Signature(pair.getRight());
+            delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+        });
+
+
         content.apply(new MethodVisitor(Opcodes.ASM5) {}, delegate); // dummy for creating values to pass.
 
 
@@ -64,11 +70,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
 
         Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(data), (method, clazz) -> {
-            types.forEach(pair -> {
-                Signature signature = new Signature(pair.getRight());
-                delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
-            });
-
             content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
