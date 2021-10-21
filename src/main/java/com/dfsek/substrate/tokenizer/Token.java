@@ -29,7 +29,7 @@ public class Token {
     }
 
     public boolean isConstant() {
-        return this.type.equals(Type.NUMBER) || this.type.equals(Type.STRING) || this.type.equals(Type.BOOLEAN);
+        return this.type.equals(Type.NUMBER) || this.type.equals(Type.STRING) || this.type.equals(Type.BOOLEAN) || this.type.equals(Type.INT);
     }
 
     public boolean isBinaryOperator() {
@@ -78,6 +78,10 @@ public class Token {
          * Numeric literal
          */
         NUMBER,
+        /**
+         * Integer literal
+         */
+        INT,
         /**
          * String literal
          */

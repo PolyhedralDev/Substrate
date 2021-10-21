@@ -139,7 +139,12 @@ public class Tokenizer {
             while (!reader.current().isEOF() && isNumberLike()) {
                 num.append(reader.consume());
             }
-            return new Token(num.toString(), Token.Type.NUMBER, new Position(reader.getLine(), reader.getIndex()));
+            String number = num.toString();
+            if(number.contains(".")) {
+                return new Token(num.toString(), Token.Type.NUMBER, new Position(reader.getLine(), reader.getIndex()));
+            } else {
+                return new Token(num.toString(), Token.Type.INT, new Position(reader.getLine(), reader.getIndex()));
+            }
         }
 
         if (reader.current().is('"')) {
