@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import static org.junit.Assert.fail;
 
@@ -69,7 +70,7 @@ public class ScriptTest {
 
     public void script(String file) {
         try {
-            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            String data = IOUtils.toString(Objects.requireNonNull(ScriptTest.class.getResource(file)), StandardCharsets.UTF_8);
             Parser parser = new Parser(data, new BaseRule());
             parser.parse().execute(null);
         } catch (Exception e) {
@@ -79,7 +80,7 @@ public class ScriptTest {
 
     public void invalidScript(String file) {
         try {
-            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            String data = IOUtils.toString(Objects.requireNonNull(ScriptTest.class.getResource(file)), StandardCharsets.UTF_8);
             Parser parser = new Parser(data, new BaseRule());
             parser.parse().execute(null);
         } catch (ParseException e) {
@@ -92,7 +93,7 @@ public class ScriptTest {
 
     public void invalidTokenStream(String file) {
         try {
-            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            String data = IOUtils.toString(Objects.requireNonNull(ScriptTest.class.getResource(file)), StandardCharsets.UTF_8);
             Tokenizer tokenizer = new Tokenizer(data);
 
             while (tokenizer.hasNext()) {
