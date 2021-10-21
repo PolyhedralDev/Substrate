@@ -1,25 +1,5 @@
-nest = (d: str) -> println(d);
-
-external = "bazinga";
-
 nest2 = (b: str) -> {
-    nest(b);
-    nest(external);
+    return 1;
 };
 
 nest2("b");
-
-thing = (a: num, b: str, c: bool) -> {
-    println(b);
-
-    thing2 = (d: str) -> println(d);
-
-    thing2("bazinga");
-    thing2(b);
-
-    return 4;
-};
-
-tupleTest = (5, "hello");
-
-thing(tupleTest, false);
