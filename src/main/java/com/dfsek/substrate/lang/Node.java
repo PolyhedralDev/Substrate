@@ -8,9 +8,7 @@ import org.objectweb.asm.Opcodes;
 
 
 public interface Node extends Opcodes {
-    default void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-
-    }
+    void apply(MethodVisitor visitor, BuildData data) throws ParseException;
 
     Position getPosition();
 }

@@ -1,10 +1,23 @@
-thing2 = (d: str) -> println(d);
+nest = (d: str) -> println(d);
 
-c = "bazinga";
+external = "bazinga";
 
-thing = (b: str) -> {
-    thing2(b);
-    thing2(c);
+nest2 = (b: str) -> {
+    nest(b);
+    nest(external);
 };
 
-thing("b");
+nest2("b");
+
+thing = (a: num, b: str, c: bool) -> {
+    println(b);
+
+    thing2 = (d: str) -> println(d);
+
+    thing2("bazinga");
+    thing2(b);
+};
+
+tupleTest = (5, "hello");
+
+thing(tupleTest, false);
