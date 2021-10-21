@@ -1,23 +1,5 @@
-
-g = 3;
-
 h = "bazinga";
 
-thing = (a: num, b: str, c: bool) -> {
-    testVar = 3;
-    test2 = 4;
-    test4 = 5;
-    test5 = "fs";
-    println(test5);
-
-    //thing2 = (d: str) -> println(d);
-
-    //thing2("bazinga");
-    //thing2(b);
+thing = (b: str) -> {
+    println(h);
 };
-
-tupleTest = (5, "hello");
-
-thing(tupleTest, false);
-
-println(h);

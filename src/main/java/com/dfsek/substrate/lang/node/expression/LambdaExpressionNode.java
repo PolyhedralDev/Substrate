@@ -36,32 +36,37 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        List<ImmutablePair<String, Signature>> extra = new ArrayList<>();
+        List<Signature> extra = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
-            if(data.valueExists(id) && !data.getValue(id).ephemeral()) {
-               extra.add(ImmutablePair.of(id, data.getValue(id).returnType()));
+            if(data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
+                System.out.println("Registering external value: " + id);
+                Signature sig = data.getValue(id).returnType();
+                System.out.println(sig);
+                extra.add(sig);
+                buildData.shadowValue(id, new EphemeralValue(sig), sig.frames());
+                System.out.println(buildData.getValue(id));
             }
         });
 
+        content.apply(new MethodVisitor(Opcodes.ASM5) {}, delegate); // dummy for creating values to pass.
+
+
         Signature merged = parameters;
 
-        for (ImmutablePair<String, Signature> signature : extra) {
-            merged = merged.and(signature.getRight());
+        for (Signature signature : extra) {
+            merged = merged.and(signature);
         }
 
-        content.apply(new MethodVisitor(Opcodes.ASM5) {}, delegate); // dummy for creating values to pass.
+        System.out.println(extra);
+        System.out.println("Merged signature: " + merged);
+
 
         Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(data), (method, clazz) -> {
             types.forEach(pair -> {
                 Signature signature = new Signature(pair.getRight());
                 delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
             });
-
-            extra.forEach(pair -> {
-                delegate.registerValue(pair.getLeft(), new EphemeralValue(pair.getRight()), pair.getRight().frames());
-            });
-
 
             content.apply(method, delegate);
             method.visitInsn(RETURN);

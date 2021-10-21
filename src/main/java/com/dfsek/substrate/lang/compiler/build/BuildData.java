@@ -73,6 +73,13 @@ public class BuildData {
         valueOffsets.put(ImmutablePair.of(this, id), offset);
     }
 
+    public void shadowValue(String id, Value value) {
+        if (!values.containsKey(id))
+            throw new IllegalArgumentException("Value with identifier \"" + id + "\" not registered.");
+        values.put(id, value);
+        valueOffsets.put(ImmutablePair.of(this, id), offset);
+    }
+
     protected Map<String, Value> getValues() {
         return values;
     }
@@ -80,6 +87,23 @@ public class BuildData {
     public void registerValue(String id, Value value, int frames) {
         registerValue(id, value);
         offset += frames;
+    }
+
+    public void shadowValue(String id, Value value, int frames) {
+        shadowValue(id, value);
+        offset += frames;
+    }
+
+    public boolean hasOffset(String id) {
+        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
+
+        BuildData test = this;
+        while (!valueOffsets.containsKey(ImmutablePair.of(test, id))) {
+            if(test == null) return false;
+            test = test.parent;
+        }
+
+        return true;
     }
 
     public Value getValue(String id) {
@@ -115,7 +139,7 @@ public class BuildData {
                 new HashMap<>(values), // new scope
                 valueOffsets, // but same JVM scope
                 this,
-                (a, b) -> {},
+                interceptor,
                 offset);
     }
 
