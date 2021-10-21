@@ -18,6 +18,7 @@ import java.util.List;
 public class BaseRule implements Rule {
     private final StatementRule statementRule = new StatementRule();
     private final BlockRule blockRule = new BlockRule();
+
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         List<Node> contents = new ArrayList<>();
@@ -25,7 +26,7 @@ public class BaseRule implements Rule {
         Position begin = tokenizer.peek().getPosition();
 
         while (tokenizer.hasNext()) {
-            if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
+            if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
                 contents.add(blockRule.assemble(tokenizer, parser));
             } else { // Parse a statement.
                 contents.add(statementRule.assemble(tokenizer, parser));

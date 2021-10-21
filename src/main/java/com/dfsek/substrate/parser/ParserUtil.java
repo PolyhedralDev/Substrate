@@ -37,7 +37,7 @@ public final class ParserUtil {
     }
 
     public static Token checkType(Token token, Token.Type... expected) throws ParseException {
-        for(Token.Type type : expected) if(token.getType().equals(type)) return token;
+        for (Token.Type type : expected) if (token.getType().equals(type)) return token;
         throw new ParseException("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition());
     }
 
@@ -49,14 +49,14 @@ public final class ParserUtil {
      * @throws ParseException If token isn't a binary operator
      */
     public static void checkBinaryOperator(Token token) throws ParseException {
-        if(!token.isBinaryOperator())
+        if (!token.isBinaryOperator())
             throw new ParseException("Expected binary operator, found " + token, token.getPosition());
     }
 
     public static boolean hasPrecedence(Token.Type first, Token.Type second) {
-        if(!PRECEDENCE.containsKey(first)) return false;
+        if (!PRECEDENCE.containsKey(first)) return false;
         Map<Token.Type, Boolean> pre = PRECEDENCE.get(first);
-        if(!pre.containsKey(second)) return false;
+        if (!pre.containsKey(second)) return false;
         return pre.get(second);
     }
 }

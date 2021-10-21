@@ -37,8 +37,8 @@ public class Char {
     }
 
     public boolean is(char... tests) {
-        for(char test : tests) {
-            if(test == character && test != '\0') {
+        for (char test : tests) {
+            if (test == character && test != '\0') {
                 return true;
             }
         }

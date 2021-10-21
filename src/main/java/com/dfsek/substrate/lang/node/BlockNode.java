@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.node;
 
-import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class BlockNode extends ExpressionNode {
     private final List<Node> contents;
-    
+
     private final ExpressionNode returnNode;
     private final Position position;
 
@@ -42,7 +42,7 @@ public class BlockNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        if(returnNode == null) {
+        if (returnNode == null) {
             return Signature.empty();
         }
         return returnNode.returnType(data);

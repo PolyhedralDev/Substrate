@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.node.expression;
 
-import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
@@ -18,11 +17,9 @@ import java.util.List;
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
     private final List<ImmutablePair<String, DataType>> types;
-
-    private Signature parameters;
     private final Position start;
-
     private final List<String> internalParameters = new ArrayList<>();
+    private Signature parameters;
 
     public LambdaExpressionNode(ExpressionNode content, List<ImmutablePair<String, DataType>> types, Position start) {
         this.content = content;
@@ -41,11 +38,11 @@ public class LambdaExpressionNode extends ExpressionNode {
         List<Signature> extra = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
-            if(data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
+            if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 Signature sig = data.getValue(id).reference();
                 extra.add(sig);
                 buildData.shadowValue(id, data.getValue(id), sig.frames());
-                if(!internalParameters.contains(id)) {
+                if (!internalParameters.contains(id)) {
                     internalParameters.add(id);
                 }
             }
@@ -57,7 +54,8 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
 
-        content.apply(new MethodVisitor(Opcodes.ASM5) {}, delegate); // dummy for creating values to pass.
+        content.apply(new MethodVisitor(Opcodes.ASM5) {
+        }, delegate); // dummy for creating values to pass.
 
 
         Signature merged = parameters;
@@ -82,6 +80,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                 "()V",
                 false);
     }
+
     public Signature getParameters() {
         return parameters;
     }

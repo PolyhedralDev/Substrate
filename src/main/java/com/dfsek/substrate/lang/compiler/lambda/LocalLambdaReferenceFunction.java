@@ -1,8 +1,8 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
-import com.dfsek.substrate.lang.compiler.value.Function;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -37,8 +37,8 @@ public class LocalLambdaReferenceFunction implements Function {
     public void invoke(MethodVisitor visitor, BuildData data) {
         String ret = returnType.internalDescriptor();
 
-        if(!returnType.isSimple()) {
-            if(returnType.equals(Signature.empty())) ret = "V";
+        if (!returnType.isSimple()) {
+            if (returnType.equals(Signature.empty())) ret = "V";
             else ret = "L" + ReflectionUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
         }
 

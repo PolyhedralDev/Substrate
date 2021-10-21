@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.ReflectionUtil;
@@ -47,8 +47,8 @@ public class LambdaFactory {
 
             String ret = returnType.internalDescriptor();
 
-            if(!returnType.isSimple()) {
-                if(returnType.equals(Signature.empty())) ret = "V";
+            if (!returnType.isSimple()) {
+                if (returnType.equals(Signature.empty())) ret = "V";
                 else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
@@ -62,13 +62,13 @@ public class LambdaFactory {
 
             byte[] bytes = writer.toByteArray();
 
-            if(true) {
+            if (true) {
                 File dump = new File("./dumps/" + name + ".class");
                 dump.getParentFile().mkdirs();
                 System.out.println("Dumping to " + dump.getAbsolutePath());
                 try {
                     IOUtils.write(bytes, new FileOutputStream(dump));
-                } catch(IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -111,8 +111,8 @@ public class LambdaFactory {
 
         String ret = returnType.internalDescriptor();
 
-        if(!returnType.isSimple()) {
-            if(returnType.equals(Signature.empty())) ret = "V";
+        if (!returnType.isSimple()) {
+            if (returnType.equals(Signature.empty())) ret = "V";
             else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
@@ -131,13 +131,13 @@ public class LambdaFactory {
 
         byte[] bytes = writer.toByteArray();
 
-        if(true) {
+        if (true) {
             File dump = new File("./dumps/" + name + ".class");
             dump.getParentFile().mkdirs();
             System.out.println("Dumping to " + dump.getAbsolutePath());
             try {
                 IOUtils.write(bytes, new FileOutputStream(dump));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

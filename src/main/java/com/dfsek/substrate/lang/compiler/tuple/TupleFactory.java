@@ -67,7 +67,7 @@ public class TupleFactory {
                 constructor.visitVarInsn(ALOAD, 0);
                 constructor.visitVarInsn(argType.loadInsn(), offset++);
 
-                if(argType == DataType.NUM) { // double takes up 2 frames
+                if (argType == DataType.NUM) { // double takes up 2 frames
                     offset++;
                 }
 
@@ -92,13 +92,13 @@ public class TupleFactory {
 
             byte[] bytes = writer.toByteArray();
 
-            if(true) {
+            if (true) {
                 File dump = new File("./dumps/" + name + ".class");
                 dump.getParentFile().mkdirs();
                 System.out.println("Dumping to " + dump.getAbsolutePath());
                 try {
                     IOUtils.write(bytes, new FileOutputStream(dump));
-                } catch(IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

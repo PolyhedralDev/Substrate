@@ -13,7 +13,7 @@ public class Signature {
 
     private static final Signature FUN = new Signature(DataType.FUN);
 
-private static final Signature TUP = new Signature(DataType.TUP);
+    private static final Signature TUP = new Signature(DataType.TUP);
     private static final Signature VOID = new Signature();
     private final List<DataType> types;
 
@@ -23,6 +23,34 @@ private static final Signature TUP = new Signature(DataType.TUP);
 
     public Signature(List<DataType> types) {
         this.types = types;
+    }
+
+    public static Signature decimal() {
+        return DECIMAL;
+    }
+
+    public static Signature bool() {
+        return BOOL;
+    }
+
+    public static Signature integer() {
+        return INT;
+    }
+
+    public static Signature string() {
+        return STRING;
+    }
+
+    public static Signature empty() {
+        return VOID;
+    }
+
+    public static Signature fun() {
+        return FUN;
+    }
+
+    public static Signature tup() {
+        return TUP;
     }
 
     public DataType getType(int index) {
@@ -106,33 +134,5 @@ private static final Signature TUP = new Signature(DataType.TUP);
         types.forEach(type -> sig.append(type.descriptor()));
 
         return sig.toString();
-    }
-
-    public static Signature decimal() {
-        return DECIMAL;
-    }
-
-    public static Signature bool() {
-        return BOOL;
-    }
-
-    public static Signature integer() {
-        return INT;
-    }
-
-    public static Signature string() {
-        return STRING;
-    }
-
-    public static Signature empty() {
-        return VOID;
-    }
-
-    public static Signature fun() {
-        return FUN;
-    }
-
-    public static Signature tup() {
-        return TUP;
     }
 }

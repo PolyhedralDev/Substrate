@@ -18,13 +18,10 @@ public class BuildData {
     private final Map<ImmutablePair<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
-    private int offset;
-
     private final DynamicClassLoader classLoader;
-
     private final ClassWriter classWriter;
-
     private final ValueInterceptor interceptor;
+    private int offset;
 
     public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter) {
         this.classLoader = classLoader;
@@ -34,7 +31,8 @@ public class BuildData {
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
-        interceptor = (a, b) -> {};
+        interceptor = (a, b) -> {
+        };
         this.offset = 2;
     }
 
@@ -99,7 +97,7 @@ public class BuildData {
 
         BuildData test = this;
         while (!valueOffsets.containsKey(ImmutablePair.of(test, id))) {
-            if(test == null) return false;
+            if (test == null) return false;
             test = test.parent;
         }
 

@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.rules.expression;
 
-import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.TupleNode;
@@ -15,6 +14,11 @@ import java.util.List;
 
 public class TupleRule implements Rule {
     private static final TupleRule INSTANCE = new TupleRule();
+
+    public static TupleRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
@@ -30,19 +34,15 @@ public class TupleRule implements Rule {
             args.add(BasicExpressionRule.getInstance().assemble(tokenizer, parser));
             while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
                 groups--;
-                if(groups < 0) {
+                if (groups < 0) {
                     ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // too many close parentheses
                 }
                 tokenizer.consume();
             }
-            if(ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END, Token.Type.STATEMENT_END).getType() == Token.Type.SEPARATOR) {
+            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END, Token.Type.STATEMENT_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }
         }
         return new TupleNode(args, begin.getPosition());
-    }
-
-    public static TupleRule getInstance() {
-        return INSTANCE;
     }
 }

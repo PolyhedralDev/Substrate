@@ -20,12 +20,12 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!data.valueExists(id.getContent())) {
+        if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
         Value value = data.getValue(id.getContent());
         int offset = data.offset(id.getContent());
-        if(value.returnType().isSimple()) {
+        if (value.returnType().isSimple()) {
             visitor.visitVarInsn(value.returnType().getType(0).loadInsn(), offset);
         } else {
             for (int i = 0; i < value.returnType().size(); i++) {
@@ -47,7 +47,7 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        if(!data.valueExists(id.getContent())) {
+        if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
         return data.getValue(id.getContent()).returnType();

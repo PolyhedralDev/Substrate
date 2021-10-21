@@ -41,9 +41,9 @@ public class TupleNode extends ExpressionNode {
     @Override
     public Signature returnType(BuildData data) {
         Signature signature;
-        if(args.isEmpty()) {
+        if (args.isEmpty()) {
             signature = Signature.empty();
-        } else if(args.size() == 1) {
+        } else if (args.size() == 1) {
             signature = args.get(0).returnType(data);
         } else {
             signature = args.get(0).returnType(data);

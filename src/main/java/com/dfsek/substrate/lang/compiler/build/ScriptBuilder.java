@@ -24,12 +24,11 @@ import java.util.List;
 import static org.objectweb.asm.Opcodes.*;
 
 public class ScriptBuilder {
-    private final List<Node> ops = new ArrayList<>();
-    private static int builds = 0;
-
     private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));
     private static final String INTERFACE_CLASS_NAME = Script.class.getCanonicalName().replace('.', '/');
     private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
+    private static int builds = 0;
+    private final List<Node> ops = new ArrayList<>();
 
     public void addOperation(Node op) {
         ops.add(op);
@@ -84,9 +83,9 @@ public class ScriptBuilder {
         Label end = new Label();
 
         data.getValues().forEach((id, value) -> {
-            if(value.ephemeral()) return;
+            if (value.ephemeral()) return;
             String descriptor;
-            if(value.returnType().isSimple()) {
+            if (value.returnType().isSimple()) {
                 descriptor = value.returnType().getType(0).descriptor();
             } else {
                 descriptor = ReflectionUtil.internalName(Tuple.class);
@@ -101,13 +100,13 @@ public class ScriptBuilder {
 
         byte[] bytes = writer.toByteArray();
 
-        if(true) {
+        if (true) {
             File dump = new File("./dumps/ScriptIMPL_" + builds + ".class");
             dump.getParentFile().mkdirs();
             System.out.println("Dumping to " + dump.getAbsolutePath());
             try {
                 IOUtils.write(bytes, new FileOutputStream(dump));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -118,7 +117,7 @@ public class ScriptBuilder {
         try {
             Object instance = clazz.getDeclaredConstructor().newInstance();
             return (Script) instance;
-        } catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

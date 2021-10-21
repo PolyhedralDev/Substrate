@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.node.expression.constant;
 
-import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;

@@ -10,24 +10,25 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 
 public class ExpressionRule implements Rule {
     private static final ExpressionRule INSTANCE = new ExpressionRule();
+
+    public static ExpressionRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token test = tokenizer.peek();
-        if(test.isConstant() || test.isIdentifier()) { // simple expression
-            if(tokenizer.peek(1).getType() == Token.Type.GROUP_BEGIN) {
+        if (test.isConstant() || test.isIdentifier()) { // simple expression
+            if (tokenizer.peek(1).getType() == Token.Type.GROUP_BEGIN) {
                 return FunctionInvocationRule.getInstance().assemble(tokenizer, parser);
             } else {
                 return BasicExpressionRule.getInstance().assemble(tokenizer, parser);
             }
         }
         // Tuple or lambda expression
-        if(tokenizer.peek(1).isIdentifier()) { // lambda
+        if (tokenizer.peek(1).isIdentifier()) { // lambda
             return LambdaExpressionRule.getInstance().assemble(tokenizer, parser);
         }
         return TupleRule.getInstance().assemble(tokenizer, parser);
-    }
-
-    public static ExpressionRule getInstance() {
-        return INSTANCE;
     }
 }

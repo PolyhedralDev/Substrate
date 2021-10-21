@@ -12,6 +12,10 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 public class StatementRule implements Rule {
     private static final StatementRule INSTANCE = new StatementRule();
 
+    public static StatementRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Node node;
@@ -27,9 +31,5 @@ public class StatementRule implements Rule {
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // Must finish with statement end token
         return node;
-    }
-
-    public static StatementRule getInstance() {
-        return INSTANCE;
     }
 }

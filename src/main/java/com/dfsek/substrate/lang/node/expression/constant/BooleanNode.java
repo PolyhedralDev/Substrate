@@ -14,7 +14,7 @@ public class BooleanNode extends ConstantExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         boolean val = Boolean.parseBoolean(token.getContent());
-        if(val) {
+        if (val) {
             visitor.visitInsn(ICONST_1); // true
         } else {
             visitor.visitInsn(ICONST_0); // false
