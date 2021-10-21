@@ -1,0 +1,3 @@
+// tokenizer should fail at unexpected eof
+
+"Hello, world!

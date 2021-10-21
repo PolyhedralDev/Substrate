@@ -1,0 +1,4 @@
+// dangling open block comment should cause EOF error
+
+/*
+

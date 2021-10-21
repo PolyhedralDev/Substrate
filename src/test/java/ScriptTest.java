@@ -1,6 +1,8 @@
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.tokenizer.exceptions.TokenizerException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -55,6 +57,16 @@ public class ScriptTest {
         invalidScript("/invalid/danglingCloseBrace.sbsc");
     }
 
+    @Test
+    public void noEndOfString() {
+        invalidTokenStream("/invalid/noEndOfString.sbsc");
+    }
+
+    @Test
+    public void eof() {
+        invalidTokenStream("/invalid/eof.sbsc");
+    }
+
     public void script(String file) {
         try {
             String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
@@ -71,6 +83,22 @@ public class ScriptTest {
             Parser parser = new Parser(data, new BaseRule());
             parser.parse().execute(null);
         } catch (ParseException e) {
+            return; // These scripts should fail to parse
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fail(); // If it parsed, something is wrong.
+    }
+
+    public void invalidTokenStream(String file) {
+        try {
+            String data = IOUtils.toString(ScriptTest.class.getResource(file), StandardCharsets.UTF_8);
+            Tokenizer tokenizer = new Tokenizer(data);
+
+            while (tokenizer.hasNext()) {
+                tokenizer.consume();
+            }
+        } catch (TokenizerException e) {
             return; // These scripts should fail to parse
         } catch (IOException e) {
             throw new RuntimeException(e);
