@@ -83,15 +83,4 @@ public class ScriptTest {
     public void danglingCloseBrace() {
         invalidScript("/invalid/danglingCloseBrace.sbsc");
     }
-
-    @Test
-    public void lambda() {
-        DynamicClassLoader classLoader = new DynamicClassLoader();
-        LambdaFactory lambdaFactory = new LambdaFactory(classLoader, new TupleFactory(classLoader));
-
-        lambdaFactory.implement(new Signature(DataType.NUM, DataType.STR, DataType.BOOL), new Signature(DataType.NUM), (method, clazz) -> {
-            method.visitLdcInsn(1.5);
-            method.visitInsn(Opcodes.DRETURN);
-        });
-    }
 }
