@@ -7,7 +7,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.util.ReflectionUtil;
-import com.dfsek.substrate.util.pair.ImmutablePair;
+import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -16,18 +16,18 @@ import java.util.List;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final List<ImmutablePair<String, DataType>> types;
+    private final List<Pair<String, DataType>> types;
     private final Position start;
     private final List<String> internalParameters = new ArrayList<>();
     private Signature parameters;
 
-    public LambdaExpressionNode(ExpressionNode content, List<ImmutablePair<String, DataType>> types, Position start) {
+    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, DataType>> types, Position start) {
         this.content = content;
         this.types = types;
         this.start = start;
         Signature signature = Signature.empty();
 
-        for (ImmutablePair<String, DataType> type : types) {
+        for (Pair<String, DataType> type : types) {
             signature = signature.and(new Signature(type.getRight()));
         }
         this.parameters = signature;

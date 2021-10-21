@@ -5,7 +5,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.ReflectionUtil;
-import com.dfsek.substrate.util.pair.ImmutablePair;
+import com.dfsek.substrate.util.pair.Pair;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
 import static org.objectweb.asm.Opcodes.*;
 
 public class LambdaFactory {
-    private final Map<Signature, Map<Signature, ImmutablePair<Class<?>, List<Class<?>>>>> generated = new HashMap<>();
+    private final Map<Signature, Map<Signature, Pair<Class<?>, List<Class<?>>>>> generated = new HashMap<>();
 
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
@@ -73,14 +73,14 @@ public class LambdaFactory {
                 }
             }
 
-            return ImmutablePair.of(classLoader.defineClass(name.replace('/', '.'), writer.toByteArray()), new ArrayList<>());
+            return Pair.of(classLoader.defineClass(name.replace('/', '.'), writer.toByteArray()), new ArrayList<>());
         }).getLeft();
     }
 
     public Class<?> implement(Signature args, Signature returnType, BiConsumer<MethodVisitor, ClassWriter> consumer) {
         generate(args, returnType);
 
-        ImmutablePair<Class<?>, List<Class<?>>> pair = generated.get(args).get(returnType);
+        Pair<Class<?>, List<Class<?>>> pair = generated.get(args).get(returnType);
 
         ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
         String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().size();
