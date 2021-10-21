@@ -1,21 +1,10 @@
-h = "bazinga";
+thing2 = (d: str) -> println(d);
+
+c = "bazinga";
 
 thing = (b: str) -> {
-    println(h);
-};
-
-
-thing("asdasd");
-
-bazinga = (a: num, b: str, c: bool) -> {
-    println(b);
-
-    thing2 = (d: str) -> println(d);
-
-    thing2("bazinga2");
     thing2(b);
+    thing2(c);
 };
 
-tupleTest = (5, "hello");
-
-bazinga(tupleTest, false);
+thing("b");

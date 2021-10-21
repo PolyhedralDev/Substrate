@@ -42,9 +42,9 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         BuildData delegate = data.detach((id, buildData) -> {
             if(data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
-                Signature sig = data.getValue(id).returnType();
+                Signature sig = data.getValue(id).reference();
                 extra.add(sig);
-                buildData.shadowValue(id, new EphemeralValue(sig), sig.frames());
+                buildData.shadowValue(id, data.getValue(id), sig.frames());
                 if(!internalParameters.contains(id)) {
                     internalParameters.add(id);
                 }

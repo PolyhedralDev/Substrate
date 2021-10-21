@@ -11,6 +11,9 @@ public class Signature {
     private static final Signature DECIMAL = new Signature(DataType.NUM);
     private static final Signature STRING = new Signature(DataType.STR);
 
+    private static final Signature FUN = new Signature(DataType.FUN);
+
+private static final Signature TUP = new Signature(DataType.TUP);
     private static final Signature VOID = new Signature();
     private final List<DataType> types;
 
@@ -123,5 +126,13 @@ public class Signature {
 
     public static Signature empty() {
         return VOID;
+    }
+
+    public static Signature fun() {
+        return FUN;
+    }
+
+    public static Signature tup() {
+        return TUP;
     }
 }

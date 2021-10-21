@@ -96,12 +96,23 @@ public enum DataType {
     FUN {
         @Override
         public String descriptor() {
-            return ReflectionUtil.internalName(Lambda.class);
+            return "L"+ReflectionUtil.internalName(Lambda.class)+";";
         }
 
         @Override
         public char descriptorChar() {
             return 'F';
+        }
+    },
+    TUP {
+        @Override
+        public String descriptor() {
+            return "L"+ReflectionUtil.internalName(Tuple.class)+";";
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'T';
         }
     };
 

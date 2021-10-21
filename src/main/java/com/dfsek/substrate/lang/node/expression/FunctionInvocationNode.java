@@ -1,10 +1,9 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
-import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -25,20 +24,20 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!data.valueExists(id.getContent())) {
+        if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such function: " + id.getContent(), id.getPosition());
         }
         Value value = data.getValue(id.getContent());
-        if(!(value instanceof Function)) {
+        if (!(value instanceof Function)) {
             throw new ParseException("Value \"" + id.getContent() + "\" is not a function.", id.getPosition());
         }
 
         Function function = (Function) value;
 
         Signature argSignature;
-        if(arguments.isEmpty()) {
+        if (arguments.isEmpty()) {
             argSignature = Signature.empty();
-        } else if(arguments.size() == 1) {
+        } else if (arguments.size() == 1) {
             argSignature = arguments.get(0).returnType(data);
         } else {
             argSignature = arguments.get(0).returnType(data);
@@ -48,7 +47,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         }
 
         List<String> internalParameters = new ArrayList<>();
-        if(function instanceof LocalLambdaReferenceFunction) {
+        if (function instanceof LocalLambdaReferenceFunction) {
             LocalLambdaReferenceFunction lambda = (LocalLambdaReferenceFunction) function;
             internalParameters = lambda.getInternalParameters();
         }
@@ -59,15 +58,14 @@ public class FunctionInvocationNode extends ExpressionNode {
         arguments.forEach(arg -> arg.apply(visitor, data));
 
         for (String internalParameter : internalParameters) {
-            argSignature = argSignature.and(data.getValue(internalParameter).returnType());
-            visitor.visitVarInsn(data.getValue(internalParameter).returnType().getType(0).loadInsn(), data.offset(internalParameter));
+            Value internal = data.getValue(internalParameter);
+            argSignature = argSignature.and(internal.reference());
+            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
-        if(!argSignature.equals(function.arguments())) {
+        if (!argSignature.equals(function.arguments())) {
             throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
         }
-
-
 
 
         function.invoke(visitor, data);

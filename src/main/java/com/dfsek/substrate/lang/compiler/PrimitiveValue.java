@@ -18,6 +18,11 @@ public class PrimitiveValue implements Value {
     }
 
     @Override
+    public Signature reference() {
+        return signature;
+    }
+
+    @Override
     public boolean ephemeral() {
         return false;
     }
