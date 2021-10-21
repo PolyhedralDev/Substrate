@@ -58,6 +58,10 @@ public class ScriptTest {
         invalidScript("/invalid/noStatementEnd.sbsc");
     }
 
+    public void noKeywordID() {
+        invalidScript("/invalid/noKeywordID.sbsc");
+    }
+
     @Test
     public void danglingCloseBrace() {
         invalidScript("/invalid/danglingCloseBrace.sbsc");

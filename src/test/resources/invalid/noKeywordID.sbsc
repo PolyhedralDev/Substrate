@@ -1,0 +1,3 @@
+// Parser should fail when keyword is used as ID
+
+num = 4;
