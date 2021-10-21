@@ -1,5 +1,15 @@
-nest2 = (b: str) -> {
-    return 1;
+test1 = (a: str) -> {
+    println(a);
+    return a;
 };
 
-nest2("b");
+test2 = (a: str, b: num) -> {
+    return (test1(a), b);
+};
+
+test3 = (a: str, b: num, c: str) -> {
+    println(a);
+    println(c);
+};
+
+test3(test2("bazinga2", 5), test1("bazinga"));

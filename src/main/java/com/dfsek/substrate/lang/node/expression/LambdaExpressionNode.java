@@ -67,7 +67,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.parameters = merged;
 
 
-        Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(data), (method, clazz) -> {
+        Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(delegate), (method, clazz) -> {
             content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
@@ -96,6 +96,21 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        return content.returnType(data);
+        BuildData data1 = data.detach((id, buildData) -> {
+            if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
+                Signature sig = data.getValue(id).reference();
+                buildData.shadowValue(id, data.getValue(id), sig.frames());
+                if (!internalParameters.contains(id)) {
+                    internalParameters.add(id);
+                }
+            }
+        });
+
+        types.forEach(pair -> {
+            Signature signature = new Signature(pair.getRight());
+            data1.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+        });
+
+        return content.returnType(data1);
     }
 }

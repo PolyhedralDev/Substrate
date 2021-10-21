@@ -31,7 +31,7 @@ public class TupleRule implements Rule {
                 groups++;
                 tokenizer.consume();
             }
-            args.add(BasicExpressionRule.getInstance().assemble(tokenizer, parser));
+            args.add(ExpressionRule.getInstance().assemble(tokenizer, parser));
             while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
                 groups--;
                 if (groups < 0) {

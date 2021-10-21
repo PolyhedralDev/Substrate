@@ -26,7 +26,7 @@ public class ExpressionRule implements Rule {
             }
         }
         // Tuple or lambda expression
-        if (tokenizer.peek(1).isIdentifier()) { // lambda
+        if (tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
             return LambdaExpressionRule.getInstance().assemble(tokenizer, parser);
         }
         return TupleRule.getInstance().assemble(tokenizer, parser);
