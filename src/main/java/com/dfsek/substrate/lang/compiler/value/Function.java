@@ -18,6 +18,4 @@ public interface Function extends Value {
 
     void invoke(MethodVisitor visitor, BuildData data);
 
-    default void generate(ClassWriter writer, BuildData data) {
-    }
 }

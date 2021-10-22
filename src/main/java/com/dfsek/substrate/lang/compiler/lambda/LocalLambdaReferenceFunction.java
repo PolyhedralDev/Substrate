@@ -67,11 +67,6 @@ public class LocalLambdaReferenceFunction implements Function {
         }
     }
 
-    @Override
-    public void generate(ClassWriter writer, BuildData data) {
-
-    }
-
     public List<String> getInternalParameters() {
         return internalParameters;
     }
