@@ -34,13 +34,6 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder("{\n");
-        contents.forEach(node -> builder.append(node).append('\n'));
-        return builder.append('}').toString();
-    }
-
-    @Override
     public Signature returnType(BuildData data) {
         if(returnType.isEmpty()) return Signature.empty();
         Signature test = returnType.get(0).type(data);

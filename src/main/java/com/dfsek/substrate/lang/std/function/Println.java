@@ -30,6 +30,6 @@ public class Println implements Function {
 
     @Override
     public Signature returnType() {
-        return new Signature();
+        return Signature.empty();
     }
 }
