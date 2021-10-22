@@ -1,0 +1,17 @@
+// test making a tuple from a function return value
+
+test = (a: num, b: str) -> {
+    return a;
+};
+
+test2 = (a: num, b: str) -> {
+    return b;
+};
+
+a = (2.5, "bazinga");
+
+b = (test(a), "bazinga");
+
+c = (test(a), test2(b));
+
+test(c);
