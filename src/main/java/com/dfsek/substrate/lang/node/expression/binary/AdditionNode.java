@@ -15,22 +15,22 @@ public class AdditionNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        if(left.returnType(data).equals(Signature.integer())) {
-            if(!left.returnType(data).equals(Signature.integer())) {
+        if (left.returnType(data).equals(Signature.integer())) {
+            if (!left.returnType(data).equals(Signature.integer())) {
                 throw new ParseException("Expected INT, got " + left.returnType(data), left.getPosition());
             }
 
-            if(!right.returnType(data).equals(Signature.integer())) {
+            if (!right.returnType(data).equals(Signature.integer())) {
                 throw new ParseException("Expected INT, got " + right.returnType(data), right.getPosition());
             }
 
             visitor.visitInsn(IADD);
         } else {
-            if(!left.returnType(data).equals(Signature.decimal())) {
+            if (!left.returnType(data).equals(Signature.decimal())) {
                 throw new ParseException("Expected NUM, got " + left.returnType(data), left.getPosition());
             }
 
-            if(!right.returnType(data).equals(Signature.decimal())) {
+            if (!right.returnType(data).equals(Signature.decimal())) {
                 throw new ParseException("Expected NUM, got " + right.returnType(data), right.getPosition());
             }
 

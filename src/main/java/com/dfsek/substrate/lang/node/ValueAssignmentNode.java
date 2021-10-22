@@ -37,7 +37,7 @@ public class ValueAssignmentNode implements Node {
 
         int offset = data.offset(id.getContent());
         if (value.returnType(data).isSimple()) {
-            if(value instanceof LambdaExpressionNode) {
+            if (value instanceof LambdaExpressionNode) {
                 visitor.visitVarInsn(ASTORE, offset);
             } else {
                 visitor.visitVarInsn(value.returnType(data).getType(0).storeInsn(), offset);

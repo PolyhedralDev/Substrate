@@ -7,20 +7,20 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
-public class ToStringNode extends TypeCastNode{
+public class ToStringNode extends TypeCastNode {
     public ToStringNode(Token type, ExpressionNode value) {
         super(type, value);
     }
 
     @Override
     public void applyCast(MethodVisitor visitor, BuildData data) {
-        if(value.returnType(data).equals(Signature.integer())) {
+        if (value.returnType(data).equals(Signature.integer())) {
             visitor.visitMethodInsn(INVOKESTATIC,
                     "java/lang/Integer",
                     "toString",
                     "(I)Ljava/lang/String;",
                     false);
-        } else if(value.returnType(data).equals(Signature.decimal())) {
+        } else if (value.returnType(data).equals(Signature.decimal())) {
             visitor.visitMethodInsn(INVOKESTATIC,
                     "java/lang/Double",
                     "toString",

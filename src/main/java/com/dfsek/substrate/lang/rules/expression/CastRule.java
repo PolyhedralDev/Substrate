@@ -15,6 +15,10 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 public class CastRule implements Rule {
     private static final CastRule INSTANCE = new CastRule();
 
+    public static CastRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public TypeCastNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token type = ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE);
@@ -27,16 +31,12 @@ public class CastRule implements Rule {
             node = new NumToIntCastNode(type, expressionNode);
         } else if (type.getType() == Token.Type.STRING_TYPE) {
             node = new ToStringNode(type, expressionNode);
-        } else if(type.getType() == Token.Type.NUM_TYPE) {
+        } else if (type.getType() == Token.Type.NUM_TYPE) {
             node = new IntToNumCastNode(type, expressionNode);
         } else {
             throw new ParseException("Invalid type: " + type.getType(), type.getPosition()); // Should never happen
         }
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
         return node;
-    }
-
-    public static CastRule getInstance() {
-        return INSTANCE;
     }
 }

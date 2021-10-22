@@ -22,7 +22,6 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SubstrateTests {
-    private static final String TEST_FOLDER = "testdata";
     private final List<DynamicTest> tests = new ArrayList<>();
 
     @TestFactory

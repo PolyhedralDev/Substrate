@@ -7,14 +7,14 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
-public class NumToIntCastNode extends TypeCastNode{
+public class NumToIntCastNode extends TypeCastNode {
     public NumToIntCastNode(Token type, ExpressionNode value) {
         super(type, value);
     }
 
     @Override
     public void applyCast(MethodVisitor visitor, BuildData data) {
-        if(!value.returnType(data).equals(Signature.decimal())) {
+        if (!value.returnType(data).equals(Signature.decimal())) {
             throw new ParseException("Expected INT, got " + value.returnType(data), getPosition());
         }
         visitor.visitInsn(D2I);

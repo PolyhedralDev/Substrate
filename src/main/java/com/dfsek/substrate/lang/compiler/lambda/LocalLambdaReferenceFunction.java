@@ -49,7 +49,7 @@ public class LocalLambdaReferenceFunction implements Function {
                 "apply",
                 "(" + args.internalDescriptor() + ")" + ret,
                 true);
-        if(!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
+        if (!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
             String internal = "$$i" + args.internalDescriptor() + "$" + ret;
             data.registerValue(internal, new EphemeralValue(returnType));
             int offset = data.offset(internal);

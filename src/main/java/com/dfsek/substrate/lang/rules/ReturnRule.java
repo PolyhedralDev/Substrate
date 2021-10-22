@@ -12,12 +12,17 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 
 public class ReturnRule implements Rule {
     private static final ReturnRule INSTANCE = new ReturnRule();
+
+    public static ReturnRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public ReturnNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         Token r = ParserUtil.checkType(tokenizer.consume(), Token.Type.RETURN);
 
         ReturnNode node;
-        if(tokenizer.peek().getType() == Token.Type.STATEMENT_END) {
+        if (tokenizer.peek().getType() == Token.Type.STATEMENT_END) {
             node = new ReturnNode(r.getPosition(), null);
         } else {
             ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, parser);
@@ -26,9 +31,5 @@ public class ReturnRule implements Rule {
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
         return node;
-    }
-
-    public static ReturnRule getInstance() {
-        return INSTANCE;
     }
 }

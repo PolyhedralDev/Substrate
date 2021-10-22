@@ -35,10 +35,10 @@ public class BlockNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        if(returnType.isEmpty()) return Signature.empty();
+        if (returnType.isEmpty()) return Signature.empty();
         Signature test = returnType.get(0).type(data);
         returnType.forEach(type -> {
-            if(!test.equals(type.type(data))) {
+            if (!test.equals(type.type(data))) {
                 throw new ParseException("Mismatched return types in block: expected " + test + ", got " + type.type(data), type.getPosition());
             }
         });

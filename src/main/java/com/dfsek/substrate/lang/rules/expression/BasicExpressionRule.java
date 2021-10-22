@@ -29,7 +29,7 @@ public class BasicExpressionRule implements Rule {
             return new BooleanNode(tokenizer.consume());
         } else if (tokenizer.peek().getType() == Token.Type.NUMBER) {
             return new DecimalNode(tokenizer.consume());
-        } else if(tokenizer.peek().getType() == Token.Type.INT) {
+        } else if (tokenizer.peek().getType() == Token.Type.INT) {
             return new IntegerNode(tokenizer.consume());
         } else {
             ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);

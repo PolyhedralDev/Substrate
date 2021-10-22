@@ -28,7 +28,7 @@ public class ExpressionRule implements Rule {
             } else {
                 node = BasicExpressionRule.getInstance().assemble(tokenizer, parser);
             }
-        } else if(test.isType()) {
+        } else if (test.isType()) {
             node = CastRule.getInstance().assemble(tokenizer, parser);
         } else if (tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer, parser);
@@ -36,11 +36,11 @@ public class ExpressionRule implements Rule {
             node = TupleRule.getInstance().assemble(tokenizer, parser);
         }
 
-        if(tokenizer.peek().isBinaryOperator()) {
+        if (tokenizer.peek().isBinaryOperator()) {
             ExpressionNode left = node;
             Token op = tokenizer.consume();
             ExpressionNode right = assemble(tokenizer, parser);
-            if(op.getType() == Token.Type.ADDITION_OPERATOR) {
+            if (op.getType() == Token.Type.ADDITION_OPERATOR) {
                 node = new AdditionNode(left, right, op);
             }
         }
