@@ -229,7 +229,15 @@ public class Token {
         /**
          * Function type "fun"
          */
-        FUN_TYPE
+        FUN_TYPE,
+        /**
+         * If expression token "if"
+         */
+        IF,
+        /**
+         * Else token "else"
+         */
+        ELSE
 
     }
 }

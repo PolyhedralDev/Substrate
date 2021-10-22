@@ -229,6 +229,13 @@ public class Tokenizer {
             return new Token(tokenString, Token.Type.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
 
+        if (tokenString.equals("if")) {
+            return new Token(tokenString, Token.Type.IF, new Position(reader.getLine(), reader.getIndex()));
+        }
+        if (tokenString.equals("else")) {
+            return new Token(tokenString, Token.Type.ELSE, new Position(reader.getLine(), reader.getIndex()));
+        }
+
 
         return new Token(tokenString, Token.Type.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
     }
