@@ -60,20 +60,12 @@ public class LambdaFactory {
             apply.visitEnd();
 
 
+
             byte[] bytes = writer.toByteArray();
+            Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
+            CompilerUtil.dump(clazz, bytes);
 
-            if (true) {
-                File dump = new File("./dumps/" + name + ".class");
-                dump.getParentFile().mkdirs();
-                System.out.println("Dumping to " + dump.getAbsolutePath());
-                try {
-                    IOUtils.write(bytes, new FileOutputStream(dump));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return Pair.of(classLoader.defineClass(name.replace('/', '.'), writer.toByteArray()), new ArrayList<>());
+            return Pair.of(clazz, new ArrayList<>());
         }).getLeft();
     }
 
@@ -131,18 +123,8 @@ public class LambdaFactory {
 
         byte[] bytes = writer.toByteArray();
 
-        if (true) {
-            File dump = new File("./dumps/" + name + ".class");
-            dump.getParentFile().mkdirs();
-            System.out.println("Dumping to " + dump.getAbsolutePath());
-            try {
-                IOUtils.write(bytes, new FileOutputStream(dump));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), writer.toByteArray());
+        Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
+        CompilerUtil.dump(clazz, bytes);
         pair.getRight().set(size, clazz);
         return clazz;
     }

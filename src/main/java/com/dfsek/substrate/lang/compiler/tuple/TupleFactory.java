@@ -91,19 +91,9 @@ public class TupleFactory {
 
 
             byte[] bytes = writer.toByteArray();
-
-            if (true) {
-                File dump = new File("./dumps/" + name + ".class");
-                dump.getParentFile().mkdirs();
-                System.out.println("Dumping to " + dump.getAbsolutePath());
-                try {
-                    IOUtils.write(bytes, new FileOutputStream(dump));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return classLoader.defineClass(name.replace('/', '.'), writer.toByteArray());
+            Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
+            CompilerUtil.dump(clazz, bytes);
+            return clazz;
         });
     }
 }

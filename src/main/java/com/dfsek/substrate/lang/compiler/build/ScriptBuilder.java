@@ -98,19 +98,9 @@ public class ScriptBuilder {
 
         byte[] bytes = writer.toByteArray();
 
-        if (true) {
-            File dump = new File("./dumps/ScriptIMPL_" + builds + ".class");
-            dump.getParentFile().mkdirs();
-            System.out.println("Dumping to " + dump.getAbsolutePath());
-            try {
-                IOUtils.write(bytes, new FileOutputStream(dump));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Class<?> clazz = classLoader.defineClass(implementationClassName.replace('/', '.'), bytes);
 
-        Class<?> clazz = classLoader.defineClass(implementationClassName.replace('/', '.'), writer.toByteArray());
-
+        CompilerUtil.dump(clazz, bytes);
         builds++;
         try {
             Object instance = clazz.getDeclaredConstructor().newInstance();
