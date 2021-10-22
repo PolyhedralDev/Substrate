@@ -17,13 +17,12 @@ public class Tokenizer {
     }
 
     private final Lookahead reader;
-    private final Stack<Token> brackets = new Stack<>();
     private final List<Token> cache = new ArrayList<>();
     private Token current;
 
     public Tokenizer(String data) throws ParseException {
         reader = new com.dfsek.substrate.tokenizer.Lookahead(new StringReader(data + '\0'));
-        cache.add(fetchCheck());
+        cache.add(fetch());
     }
 
     /**
@@ -40,7 +39,7 @@ public class Tokenizer {
     public Token peek(int n) throws ParseException {
         while (cache.size() <= n) {
             if (!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
-            cache.add(fetchCheck());
+            cache.add(fetch());
         }
         return cache.get(n);
     }
@@ -53,7 +52,7 @@ public class Tokenizer {
      */
     public Token consume() throws ParseException {
         if (!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
-        cache.add(fetchCheck());
+        cache.add(fetch());
         current = cache.remove(0);
         return current;
     }
@@ -65,20 +64,6 @@ public class Tokenizer {
      */
     public boolean hasNext() {
         return cache.size() != 0 && cache.get(0) != null;
-    }
-
-    private Token fetchCheck() throws ParseException {
-        Token fetch = fetch();
-        if (fetch != null) {
-            if (fetch.getType().equals(Token.Type.BLOCK_BEGIN)) brackets.push(fetch); // Opening bracket
-            else if (fetch.getType().equals(Token.Type.BLOCK_END)) {
-                if (!brackets.isEmpty()) brackets.pop();
-                else throw new ParseException("Dangling opening brace", new Position(0, 0));
-            }
-        } else if (!brackets.isEmpty()) {
-            throw new ParseException("Dangling closing brace", brackets.peek().getPosition());
-        }
-        return fetch;
     }
 
     private Token fetch() throws TokenizerException {
