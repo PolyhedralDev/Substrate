@@ -1,6 +1,0 @@
-test1 = (a: str, b: int) -> {
-    println(a);
-    return b + 2;
-};
-
-println(str(test1("aaa", 4)));
