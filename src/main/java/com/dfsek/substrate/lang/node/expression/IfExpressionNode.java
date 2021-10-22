@@ -27,25 +27,30 @@ public class IfExpressionNode extends ExpressionNode {
             throw new ParseException("If expression case has invalid return type, expected " + caseTrue.returnType(data) + ", got " + caseFalse.returnType(data), caseFalse.getPosition());
         }
 
+        Label equal = new Label();
         Label end = new Label();
         predicate.apply(visitor, data);
 
-        visitor.visitJumpInsn(IFEQ, end);
+        visitor.visitJumpInsn(IFEQ, equal);
 
         caseTrue.apply(visitor, data);
 
-        visitor.visitLabel(end);
+        visitor.visitJumpInsn(GOTO, end);
+
+        visitor.visitLabel(equal);
 
         caseFalse.apply(visitor, data);
+
+        visitor.visitLabel(end);
     }
 
     @Override
     public Position getPosition() {
-        return null;
+        return predicate.getPosition();
     }
 
     @Override
     public Signature returnType(BuildData data) {
-        return null;
+        return caseTrue.returnType(data);
     }
 }

@@ -15,8 +15,9 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 import org.objectweb.asm.MethodVisitor;
 
 public class IfExpressionRule implements Rule {
+    private static final IfExpressionRule INSTANCE = new IfExpressionRule();
     @Override
-    public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.IF);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
         ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer, parser);
@@ -25,6 +26,7 @@ public class IfExpressionRule implements Rule {
 
         ExpressionNode caseFalse;
         if(tokenizer.peek().getType() == Token.Type.ELSE) {
+            tokenizer.consume();
             caseFalse = ExpressionRule.getInstance().assemble(tokenizer, parser);
         } else {
             caseFalse = new ExpressionNode() {
@@ -46,5 +48,9 @@ public class IfExpressionRule implements Rule {
         }
 
         return new IfExpressionNode(predicate, caseTrue, caseFalse);
+    }
+
+    public static IfExpressionRule getInstance() {
+        return INSTANCE;
     }
 }

@@ -1,0 +1,9 @@
+// test basic if statements
+
+a = if(true) 5 else 4;
+
+println(str(a));
+
+b = if(false) 5 else 4;
+
+println(str(b));
