@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -43,6 +44,9 @@ public class ValueAssignmentNode implements Node {
                 visitor.visitVarInsn(value.returnType(data).getType(0).storeInsn(), offset);
             }
         } else {
+            if(value.returnType(data).equals(Signature.empty()) && !(value instanceof LambdaExpressionNode)) { // void non-lambda expression
+                throw new ParseException("Cannot assign VOID expression to value", getPosition());
+            }
             visitor.visitVarInsn(ASTORE, offset);
         }
     }

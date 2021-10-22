@@ -41,6 +41,7 @@ public class SubstrateTests {
                 Parser parser = new Parser(data, new BaseRule());
                 parser.parse().execute(null);
             } catch (ParseException e) {
+                e.printStackTrace();
                 return;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -57,6 +58,7 @@ public class SubstrateTests {
                     tokenizer.consume();
                 }
             } catch (TokenizerException e) {
+                e.printStackTrace();
                 return; // These scripts should fail to parse
             } catch (IOException e) {
                 throw new RuntimeException(e);
