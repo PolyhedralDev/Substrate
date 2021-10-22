@@ -94,6 +94,11 @@ public class ScriptTest {
     }
 
     @Test
+    public void noValueReassignment() {
+        invalidScript("invalid/noValueReassignment.sbsc");
+    }
+
+    @Test
     public void casts() {
         script("/valid/casts.sbsc");
     }

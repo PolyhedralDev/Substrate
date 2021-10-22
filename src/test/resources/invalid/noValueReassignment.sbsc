@@ -1,0 +1,5 @@
+// Parser should fail on value reassignment
+
+a = "bazinga";
+
+a = "bazinga2";
