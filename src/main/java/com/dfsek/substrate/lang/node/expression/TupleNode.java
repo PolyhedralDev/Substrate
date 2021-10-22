@@ -2,9 +2,9 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class TupleNode extends ExpressionNode {
 
         Class<?> tuple = data.tupleFactory().generate(signature);
 
-        String tupleName = ReflectionUtil.internalName(tuple);
+        String tupleName = CompilerUtil.internalName(tuple);
         visitor.visitTypeInsn(NEW, tupleName);
         visitor.visitInsn(DUP);
 

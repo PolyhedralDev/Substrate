@@ -3,9 +3,9 @@ package com.dfsek.substrate.lang.compiler.lambda;
 import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.internal.Tuple;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
@@ -41,11 +41,11 @@ public class LocalLambdaReferenceFunction implements Function {
 
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + ReflectionUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
+            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
         }
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
-                ReflectionUtil.internalName(data.lambdaFactory().generate(args, returnType)),
+                CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType)),
                 "apply",
                 "(" + args.internalDescriptor() + ")" + ret,
                 true);
@@ -59,7 +59,7 @@ public class LocalLambdaReferenceFunction implements Function {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        ReflectionUtil.internalName(Tuple.class) + "IMPL_" + returnType.classDescriptor(),
+                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + returnType.classDescriptor(),
                         "param" + i,
                         "()" + returnType.getType(i).descriptor(),
                         false);

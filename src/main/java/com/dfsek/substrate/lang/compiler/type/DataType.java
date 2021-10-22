@@ -1,9 +1,9 @@
 package com.dfsek.substrate.lang.compiler.type;
 
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.Opcodes;
 
 public enum DataType {
@@ -96,7 +96,7 @@ public enum DataType {
     FUN {
         @Override
         public String descriptor() {
-            return "L" + ReflectionUtil.internalName(Lambda.class) + ";";
+            return "L" + CompilerUtil.internalName(Lambda.class) + ";";
         }
 
         @Override
@@ -107,7 +107,7 @@ public enum DataType {
     TUP {
         @Override
         public String descriptor() {
-            return "L" + ReflectionUtil.internalName(Tuple.class) + ";";
+            return "L" + CompilerUtil.internalName(Tuple.class) + ";";
         }
 
         @Override

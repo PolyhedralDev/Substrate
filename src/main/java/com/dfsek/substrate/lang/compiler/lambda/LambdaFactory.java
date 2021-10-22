@@ -2,9 +2,9 @@ package com.dfsek.substrate.lang.compiler.lambda;
 
 import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.ReflectionUtil;
 import com.dfsek.substrate.util.pair.Pair;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
@@ -35,21 +35,21 @@ public class LambdaFactory {
     public Class<?> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
             ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor();
+            String name = CompilerUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor();
 
             writer.visit(V1_8,
                     ACC_PUBLIC | ACC_ABSTRACT | ACC_INTERFACE,
                     name,
                     null,
                     "java/lang/Object",
-                    new String[]{ReflectionUtil.internalName(Lambda.class)});
+                    new String[]{CompilerUtil.internalName(Lambda.class)});
 
 
             String ret = returnType.internalDescriptor();
 
             if (!returnType.isSimple()) {
                 if (returnType.equals(Signature.empty())) ret = "V";
-                else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
+                else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
             MethodVisitor apply = writer.visitMethod(ACC_PUBLIC | ACC_ABSTRACT,
@@ -83,14 +83,14 @@ public class LambdaFactory {
         Pair<Class<?>, List<Class<?>>> pair = generated.get(args).get(returnType);
 
         ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-        String name = ReflectionUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().size();
+        String name = CompilerUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().size();
 
         writer.visit(V1_8,
                 ACC_PUBLIC,
                 name,
                 null,
                 "java/lang/Object",
-                new String[]{ReflectionUtil.internalName(pair.getLeft())});
+                new String[]{CompilerUtil.internalName(pair.getLeft())});
 
         MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
                 "<init>", // Constructor method name is <init>
@@ -113,7 +113,7 @@ public class LambdaFactory {
 
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + ReflectionUtil.internalName(tupleFactory.generate(returnType)) + ";";
+            else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
         MethodVisitor apply = writer.visitMethod(ACC_PUBLIC,

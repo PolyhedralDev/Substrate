@@ -3,11 +3,11 @@ package com.dfsek.substrate.lang.compiler.build;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -86,7 +86,7 @@ public class ScriptBuilder {
             if (value.returnType().isSimple()) {
                 descriptor = value.returnType().getType(0).descriptor();
             } else {
-                descriptor = ReflectionUtil.internalName(Tuple.class);
+                descriptor = CompilerUtil.internalName(Tuple.class);
             }
             absMethod.visitLocalVariable(id, descriptor, null, begin, end, data.offset(id));
         });

@@ -4,9 +4,9 @@ import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.ReflectionUtil;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -72,10 +72,10 @@ public class LambdaExpressionNode extends ExpressionNode {
             method.visitInsn(RETURN);
         });
 
-        visitor.visitTypeInsn(NEW, ReflectionUtil.internalName(lambda));
+        visitor.visitTypeInsn(NEW, CompilerUtil.internalName(lambda));
         visitor.visitInsn(DUP);
         visitor.visitMethodInsn(INVOKESPECIAL,
-                ReflectionUtil.internalName(lambda),
+                CompilerUtil.internalName(lambda),
                 "<init>",
                 "()V",
                 false);

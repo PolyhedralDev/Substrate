@@ -1,6 +1,6 @@
-package com.dfsek.substrate.util;
+package com.dfsek.substrate.lang.compiler.util;
 
-public class ReflectionUtil {
+public final class CompilerUtil {
     public static String internalName(Class<?> clazz) {
         return clazz.getCanonicalName().replace('.', '/');
     }

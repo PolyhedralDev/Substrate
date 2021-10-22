@@ -2,9 +2,9 @@ package com.dfsek.substrate.lang.compiler.tuple;
 
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -29,14 +29,14 @@ public class TupleFactory {
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
             ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = ReflectionUtil.internalName(Tuple.class) + "IMPL_" + args.classDescriptor();
+            String name = CompilerUtil.internalName(Tuple.class) + "IMPL_" + args.classDescriptor();
 
             writer.visit(V1_8,
                     ACC_PUBLIC,
                     name,
                     null,
                     "java/lang/Object",
-                    new String[]{ReflectionUtil.internalName(Tuple.class)});
+                    new String[]{CompilerUtil.internalName(Tuple.class)});
 
             String constructorSig = "(" + args.internalDescriptor() + ")V";
 

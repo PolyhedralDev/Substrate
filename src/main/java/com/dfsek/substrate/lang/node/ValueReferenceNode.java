@@ -2,13 +2,13 @@ package com.dfsek.substrate.lang.node;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.util.ReflectionUtil;
 import org.objectweb.asm.MethodVisitor;
 
 public class ValueReferenceNode extends ExpressionNode {
@@ -32,7 +32,7 @@ public class ValueReferenceNode extends ExpressionNode {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        ReflectionUtil.internalName(Tuple.class) + "IMPL_" + value.returnType().classDescriptor(),
+                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + value.returnType().classDescriptor(),
                         "param" + i,
                         "()" + value.returnType().getType(i).descriptor(),
                         false);
