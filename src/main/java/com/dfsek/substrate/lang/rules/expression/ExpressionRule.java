@@ -2,10 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.binary.AdditionNode;
-import com.dfsek.substrate.lang.node.expression.binary.EqualsNode;
-import com.dfsek.substrate.lang.node.expression.binary.MultiplyNode;
-import com.dfsek.substrate.lang.node.expression.binary.SubtractionNode;
+import com.dfsek.substrate.lang.node.expression.binary.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -52,6 +49,8 @@ public class ExpressionRule implements Rule {
                 node = new SubtractionNode(left, right, op);
             } else if(op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
                 node = new MultiplyNode(left, right, op);
+            }else if(op.getType() == Token.Type.DIVISION_OPERATOR) {
+                node = new DivisionNode(left, right, op);
             } else if(op.getType() == Token.Type.EQUALS_OPERATOR) {
                 node = new EqualsNode(left, right, op);
             }else {
