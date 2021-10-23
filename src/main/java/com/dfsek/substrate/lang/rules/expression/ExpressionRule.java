@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.AdditionNode;
 import com.dfsek.substrate.lang.node.expression.binary.EqualsNode;
+import com.dfsek.substrate.lang.node.expression.binary.MultiplyNode;
 import com.dfsek.substrate.lang.node.expression.binary.SubtractionNode;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.Parser;
@@ -47,11 +48,13 @@ public class ExpressionRule implements Rule {
             ExpressionNode right = assemble(tokenizer, parser);
             if (op.getType() == Token.Type.ADDITION_OPERATOR) {
                 node = new AdditionNode(left, right, op);
-            } else if(op.getType() == Token.Type.EQUALS_OPERATOR) {
-                node = new EqualsNode(left, right, op);
             } else if(op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
                 node = new SubtractionNode(left, right, op);
-            } else {
+            } else if(op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
+                node = new MultiplyNode(left, right, op);
+            } else if(op.getType() == Token.Type.EQUALS_OPERATOR) {
+                node = new EqualsNode(left, right, op);
+            }else {
                 throw new ParseException("Unexpected token: " + op, op.getPosition());
             }
         }
