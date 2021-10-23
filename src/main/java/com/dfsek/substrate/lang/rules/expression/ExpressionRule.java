@@ -49,8 +49,10 @@ public class ExpressionRule implements Rule {
                 node = new SubtractionNode(left, right, op);
             } else if(op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
                 node = new MultiplyNode(left, right, op);
-            }else if(op.getType() == Token.Type.DIVISION_OPERATOR) {
+            } else if(op.getType() == Token.Type.DIVISION_OPERATOR) {
                 node = new DivisionNode(left, right, op);
+            } else if(op.getType() == Token.Type.MODULO_OPERATOR) {
+                node = new ModulusNode(left, right, op);
             } else if(op.getType() == Token.Type.EQUALS_OPERATOR) {
                 node = new EqualsNode(left, right, op);
             }else {

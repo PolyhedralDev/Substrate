@@ -1,0 +1,3 @@
+// Test modulo
+
+println(str(7 % 3));
