@@ -15,26 +15,25 @@ public class AdditionNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        if (left.returnType(data).equals(Signature.integer())) {
-            if (!left.returnType(data).equals(Signature.integer())) {
-                throw new ParseException("Expected INT, got " + left.returnType(data), left.getPosition());
-            }
+        Signature leftType = left.returnType(data);
+        Signature rightType = right.returnType(data);
 
-            if (!right.returnType(data).equals(Signature.integer())) {
-                throw new ParseException("Expected INT, got " + right.returnType(data), right.getPosition());
-            }
+        if(!rightType.equals(leftType)) {
+            throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
+        }
 
+        if(leftType.equals(Signature.integer())) {
             visitor.visitInsn(IADD);
-        } else {
-            if (!left.returnType(data).equals(Signature.decimal())) {
-                throw new ParseException("Expected NUM, got " + left.returnType(data), left.getPosition());
-            }
-
-            if (!right.returnType(data).equals(Signature.decimal())) {
-                throw new ParseException("Expected NUM, got " + right.returnType(data), right.getPosition());
-            }
-
+        } else if(leftType.equals(Signature.decimal())) {
             visitor.visitInsn(DADD);
+        } else if(leftType.equals(Signature.string())) {
+            visitor.visitMethodInsn(INVOKEVIRTUAL,
+                    "java/lang/String",
+                    "concat",
+                    "(Ljava/lang/String;)Ljava/lang/String;",
+                    false);
+        } else {
+            throw new ParseException("Expected [INT, NUM, STR], got " + leftType, left.getPosition());
         }
     }
 

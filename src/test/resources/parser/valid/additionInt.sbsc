@@ -1,0 +1,3 @@
+// Test addition
+
+println(str(1 + 2));

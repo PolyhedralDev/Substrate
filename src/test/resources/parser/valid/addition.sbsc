@@ -1,7 +1,0 @@
-// Test addition
-
-add = (a: num, b: num) -> {
-    return a + b;
-};
-
-println(str(add(1.0, 2.0)));

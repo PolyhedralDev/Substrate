@@ -1,0 +1,5 @@
+// test string concatenation
+
+a = "bazinga";
+
+println("Sheldon says: " + a);
