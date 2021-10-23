@@ -42,8 +42,14 @@ public class EqualsNode extends BinaryOperationNode {
             visitor.visitLabel(f);
             visitor.visitInsn(ICONST_0);
             visitor.visitLabel(t);
+        } else if(leftType.equals(Signature.string())) {
+            visitor.visitMethodInsn(INVOKEVIRTUAL,
+                    "java/lang/String",
+                    "equals",
+                    "(Ljava/lang/Object;)Z",
+                    false);
         } else {
-            throw new ParseException("Expected [INT, NUM], got " + leftType, left.getPosition());
+            throw new ParseException("Expected [INT, NUM, STR], got " + leftType, left.getPosition());
         }
     }
 
