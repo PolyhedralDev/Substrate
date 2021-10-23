@@ -1,0 +1,17 @@
+// test if expression with a block
+
+a = if(true) {
+    return 5;
+} else {
+    return 4;
+};
+
+println(str(a));
+
+b = if(false) {
+    return 5;
+} else {
+    return 4;
+};
+
+println(str(b));

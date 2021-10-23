@@ -1,4 +1,4 @@
-// test basic if statements
+// test basic if expression
 
 a = if(true) 5 else 4;
 
