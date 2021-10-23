@@ -1,3 +1,3 @@
-// Test addition
+// Test multiplication
 
 println(str(4.0 * 2.0));
