@@ -33,7 +33,8 @@ public class ExpressionRule implements Rule {
             node = CastRule.getInstance().assemble(tokenizer, parser);
         } else if (test.getType() == Token.Type.IF) {
             node = IfExpressionRule.getInstance().assemble(tokenizer, parser);
-        } else if(tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
+        } else if((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
+        || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer, parser);
         } else {
             node = TupleRule.getInstance().assemble(tokenizer, parser);

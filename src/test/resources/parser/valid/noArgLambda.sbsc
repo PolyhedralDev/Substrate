@@ -1,0 +1,7 @@
+// test a zero-arg lambda
+
+test = () -> {
+    println("bazinga");
+};
+
+test();
