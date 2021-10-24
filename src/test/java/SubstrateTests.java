@@ -1,12 +1,17 @@
+import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 import com.dfsek.substrate.tokenizer.exceptions.TokenizerException;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
+import org.objectweb.asm.MethodVisitor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,12 +29,59 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class SubstrateTests {
     private final List<DynamicTest> tests = new ArrayList<>();
 
+    private Parser createParser(String script) {
+        Parser parser = new Parser(script, new BaseRule());
+        parser.registerMacro(data -> {
+            data.registerValue("fail", new com.dfsek.substrate.lang.compiler.value.Function() {
+                @Override
+                public Signature arguments() {
+                    return Signature.empty();
+                }
+
+                @Override
+                public void invoke(MethodVisitor visitor, BuildData data) {
+                    visitor.visitMethodInsn(INVOKESTATIC,
+                            CompilerUtil.internalName(Assertions.class),
+                            "fail",
+                            "()V",
+                            false);
+                }
+
+                @Override
+                public Signature returnType() {
+                    return Signature.empty();
+                }
+            });
+            data.registerValue("assert", new com.dfsek.substrate.lang.compiler.value.Function() {
+                @Override
+                public Signature arguments() {
+                    return Signature.bool();
+                }
+
+                @Override
+                public void invoke(MethodVisitor visitor, BuildData data) {
+                    visitor.visitMethodInsn(INVOKESTATIC,
+                            CompilerUtil.internalName(Assertions.class),
+                            "assertTrue",
+                            "(Z)V",
+                            false);
+                }
+
+                @Override
+                public Signature returnType() {
+                    return Signature.empty();
+                }
+            });
+        });
+        return parser;
+    }
+
     @TestFactory
     public Collection<DynamicTest> tests() throws IOException {
         register(Paths.get("src", "test", "resources", "parser", "valid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = new Parser(data, new BaseRule());
+                Parser parser = createParser(data);
                 parser.parse().execute(null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -38,7 +90,7 @@ public class SubstrateTests {
         register(Paths.get("src", "test", "resources", "parser", "invalid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = new Parser(data, new BaseRule());
+                Parser parser = createParser(data);
                 parser.parse().execute(null);
             } catch (ParseException e) {
                 e.printStackTrace();
