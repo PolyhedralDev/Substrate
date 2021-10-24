@@ -228,6 +228,9 @@ public class Tokenizer {
         if (tokenString.equals("fun")) {
             return new Token(tokenString, Token.Type.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
+        if (tokenString.equals("list")) {
+            return new Token(tokenString, Token.Type.LIST_TYPE, new Position(reader.getLine(), reader.getIndex()));
+        }
 
         if (tokenString.equals("if")) {
             return new Token(tokenString, Token.Type.IF, new Position(reader.getLine(), reader.getIndex()));

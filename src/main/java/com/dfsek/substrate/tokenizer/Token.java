@@ -37,7 +37,8 @@ public class Token {
                 || type == Type.STRING_TYPE
                 || type == Type.FUN_TYPE
                 || type == Type.INT_TYPE
-                || type == Type.BOOL_TYPE;
+                || type == Type.BOOL_TYPE
+                || type == Type.LIST_TYPE;
     }
 
     public boolean isBinaryOperator() {
@@ -230,6 +231,10 @@ public class Token {
          * Function type "fun"
          */
         FUN_TYPE,
+        /**
+         * If expression token "if"
+         */
+        LIST_TYPE,
         /**
          * If expression token "if"
          */
