@@ -1,7 +1,10 @@
 package com.dfsek.substrate.lang.compiler.type;
 
+import com.dfsek.substrate.util.pair.Pair;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -16,13 +19,21 @@ public class Signature {
     private static final Signature TUP = new Signature(DataType.TUP);
     private static final Signature VOID = new Signature();
     private final List<DataType> types;
+    private final List<Pair<Signature, Signature>> generic;
 
-    public Signature(DataType... types) {
-        this.types = Arrays.asList(types);
+    public Signature(DataType type) {
+        this.types = Collections.singletonList(type);
+        this.generic = Collections.singletonList(Pair.of(Signature.empty(), Signature.empty()));
     }
 
-    public Signature(List<DataType> types) {
+    private Signature() {
+        this.types = Collections.emptyList();
+        this.generic = Collections.emptyList();
+    }
+
+    private Signature(List<DataType> types, List<Pair<Signature, Signature>> generic) {
         this.types = types;
+        this.generic = generic;
     }
 
     public static Signature decimal() {
@@ -75,6 +86,28 @@ public class Signature {
         return result;
     }
 
+    public Signature getGenericReturn(int index) {
+        return generic.get(index).getRight();
+    }
+
+    public Signature getGenericArguments(int index) {
+        return generic.get(index).getLeft();
+    }
+
+    public Signature applyGenericReturn(int index, Signature generic) {
+        List<DataType> otherTypes = new ArrayList<>(types);
+        List<Pair<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
+        otherGeneric.set(index, Pair.of(otherGeneric.get(index).getLeft(), generic));
+        return new Signature(otherTypes, otherGeneric);
+    }
+
+    public Signature applyGenericArgument(int index, Signature generic) {
+        List<DataType> otherTypes = new ArrayList<>(types);
+        List<Pair<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
+        otherGeneric.set(index, Pair.of(generic, otherGeneric.get(index).getRight()));
+        return new Signature(otherTypes, otherGeneric);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Signature)) return false;
@@ -100,17 +133,11 @@ public class Signature {
     }
 
     public Signature and(Signature other) {
-        List<DataType> copy = new ArrayList<>(types);
-        copy.addAll(other.types);
-        return new Signature(copy);
-    }
-
-    public Signature and(Signature... more) {
-        Signature run = this;
-        for (Signature signature : more) {
-            run = run.and(signature);
-        }
-        return run;
+        List<DataType> otherTypes = new ArrayList<>(types);
+        otherTypes.addAll(other.types);
+        List<Pair<Signature, Signature>> otherGeneric = new ArrayList<>(generic);
+        otherGeneric.addAll(other.generic);
+        return new Signature(otherTypes, otherGeneric);
     }
 
     public int frames() {

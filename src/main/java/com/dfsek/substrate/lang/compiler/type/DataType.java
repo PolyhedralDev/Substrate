@@ -114,6 +114,17 @@ public enum DataType {
         public char descriptorChar() {
             return 'T';
         }
+    },
+    LIST {
+        @Override
+        public String descriptor() {
+            return "[";
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'A';
+        }
     };
 
     public static DataType fromToken(Token token) {
@@ -127,6 +138,8 @@ public enum DataType {
             return NUM;
         } else if (token.getType() == Token.Type.FUN_TYPE) {
             return FUN;
+        } else if (token.getType() == Token.Type.LIST_TYPE) {
+            return LIST;
         }
         throw new IllegalArgumentException("Invalid token: " + token);
     }
