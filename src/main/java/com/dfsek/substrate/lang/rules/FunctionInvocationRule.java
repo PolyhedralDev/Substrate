@@ -4,7 +4,6 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.FunctionInvocationNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
-import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -21,13 +20,13 @@ public class FunctionInvocationRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
         Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<ExpressionNode> args = new ArrayList<>();
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-            args.add(ExpressionRule.getInstance().assemble(tokenizer, parser));
+            args.add(ExpressionRule.getInstance().assemble(tokenizer));
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }

@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.rules.expression;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.TupleNode;
-import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -20,7 +19,7 @@ public class TupleRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
 
         List<ExpressionNode> args = new ArrayList<>();
@@ -31,7 +30,7 @@ public class TupleRule implements Rule {
                 groups++;
                 tokenizer.consume();
             }
-            args.add(ExpressionRule.getInstance().assemble(tokenizer, parser));
+            args.add(ExpressionRule.getInstance().assemble(tokenizer));
             while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
                 groups--;
                 if (groups < 0) {

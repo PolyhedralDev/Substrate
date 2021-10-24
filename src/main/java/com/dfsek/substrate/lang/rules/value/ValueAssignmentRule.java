@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.ValueAssignmentNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
-import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -19,10 +18,10 @@ public class ValueAssignmentRule implements Rule {
     }
 
     @Override
-    public Node assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public Node assemble(Tokenizer tokenizer) throws ParseException {
         Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.ASSIGNMENT); // next token should be =
-        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer, parser);
+        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer);
         return new ValueAssignmentNode(id, value);
     }
 }

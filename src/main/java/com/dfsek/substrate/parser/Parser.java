@@ -18,7 +18,7 @@ public class Parser {
 
     public Script parse() throws ParseException {
         while (tokenizer.hasNext()) {
-            builder.addOperation(base.assemble(tokenizer, this));
+            builder.addOperation(base.assemble(tokenizer));
         }
         return builder.build();
     }

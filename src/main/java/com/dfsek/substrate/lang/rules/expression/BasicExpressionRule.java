@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.lang.node.expression.constant.StringNode;
-import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -21,7 +20,7 @@ public class BasicExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER, Token.Type.STRING, Token.Type.BOOLEAN, Token.Type.NUMBER, Token.Type.INT);
         if (tokenizer.peek().getType() == Token.Type.STRING) {
             return new StringNode(tokenizer.consume());

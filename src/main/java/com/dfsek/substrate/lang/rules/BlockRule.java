@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.BlockNode;
 import com.dfsek.substrate.lang.node.ReturnNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -24,7 +23,7 @@ public class BlockRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, Parser parser) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         List<ReturnNode> ret = new ArrayList<>();
@@ -34,11 +33,11 @@ public class BlockRule implements Rule {
 
         while (tokenizer.peek().getType() != Token.Type.BLOCK_END) {
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(this.assemble(tokenizer, parser));
+                contents.add(this.assemble(tokenizer));
             } else if (tokenizer.peek().isIdentifier() || tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(tokenizer, parser));
+                contents.add(StatementRule.getInstance().assemble(tokenizer));
             } else if (tokenizer.peek().getType() == Token.Type.RETURN) { // Parse a return
-                ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer, parser);
+                ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer);
                 ret.add(returnNode);
                 contents.add(returnNode);
             }
