@@ -3,4 +3,4 @@
 a = "test";
 b = "test";
 
-println(if(a == b) "bazinga" else "not bazinga");
+assert(a == b);

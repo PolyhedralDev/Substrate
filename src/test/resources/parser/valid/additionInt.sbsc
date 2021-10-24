@@ -1,3 +1,5 @@
 // Test addition
 
-println(str(1 + 2));
+a = 1 + 2;
+
+assert(a == 3);

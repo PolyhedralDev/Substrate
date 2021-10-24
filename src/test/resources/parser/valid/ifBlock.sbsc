@@ -6,7 +6,7 @@ a = if(true) {
     return 4;
 };
 
-println(str(a));
+assert(a == 5);
 
 b = if(false) {
     return 5;
@@ -14,4 +14,4 @@ b = if(false) {
     return 4;
 };
 
-println(str(b));
+assert(b == 4);

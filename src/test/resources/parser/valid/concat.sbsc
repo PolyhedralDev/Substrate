@@ -2,4 +2,6 @@
 
 a = "bazinga";
 
-println("Sheldon says: " + a);
+b = "Sheldon says: " + a;
+
+assert(b == "Sheldon says: bazinga");

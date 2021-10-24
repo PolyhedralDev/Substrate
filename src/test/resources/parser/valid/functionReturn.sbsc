@@ -5,4 +5,4 @@ test = (a: str) -> {
 };
 
 
-println(test("bazinga"));
+assert(test("bazinga") == "bazinga");

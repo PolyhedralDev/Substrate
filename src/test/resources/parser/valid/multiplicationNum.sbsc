@@ -1,3 +1,5 @@
 // Test multiplication
 
-println(str(4.0 * 2.0));
+a = 4.0 * 2.0;
+
+assert(a == 8.0);

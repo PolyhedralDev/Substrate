@@ -2,8 +2,8 @@
 
 a = if(true) 5 else 4;
 
-println(str(a));
+assert(a == 5);
 
 b = if(false) 5 else 4;
 
-println(str(b));
+assert(b == 4);
