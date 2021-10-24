@@ -2,9 +2,13 @@ package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ScriptBuilder;
+import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Tokenizer;
+
+import java.util.function.Consumer;
 
 public class Parser {
     private final Tokenizer tokenizer;
@@ -13,6 +17,7 @@ public class Parser {
 
     public Parser(String data, Rule base) throws ParseException {
         tokenizer = new Tokenizer(data);
+        builder.registerMacro(buildData -> buildData.registerValue("println", new Println()));
         this.base = base;
     }
 
@@ -21,5 +26,9 @@ public class Parser {
             builder.addOperation(base.assemble(tokenizer));
         }
         return builder.build();
+    }
+
+    public void registerMacro(Consumer<BuildData> buildDataConsumer) {
+        builder.registerMacro(buildDataConsumer);
     }
 }

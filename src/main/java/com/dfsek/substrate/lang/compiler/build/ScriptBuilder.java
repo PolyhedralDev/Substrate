@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -28,6 +29,8 @@ public class ScriptBuilder {
     private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
     private static int builds = 0;
     private final List<Node> ops = new ArrayList<>();
+
+    private final List<Consumer<BuildData>> macros = new ArrayList<>();
 
     public void addOperation(Node op) {
         ops.add(op);
@@ -75,7 +78,7 @@ public class ScriptBuilder {
         DynamicClassLoader classLoader = new DynamicClassLoader();
 
         BuildData data = new BuildData(classLoader, writer);
-        data.registerValue("println", new Println());
+        macros.forEach(buildDataConsumer -> buildDataConsumer.accept(data));
         ops.forEach(op -> op.apply(absMethod, data));
 
         Label end = new Label();
@@ -108,5 +111,9 @@ public class ScriptBuilder {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void registerMacro(Consumer<BuildData> buildDataConsumer) {
+        macros.add(buildDataConsumer);
     }
 }
