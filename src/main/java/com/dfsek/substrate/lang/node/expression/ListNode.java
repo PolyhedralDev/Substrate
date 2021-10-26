@@ -28,6 +28,11 @@ public class ListNode extends ExpressionNode {
         Signature params = args.get(0).returnType(data);
         if(params.isSimple()) {
             params.getType(0).applyNewArray(visitor, params.getGenericReturn(0));
+
+            args.forEach(arg -> {
+                arg.apply(visitor, data);
+                visitor.visitInsn(params.getType(0).arrayStoreInsn());
+            });
         }
     }
 
