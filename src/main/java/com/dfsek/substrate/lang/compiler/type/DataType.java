@@ -7,8 +7,6 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import java.util.Optional;
-
 public enum DataType implements Opcodes{
     INT {
         @Override
@@ -36,7 +34,7 @@ public enum DataType implements Opcodes{
         }
 
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitIntInsn(NEWARRAY, T_INT);
         }
     },
@@ -65,7 +63,7 @@ public enum DataType implements Opcodes{
             return DRETURN;
         }
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitIntInsn(NEWARRAY, T_DOUBLE);
         }
     },
@@ -81,7 +79,7 @@ public enum DataType implements Opcodes{
         }
 
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitTypeInsn(ANEWARRAY, "java/lang/String");
         }
     },
@@ -110,7 +108,7 @@ public enum DataType implements Opcodes{
             return IRETURN;
         }
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitIntInsn(NEWARRAY, T_BOOLEAN);
         }
     },
@@ -125,7 +123,7 @@ public enum DataType implements Opcodes{
             return 'F';
         }
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitTypeInsn(ANEWARRAY, CompilerUtil.internalName(Lambda.class));
         }
     },
@@ -140,7 +138,7 @@ public enum DataType implements Opcodes{
             return 'T';
         }
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitTypeInsn(ANEWARRAY, CompilerUtil.internalName(Tuple.class));
         }
     },
@@ -155,10 +153,9 @@ public enum DataType implements Opcodes{
             return 'A';
         }
         @Override
-        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
-            Signature gen = generic.orElseThrow(IllegalArgumentException::new);
+        public void applyNewArray(MethodVisitor visitor, Signature generic) {
             StringBuilder arr = new StringBuilder("[[");
-            int dims = nestArray(arr, gen, 2);
+            int dims = nestArray(arr, generic, 2);
             visitor.visitMultiANewArrayInsn(arr.toString(), dims);
         }
 
@@ -223,5 +220,5 @@ public enum DataType implements Opcodes{
         return ARETURN;
     }
 
-    public abstract void applyNewArray(MethodVisitor visitor, Optional<Signature> generic);
+    public abstract void applyNewArray(MethodVisitor visitor, Signature generic);
 }
