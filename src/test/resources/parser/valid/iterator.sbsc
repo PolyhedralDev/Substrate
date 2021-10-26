@@ -2,4 +2,4 @@
 
 a = [1, 2, 3, 5];
 
-for b in a -> println(str(b));
+for(a, (b: int) -> println(b));

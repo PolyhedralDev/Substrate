@@ -250,14 +250,6 @@ public class Token {
         /**
          * Else token "else"
          */
-        ELSE,
-        /**
-         * For token "for"
-         */
-        FOR,
-        /**
-         * In token "in"
-         */
-        IN
+        ELSE
     }
 }

@@ -243,13 +243,6 @@ public class Tokenizer {
             return new Token(tokenString, Token.Type.ELSE, new Position(reader.getLine(), reader.getIndex()));
         }
 
-        if (tokenString.equals("for")) {
-            return new Token(tokenString, Token.Type.FOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("in")) {
-            return new Token(tokenString, Token.Type.IN, new Position(reader.getLine(), reader.getIndex()));
-        }
-
 
         return new Token(tokenString, Token.Type.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
     }
