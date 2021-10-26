@@ -13,7 +13,7 @@ public class Tokenizer {
 
     static {
         syntaxSignificant = new HashSet<>();
-        syntaxSignificant.addAll(Arrays.asList(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.')); // Reserved chars
+        syntaxSignificant.addAll(Arrays.asList(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.', '$', '[', ']')); // Reserved chars
     }
 
     private final Lookahead reader;
@@ -180,6 +180,10 @@ public class Tokenizer {
                 return new Token(reader.consume().toString(), Token.Type.BOOLEAN_NOT, new Position(reader.getLine(), reader.getIndex()));
             case ':':
                 return new Token(reader.consume().toString(), Token.Type.TYPE, new Position(reader.getLine(), reader.getIndex()));
+            case '[':
+                return new Token(reader.consume().toString(), Token.Type.LIST_BEGIN, new Position(reader.getLine(), reader.getIndex()));
+            case ']':
+                return new Token(reader.consume().toString(), Token.Type.LIST_END, new Position(reader.getLine(), reader.getIndex()));
         }
 
 

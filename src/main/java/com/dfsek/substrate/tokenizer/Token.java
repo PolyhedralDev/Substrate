@@ -124,6 +124,14 @@ public class Token {
          */
         BLOCK_END,
         /**
+         * Beginning of list reference "["
+         */
+        LIST_BEGIN,
+        /**
+         * End of list reference "]"
+         */
+        LIST_END,
+        /**
          * assignment operator "="
          */
         ASSIGNMENT,
