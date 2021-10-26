@@ -170,12 +170,12 @@ public enum DataType implements Opcodes{
         }
         @Override
         public void applyNewArray(MethodVisitor visitor, Signature generic) {
-            StringBuilder arr = new StringBuilder("[[");
-            int dims = nestArray(arr, generic, 2);
-            visitor.visitMultiANewArrayInsn(arr.toString(), dims);
+            StringBuilder arr = new StringBuilder("[");
+            nestArray(arr, generic);
+            visitor.visitTypeInsn(ANEWARRAY, arr.toString());
         }
 
-        private int nestArray(StringBuilder arr, Signature generic, int dimensions) {
+        private void nestArray(StringBuilder arr, Signature generic) {
             if(generic.isSimple()) {
                 if(generic.getType(0).equals(INT)) {
                     arr.append('I');
@@ -191,7 +191,7 @@ public enum DataType implements Opcodes{
                     arr.append(CompilerUtil.internalName(Tuple.class));
                 } else if(generic.getType(0).equals(LIST)) {
                     Signature nested = generic.getGenericReturn(0);
-                    return nestArray(arr, nested, dimensions+1);
+                    nestArray(arr, nested);
                 }
             } else {
                 if(generic.equals(Signature.empty())) {
@@ -199,7 +199,6 @@ public enum DataType implements Opcodes{
                 }
                 arr.append(CompilerUtil.internalName(Tuple.class)); // It's a tuple.
             }
-            return dimensions;
         }
     };
 
