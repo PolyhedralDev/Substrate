@@ -1,0 +1,6 @@
+// list element tuples should have same signature
+
+a = ("bazinga", 1);
+b = ("bazinga", 1, 2);
+
+c = [a, b];
