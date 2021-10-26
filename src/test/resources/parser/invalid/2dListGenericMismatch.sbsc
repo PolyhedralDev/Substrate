@@ -1,0 +1,11 @@
+// nested lists generic mismatch
+
+a = ("bazinga", 2);
+b = ("bazinga2", 3);
+c = ("bazinga", 3, 4);
+d = ("bazinga2", 4, 5);
+
+e = [a, b];
+f = [c, d];
+
+g = [e, f]; // this should fail.
