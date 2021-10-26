@@ -1,0 +1,7 @@
+// a list of tuples
+
+a = (1, "Sheldon");
+b = (2, "Leonard");
+c = (3, "Penny");
+
+d = [a, b, c];

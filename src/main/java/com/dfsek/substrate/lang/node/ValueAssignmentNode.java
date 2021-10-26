@@ -33,7 +33,7 @@ public class ValueAssignmentNode implements Node {
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
             data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent(), lambdaExpressionNode.internalParameters()), value.returnType(data).frames());
         } else {
-            data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data), id.getContent()), value.returnType(data).frames());
+            data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data)), value.returnType(data).frames());
         }
 
         int offset = data.offset(id.getContent());

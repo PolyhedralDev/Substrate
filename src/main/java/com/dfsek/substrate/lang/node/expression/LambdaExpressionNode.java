@@ -116,6 +116,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public Signature referenceType(BuildData data) {
-        return new Signature(DataType.FUN).applyGenericReturn(0, returnType(data)).applyGenericArgument(0, getParameters());
+        return Signature.fun().applyGenericReturn(0, returnType(data)).applyGenericArgument(0, getParameters());
     }
 }

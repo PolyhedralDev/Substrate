@@ -42,6 +42,17 @@ public class ValueReferenceNode extends ExpressionNode {
     }
 
     @Override
+    public void applyReferential(MethodVisitor visitor, BuildData data) {
+        if (!data.valueExists(id.getContent())) {
+            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
+        }
+        Value value = data.getValue(id.getContent());
+        int offset = data.offset(id.getContent());
+
+        visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
+    }
+
+    @Override
     public Position getPosition() {
         return id.getPosition();
     }

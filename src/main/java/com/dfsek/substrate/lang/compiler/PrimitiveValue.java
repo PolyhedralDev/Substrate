@@ -5,11 +5,9 @@ import com.dfsek.substrate.lang.compiler.value.Value;
 
 public class PrimitiveValue implements Value {
     private final Signature signature;
-    private final String name;
 
-    public PrimitiveValue(Signature signature, String name) {
+    public PrimitiveValue(Signature signature) {
         this.signature = signature;
-        this.name = name;
     }
 
     @Override

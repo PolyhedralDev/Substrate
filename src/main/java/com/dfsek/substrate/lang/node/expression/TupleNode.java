@@ -53,4 +53,9 @@ public class TupleNode extends ExpressionNode {
         }
         return signature;
     }
+
+    @Override
+    public Signature referenceType(BuildData data) {
+        return Signature.tup().applyGenericReturn(0, returnType(data));
+    }
 }

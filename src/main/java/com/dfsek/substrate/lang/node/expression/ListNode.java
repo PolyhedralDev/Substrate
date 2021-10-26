@@ -30,7 +30,7 @@ public class ListNode extends ExpressionNode {
         for (int i = 0; i < args.size(); i++) {
             visitor.visitInsn(DUP); // duplicate reference for all elements.
             CompilerUtil.pushInt(i, visitor); // push index
-            args.get(i).apply(visitor, data); // apply value
+            args.get(i).applyReferential(visitor, data); // apply value
             visitor.visitInsn(params.getType(0).arrayStoreInsn());
         }
     }
