@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.ListNode;
 import com.dfsek.substrate.lang.node.expression.binary.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -31,6 +32,8 @@ public class ExpressionRule implements Rule {
             node = CastRule.getInstance().assemble(tokenizer);
         } else if (test.getType() == Token.Type.IF) {
             node = IfExpressionRule.getInstance().assemble(tokenizer);
+        } else if(test.getType() == Token.Type.LIST_BEGIN) {
+            node = ListRule.getInstance().assemble(tokenizer);
         } else if((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
         || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer);
