@@ -1,0 +1,3 @@
+// declare a list of strs
+
+a = ["Sheldon", "Leonard", "Penny"];
