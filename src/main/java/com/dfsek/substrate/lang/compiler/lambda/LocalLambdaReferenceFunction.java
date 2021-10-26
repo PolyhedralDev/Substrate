@@ -77,6 +77,11 @@ public class LocalLambdaReferenceFunction implements Function {
     }
 
     @Override
+    public Signature reference() {
+        return Signature.fun().applyGenericArgument(0, args).applyGenericReturn(0, returnType);
+    }
+
+    @Override
     public boolean ephemeral() {
         return false;
     }

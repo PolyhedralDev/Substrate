@@ -32,4 +32,9 @@ public class Println implements Function {
     public Signature returnType() {
         return Signature.empty();
     }
+
+    @Override
+    public Signature reference() {
+        return Signature.fun().applyGenericArgument(0, Signature.string());
+    }
 }

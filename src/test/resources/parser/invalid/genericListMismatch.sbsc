@@ -1,0 +1,7 @@
+// list element generic signature mismatch
+
+a = (q: num) -> {};
+
+b = (q: int) -> {};
+
+c = [a, b];

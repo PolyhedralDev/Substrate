@@ -17,10 +17,10 @@ public final class Pair<L, R> {
         return new Pair<>(left, right);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <L1, R1> Pair<L1, R1> ofNull() {
-        return (Pair<L1, R1>) NULL;
-    }
+   @SuppressWarnings("unchecked")
+   public static <L1, R1> Pair<L1, R1> ofNull() {
+       return (Pair<L1, R1>) NULL;
+   }
 
     public Mutable<L, R> mutable() {
         return Mutable.of(left, right);
@@ -45,6 +45,11 @@ public final class Pair<L, R> {
 
         Pair<?, ?> that = (Pair<?, ?>) obj;
         return Objects.equals(this.left, that.left) && Objects.equals(this.right, that.right);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + left + ", " + right + ")";
     }
 
     public static class Mutable<L, R> {

@@ -6,11 +6,13 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 
 
 public class Signature implements Opcodes {
+    private static final Signature VOID = new Signature();
     private static final Signature BOOL = new Signature(DataType.BOOL);
     private static final Signature INT = new Signature(DataType.INT);
     private static final Signature DECIMAL = new Signature(DataType.NUM);
@@ -19,7 +21,6 @@ public class Signature implements Opcodes {
     private static final Signature FUN = new Signature(DataType.FUN);
 
     private static final Signature TUP = new Signature(DataType.TUP);
-    private static final Signature VOID = new Signature();
     private final List<DataType> types;
     private final List<Pair<Signature, Signature>> generic;
 
@@ -74,16 +75,16 @@ public class Signature implements Opcodes {
         return types.size();
     }
 
-    public void forEach(Consumer<DataType> action) {
-        types.forEach(action);
-    }
-
     @Override
     public int hashCode() {
         int result = 1;
 
         for (DataType element : types)
             result = 31 * result + (element == null ? 0 : element.hashCode());
+
+        for (Pair<Signature, Signature> pair : generic) {
+            result = 31 * result + (pair == null ? 0 : pair.hashCode());
+        }
 
         return result;
     }
@@ -99,16 +100,20 @@ public class Signature implements Opcodes {
     }
 
     public Signature applyGenericReturn(int index, Signature generic) {
+        Objects.requireNonNull(generic);
         List<DataType> otherTypes = new ArrayList<>(types);
         List<Pair<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
-        otherGeneric.set(index, Pair.of(otherGeneric.get(index).getLeft(), generic));
+        Signature left = otherGeneric.get(index).getLeft();
+        otherGeneric.set(index, Pair.of(left == null ? empty() : left, generic));
         return new Signature(otherTypes, otherGeneric);
     }
 
     public Signature applyGenericArgument(int index, Signature generic) {
+        Objects.requireNonNull(generic);
         List<DataType> otherTypes = new ArrayList<>(types);
         List<Pair<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
-        otherGeneric.set(index, Pair.of(generic, otherGeneric.get(index).getRight()));
+        Signature right = otherGeneric.get(index).getRight();
+        otherGeneric.set(index, Pair.of(generic, right == null ? empty() : right));
         return new Signature(otherTypes, otherGeneric);
     }
 
@@ -121,6 +126,10 @@ public class Signature implements Opcodes {
 
         for (int i = 0; i < this.types.size(); i++) {
             if (this.types.get(i) != that.types.get(i)) return false;
+        }
+
+        for (int i = 0; i < generic.size(); i++) {
+            if(!this.generic.get(i).equals(that.generic.get(i))) return false;
         }
 
         return true;

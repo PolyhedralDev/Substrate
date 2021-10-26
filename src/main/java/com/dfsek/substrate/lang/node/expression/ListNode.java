@@ -22,6 +22,8 @@ public class ListNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Signature signature = elements.get(0).referenceType(data);
+        System.out.println("SIG: " + signature);
+        System.out.println(elements.get(0));
         elements.forEach(arg -> {
             if(!arg.referenceType(data).equals(signature)) {
                 throw new ParseException("Array element mismatch. Expected " + signature + ", got " + arg.referenceType(data), position);

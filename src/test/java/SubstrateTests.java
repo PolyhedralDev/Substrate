@@ -51,6 +51,11 @@ public class SubstrateTests {
                 public Signature returnType() {
                     return Signature.empty();
                 }
+
+                @Override
+                public Signature reference() {
+                    return Signature.fun();
+                }
             });
             data.registerValue("assert", new com.dfsek.substrate.lang.compiler.value.Function() {
                 @Override
@@ -70,6 +75,11 @@ public class SubstrateTests {
                 @Override
                 public Signature returnType() {
                     return Signature.empty();
+                }
+
+                @Override
+                public Signature reference() {
+                    return Signature.fun().applyGenericArgument(0, Signature.bool());
                 }
             });
         });

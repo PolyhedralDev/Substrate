@@ -8,11 +8,6 @@ import org.objectweb.asm.MethodVisitor;
 public interface Function extends Value {
     Signature arguments();
 
-    @Override
-    default Signature reference() {
-        return Signature.fun();
-    }
-
     default void preArgsPrep(MethodVisitor visitor, BuildData data) {
     }
 
