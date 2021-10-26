@@ -21,9 +21,13 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if (args.stream().map(node -> node.returnType(data)).distinct().count() > 1) {
-            throw new ParseException("", position);
-        }
+        Signature signature = args.get(0).referenceType(data);
+        args.forEach(arg -> {
+            if(!arg.referenceType(data).equals(signature)) {
+                throw new ParseException("Array element mismatch. Expected " + signature + ", got " + arg.referenceType(data), position);
+            }
+        });
+
         CompilerUtil.pushInt(args.size(), visitor);
         Signature params = args.get(0).referenceType(data);
         params.getType(0).applyNewArray(visitor, params.getGenericReturn(0));

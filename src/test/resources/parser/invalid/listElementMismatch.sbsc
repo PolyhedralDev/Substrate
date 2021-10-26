@@ -1,0 +1,7 @@
+// parser should fail if array elements are mismatched.
+
+a = "bazinga";
+
+b = 2;
+
+c = [a, b];
