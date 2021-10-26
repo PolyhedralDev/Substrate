@@ -1,0 +1,5 @@
+// declare a list of functions
+
+b = () -> {};
+
+d = [() -> {}, b, () -> {}];

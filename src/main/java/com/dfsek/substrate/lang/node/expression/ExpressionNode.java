@@ -6,4 +6,8 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 
 public abstract class ExpressionNode implements Node {
     public abstract Signature returnType(BuildData data);
+
+    public Signature referenceType(BuildData data) {
+        return returnType(data);
+    }
 }

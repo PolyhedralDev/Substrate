@@ -21,19 +21,17 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(args.stream().map(node -> node.returnType(data)).distinct().count() > 1) {
+        if (args.stream().map(node -> node.returnType(data)).distinct().count() > 1) {
             throw new ParseException("", position);
         }
         CompilerUtil.pushInt(args.size(), visitor);
-        Signature params = args.get(0).returnType(data);
-        if(params.isSimple()) {
-            params.getType(0).applyNewArray(visitor, params.getGenericReturn(0));
-            for (int i = 0; i < args.size(); i++) {
-                visitor.visitInsn(DUP); // duplicate reference for all elements.
-                CompilerUtil.pushInt(i, visitor); // push index
-                args.get(i).apply(visitor, data); // apply value
-                visitor.visitInsn(params.getType(0).arrayStoreInsn());
-            }
+        Signature params = args.get(0).referenceType(data);
+        params.getType(0).applyNewArray(visitor, params.getGenericReturn(0));
+        for (int i = 0; i < args.size(); i++) {
+            visitor.visitInsn(DUP); // duplicate reference for all elements.
+            CompilerUtil.pushInt(i, visitor); // push index
+            args.get(i).apply(visitor, data); // apply value
+            visitor.visitInsn(params.getType(0).arrayStoreInsn());
         }
     }
 
