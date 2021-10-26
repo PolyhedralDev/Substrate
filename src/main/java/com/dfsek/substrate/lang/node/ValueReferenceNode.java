@@ -26,7 +26,7 @@ public class ValueReferenceNode extends ExpressionNode {
         Value value = data.getValue(id.getContent());
         int offset = data.offset(id.getContent());
 
-        if (value.reference().isSimple()) {
+        if (value.returnType().isSimple()) {
             visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
         } else {
             for (int i = 0; i < value.returnType().size(); i++) {
