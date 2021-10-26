@@ -89,11 +89,13 @@ public class Signature implements Opcodes {
     }
 
     public Signature getGenericReturn(int index) {
-        return generic.get(index).getRight();
+        Signature ret = generic.get(index).getRight();
+        return ret == null ? empty() : ret;
     }
 
     public Signature getGenericArguments(int index) {
-        return generic.get(index).getLeft();
+        Signature arg = generic.get(index).getLeft();
+        return arg == null ? empty() : arg;
     }
 
     public Signature applyGenericReturn(int index, Signature generic) {
@@ -129,6 +131,13 @@ public class Signature implements Opcodes {
         StringBuilder builder = new StringBuilder("(");
         for (int i = 0; i < types.size(); i++) {
             builder.append(types.get(i));
+            if(!getGenericArguments(i).equals(empty()) || !getGenericReturn(i).equals(empty())){
+                builder.append('<');
+                builder.append(getGenericArguments(i).toString());
+                builder.append("->");
+                builder.append(getGenericReturn(i).toString());
+                builder.append('>');
+            }
             if (i != types.size() - 1) builder.append(',');
         }
         return builder.append(')').toString();
