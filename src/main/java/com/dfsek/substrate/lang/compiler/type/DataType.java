@@ -4,9 +4,12 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.tokenizer.Token;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public enum DataType {
+import java.util.Optional;
+
+public enum DataType implements Opcodes{
     INT {
         @Override
         public String descriptor() {
@@ -20,16 +23,21 @@ public enum DataType {
 
         @Override
         public int loadInsn() {
-            return Opcodes.ILOAD;
+            return ILOAD;
         }
 
         @Override
         public int storeInsn() {
-            return Opcodes.ISTORE;
+            return ISTORE;
         }
 
         public int returnInsn() {
-            return Opcodes.IRETURN;
+            return IRETURN;
+        }
+
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitIntInsn(NEWARRAY, T_INT);
         }
     },
     NUM {
@@ -45,16 +53,20 @@ public enum DataType {
 
         @Override
         public int loadInsn() {
-            return Opcodes.DLOAD;
+            return DLOAD;
         }
 
         @Override
         public int storeInsn() {
-            return Opcodes.DSTORE;
+            return DSTORE;
         }
 
         public int returnInsn() {
-            return Opcodes.DRETURN;
+            return DRETURN;
+        }
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitIntInsn(NEWARRAY, T_DOUBLE);
         }
     },
     STR {
@@ -66,6 +78,11 @@ public enum DataType {
         @Override
         public char descriptorChar() {
             return 'S';
+        }
+
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitTypeInsn(ANEWARRAY, "java/lang/String");
         }
     },
     BOOL {
@@ -81,16 +98,20 @@ public enum DataType {
 
         @Override
         public int loadInsn() {
-            return Opcodes.ILOAD;
+            return ILOAD;
         }
 
         @Override
         public int storeInsn() {
-            return Opcodes.ISTORE;
+            return ISTORE;
         }
 
         public int returnInsn() {
-            return Opcodes.IRETURN;
+            return IRETURN;
+        }
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitIntInsn(NEWARRAY, T_BOOLEAN);
         }
     },
     FUN {
@@ -103,6 +124,10 @@ public enum DataType {
         public char descriptorChar() {
             return 'F';
         }
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitTypeInsn(ANEWARRAY, CompilerUtil.internalName(Lambda.class));
+        }
     },
     TUP {
         @Override
@@ -114,6 +139,10 @@ public enum DataType {
         public char descriptorChar() {
             return 'T';
         }
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            visitor.visitTypeInsn(ANEWARRAY, CompilerUtil.internalName(Tuple.class));
+        }
     },
     LIST {
         @Override
@@ -124,6 +153,40 @@ public enum DataType {
         @Override
         public char descriptorChar() {
             return 'A';
+        }
+        @Override
+        public void applyNewArray(MethodVisitor visitor, Optional<Signature> generic) {
+            Signature gen = generic.orElseThrow(IllegalArgumentException::new);
+            StringBuilder arr = new StringBuilder("[[");
+            int dims = nestArray(arr, gen, 2);
+            visitor.visitMultiANewArrayInsn(arr.toString(), dims);
+        }
+
+        private int nestArray(StringBuilder arr, Signature generic, int dimensions) {
+            if(generic.isSimple()) {
+                if(generic.getType(0).equals(INT)) {
+                    arr.append('I');
+                } else if(generic.getType(0).equals(NUM)) {
+                    arr.append('D');
+                } else if(generic.getType(0).equals(BOOL)) {
+                    arr.append('Z');
+                } else if(generic.getType(0).equals(STR)) {
+                    arr.append("Ljava/lang/String;");
+                } else if(generic.getType(0).equals(FUN)) {
+                    arr.append(CompilerUtil.internalName(Lambda.class));
+                } else if(generic.getType(0).equals(TUP)) {
+                    arr.append(CompilerUtil.internalName(Tuple.class));
+                } else if(generic.getType(0).equals(LIST)) {
+                    Signature nested = generic.getGenericReturn(0);
+                    return nestArray(arr, nested, dimensions+1);
+                }
+            } else {
+                if(generic.equals(Signature.empty())) {
+                    throw new IllegalArgumentException("Cannot construct array of VOID");
+                }
+                arr.append(CompilerUtil.internalName(Tuple.class)); // It's a tuple.
+            }
+            return dimensions;
         }
     };
 
@@ -149,14 +212,16 @@ public enum DataType {
     public abstract char descriptorChar();
 
     public int loadInsn() {
-        return Opcodes.ALOAD;
+        return ALOAD;
     }
 
     public int storeInsn() {
-        return Opcodes.ASTORE;
+        return ASTORE;
     }
 
     public int returnInsn() {
-        return Opcodes.ARETURN;
+        return ARETURN;
     }
+
+    public abstract void applyNewArray(MethodVisitor visitor, Optional<Signature> generic);
 }

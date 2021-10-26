@@ -1,14 +1,16 @@
 package com.dfsek.substrate.lang.compiler.type;
 
 import com.dfsek.substrate.util.pair.Pair;
+import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Signature {
+
+
+public class Signature implements Opcodes {
     private static final Signature BOOL = new Signature(DataType.BOOL);
     private static final Signature INT = new Signature(DataType.INT);
     private static final Signature DECIMAL = new Signature(DataType.NUM);
