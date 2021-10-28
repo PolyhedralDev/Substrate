@@ -2,4 +2,6 @@
 
 a = [1, 2, 3, 5];
 
-for(a, (b: int) -> println(b));
+forEach(a, (b: int) -> println(b));
+
+for b in a -> println(b);

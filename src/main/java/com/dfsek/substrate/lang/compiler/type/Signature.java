@@ -21,6 +21,8 @@ public class Signature implements Opcodes {
     private static final Signature FUN = new Signature(DataType.FUN);
 
     private static final Signature TUP = new Signature(DataType.TUP);
+
+    private static final Signature LIST = new Signature(DataType.LIST);
     private final List<DataType> types;
     private final List<Pair<Signature, Signature>> generic;
 
@@ -65,6 +67,10 @@ public class Signature implements Opcodes {
 
     public static Signature tup() {
         return TUP;
+    }
+
+    public static Signature list() {
+        return LIST;
     }
 
     public DataType getType(int index) {
