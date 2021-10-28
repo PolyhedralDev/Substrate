@@ -26,7 +26,7 @@ public class ForEach implements Function {
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data) {
+    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
         Signature node = consumer.referenceType(data);
 
         if (!Signature.fun().applyGenericReturn(0, Signature.empty()).applyGenericArgument(0, listGeneric).equals(node)) {

@@ -20,7 +20,7 @@ public class Println implements Function {
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data) {
+    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
         visitor.visitMethodInsn(INVOKEVIRTUAL,
                 "java/io/PrintStream",
                 "println",

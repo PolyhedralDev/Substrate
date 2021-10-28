@@ -6,7 +6,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.internal.Tuple;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public class LocalLambdaReferenceFunction implements Function {
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data) {
+    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
         String ret = returnType.internalDescriptor();
 
         if (!returnType.isSimple()) {
@@ -45,12 +44,12 @@ public class LocalLambdaReferenceFunction implements Function {
         }
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType)),
+                CompilerUtil.internalName(data.lambdaFactory().generate(this.args, returnType)),
                 "apply",
-                "(" + args.internalDescriptor() + ")" + ret,
+                "(" + this.args.internalDescriptor() + ")" + ret,
                 true);
         if (!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
-            String internal = "$$i" + args.classDescriptor() + "$" + ret + "$" + returnType.classDescriptor();
+            String internal = "$$i" + this.args.classDescriptor() + "$" + ret + "$" + returnType.classDescriptor();
             data.registerValue(internal, new EphemeralValue(returnType));
             int offset = data.offset(internal);
             visitor.visitVarInsn(ASTORE, offset);

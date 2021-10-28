@@ -39,7 +39,7 @@ public class SubstrateTests {
                 }
 
                 @Override
-                public void invoke(MethodVisitor visitor, BuildData data) {
+                public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
                     visitor.visitMethodInsn(INVOKESTATIC,
                             CompilerUtil.internalName(Assertions.class),
                             "fail",
@@ -64,7 +64,7 @@ public class SubstrateTests {
                 }
 
                 @Override
-                public void invoke(MethodVisitor visitor, BuildData data) {
+                public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
                     visitor.visitMethodInsn(INVOKESTATIC,
                             CompilerUtil.internalName(Assertions.class),
                             "assertTrue",

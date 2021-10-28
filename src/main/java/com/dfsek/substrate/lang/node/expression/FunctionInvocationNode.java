@@ -63,12 +63,12 @@ public class FunctionInvocationNode extends ExpressionNode {
             visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
-        if (!argSignature.equals(function.arguments(argSignature))) {
+        if (!function.argsMatch(argSignature)) {
             throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
         }
 
 
-        function.invoke(visitor, data);
+        function.invoke(visitor, data, argSignature);
     }
 
     @Override
