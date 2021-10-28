@@ -141,6 +141,16 @@ public class Signature implements Opcodes {
         return true;
     }
 
+    public boolean weakEquals(Signature that) {
+        if (this.size() != that.size()) return false;
+
+        for (int i = 0; i < this.types.size(); i++) {
+            if (this.types.get(i) != that.types.get(i)) return false;
+        }
+
+        return true;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("(");
