@@ -141,6 +141,7 @@ public class SubstrateTests {
             }
         });
 
+        tests.sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
         return tests;
     }
 
@@ -148,7 +149,7 @@ public class SubstrateTests {
         Files.walk(parent)
                 .filter(path -> !path.toFile().isDirectory())
                 .forEach(path -> {
-                    String name = path.getFileName().toString();
+                    String name = parent.relativize(path).toString();
                     tests.add(DynamicTest.dynamicTest(name, executable.apply(path)));
                 });
 
