@@ -49,9 +49,8 @@ public class LocalLambdaReferenceFunction implements Function {
                 "(" + this.args.internalDescriptor() + ")" + ret,
                 true);
         if (!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
-            String internal = "$$i" + this.args.classDescriptor() + "$" + ret + "$" + returnType.classDescriptor();
-            data.registerValue(internal, new EphemeralValue(returnType));
-            int offset = data.offset(internal);
+            data.offsetInc(1);
+            int offset = data.getOffset();
             visitor.visitVarInsn(ASTORE, offset);
 
             for (int i = 0; i < returnType.size(); i++) {

@@ -92,6 +92,14 @@ public class BuildData {
         offset += frames;
     }
 
+    public void offsetInc(int offset) {
+        this.offset += offset;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
     public boolean hasOffset(String id) {
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
 
