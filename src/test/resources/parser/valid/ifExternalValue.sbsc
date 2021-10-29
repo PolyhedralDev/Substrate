@@ -12,9 +12,9 @@ a = if(true) {
 assert(a == "bazinga");
 
 b = if(false) {
-    return f;
-} else {
     return e;
+} else {
+    return f;
 };
 
 assert(b == "not bazinga");

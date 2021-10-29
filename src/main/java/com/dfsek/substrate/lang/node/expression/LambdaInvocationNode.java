@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.node.expression;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -27,6 +28,11 @@ public class LambdaInvocationNode extends ExpressionNode{
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
             else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
+        }
+
+        for (String internalParameter : lambda.internalParameters()) {
+            Value internal = data.getValue(internalParameter);
+            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
