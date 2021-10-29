@@ -1,0 +1,20 @@
+// use external value in if block
+
+e = "bazinga";
+f = "not bazinga";
+
+a = if(true) {
+    return e;
+} else {
+    return f;
+};
+
+assert(a == "bazinga");
+
+b = if(false) {
+    return f;
+} else {
+    return e;
+};
+
+assert(b == "not bazinga");
