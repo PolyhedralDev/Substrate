@@ -158,8 +158,10 @@ public class Signature implements Opcodes {
             builder.append(types.get(i));
             if(!getGenericArguments(i).equals(empty()) || !getGenericReturn(i).equals(empty())){
                 builder.append('<');
-                builder.append(getGenericArguments(i).toString());
-                builder.append("->");
+                if(!getGenericArguments(i).equals(empty())) {
+                    builder.append(getGenericArguments(i).toString());
+                    builder.append("->");
+                }
                 builder.append(getGenericReturn(i).toString());
                 builder.append('>');
             }

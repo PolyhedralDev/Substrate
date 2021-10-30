@@ -55,7 +55,6 @@ public class ForEach implements Function {
 
         visitor.visitVarInsn(ILOAD, iLV);
         visitor.visitVarInsn(ILOAD, arrayLengthLV);
-        visitor.visitIincInsn(iLV, 1);
         visitor.visitJumpInsn(IF_ICMPGE, end); // jump to end if i >= length
 
         visitor.visitVarInsn(ALOAD, lambdaLV); // load lambda
@@ -73,9 +72,10 @@ public class ForEach implements Function {
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(data.lambdaFactory().generate(lambda.getGenericArguments(0), lambda.getGenericReturn(0))),
                 "apply",
-                "(" + lambda.getGenericArguments(0).internalDescriptor() + ")" + lambda.getGenericReturn(0).internalDescriptor(),
+                "(" + lambda.getGenericArguments(0).internalDescriptor() + ")V",
                 true);
 
+        visitor.visitIincInsn(iLV, 1);
         visitor.visitJumpInsn(GOTO, start);
 
         visitor.visitLabel(end);

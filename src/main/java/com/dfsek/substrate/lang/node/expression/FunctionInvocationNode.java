@@ -42,7 +42,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         } else {
             argSignature = arguments.get(0).returnType(data);
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).returnType(data));
+                argSignature = argSignature.and(arguments.get(i).referenceType(data));
             }
         }
 

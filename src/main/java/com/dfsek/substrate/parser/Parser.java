@@ -4,6 +4,7 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ScriptBuilder;
+import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Tokenizer;
@@ -18,6 +19,7 @@ public class Parser {
     public Parser(String data, Rule base) throws ParseException {
         tokenizer = new Tokenizer(data);
         builder.registerMacro(buildData -> buildData.registerValue("println", new Println()));
+        builder.registerMacro(buildData -> buildData.registerValue("forEach", new ForEach()));
         this.base = base;
     }
 
