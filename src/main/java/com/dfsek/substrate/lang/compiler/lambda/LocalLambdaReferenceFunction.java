@@ -1,11 +1,11 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
-import com.dfsek.substrate.lang.compiler.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.internal.Tuple;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class LocalLambdaReferenceFunction implements Function {
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+    public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
         String ret = returnType.internalDescriptor();
 
         if (!returnType.isSimple()) {

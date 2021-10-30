@@ -68,7 +68,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         }
 
 
-        function.invoke(visitor, data, argSignature);
+        function.invoke(visitor, data, argSignature, arguments);
     }
 
     @Override

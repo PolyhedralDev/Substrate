@@ -1,6 +1,7 @@
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -39,7 +40,7 @@ public class SubstrateTests {
                 }
 
                 @Override
-                public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+                public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
                     visitor.visitMethodInsn(INVOKESTATIC,
                             CompilerUtil.internalName(Assertions.class),
                             "fail",
@@ -64,7 +65,7 @@ public class SubstrateTests {
                 }
 
                 @Override
-                public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+                public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
                     visitor.visitMethodInsn(INVOKESTATIC,
                             CompilerUtil.internalName(Assertions.class),
                             "assertTrue",

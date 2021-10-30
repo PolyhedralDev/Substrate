@@ -39,6 +39,11 @@ public enum DataType implements Opcodes{
         }
 
         @Override
+        public int arrayLoadInsn() {
+            return IALOAD;
+        }
+
+        @Override
         public void applyNewArray(MethodVisitor visitor, Signature generic) {
             visitor.visitIntInsn(NEWARRAY, T_INT);
         }
@@ -71,6 +76,11 @@ public enum DataType implements Opcodes{
         @Override
         public int arrayStoreInsn() {
             return DASTORE;
+        }
+
+        @Override
+        public int arrayLoadInsn() {
+            return DALOAD;
         }
         @Override
         public void applyNewArray(MethodVisitor visitor, Signature generic) {
@@ -120,7 +130,12 @@ public enum DataType implements Opcodes{
 
         @Override
         public int arrayStoreInsn() {
-            return IASTORE;
+            return BASTORE;
+        }
+
+        @Override
+        public int arrayLoadInsn() {
+            return BALOAD;
         }
 
         @Override
@@ -237,6 +252,10 @@ public enum DataType implements Opcodes{
 
     public int arrayStoreInsn() {
         return AASTORE;
+    }
+
+    public int arrayLoadInsn() {
+        return AALOAD;
     }
 
     public abstract void applyNewArray(MethodVisitor visitor, Signature generic);
