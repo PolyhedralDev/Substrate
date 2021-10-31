@@ -6,11 +6,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import org.objectweb.asm.MethodVisitor;
 
 public abstract class ExpressionNode implements Node {
-    public abstract Signature returnType(BuildData data);
-
-    public Signature referenceType(BuildData data) {
-        return returnType(data);
-    }
+    public abstract Signature referenceType(BuildData data);
 
     public void applyReferential(MethodVisitor visitor, BuildData data) {
         apply(visitor, data);

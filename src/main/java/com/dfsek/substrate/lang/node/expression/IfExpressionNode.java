@@ -20,11 +20,11 @@ public class IfExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!predicate.returnType(data).equals(Signature.bool())) {
-            throw new ParseException("If expression predicate must return BOOL, got " + predicate.returnType(data), predicate.getPosition());
+        if(!predicate.referenceType(data).equals(Signature.bool())) {
+            throw new ParseException("If expression predicate must return BOOL, got " + predicate.referenceType(data), predicate.getPosition());
         }
-        if(!caseTrue.returnType(data).equals(caseFalse.returnType(data))) {
-            throw new ParseException("If expression case has invalid return type, expected " + caseTrue.returnType(data) + ", got " + caseFalse.returnType(data), caseFalse.getPosition());
+        if(!caseTrue.referenceType(data).equals(caseFalse.referenceType(data))) {
+            throw new ParseException("If expression case has invalid return type, expected " + caseTrue.referenceType(data) + ", got " + caseFalse.referenceType(data), caseFalse.getPosition());
         }
 
         Label equal = new Label();
@@ -50,7 +50,7 @@ public class IfExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
-        return caseTrue.returnType(data);
+    public Signature referenceType(BuildData data) {
+        return caseTrue.referenceType(data).getSimpleReturn();
     }
 }

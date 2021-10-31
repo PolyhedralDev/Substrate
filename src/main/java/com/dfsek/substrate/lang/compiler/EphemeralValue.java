@@ -11,11 +11,6 @@ public class EphemeralValue implements Value {
     }
 
     @Override
-    public Signature returnType() {
-        return signature;
-    }
-
-    @Override
     public Signature reference() {
         return signature;
     }

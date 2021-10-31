@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -30,7 +29,6 @@ public class ListNode extends ExpressionNode {
 
         CompilerUtil.pushInt(elements.size(), visitor);
         Signature elementSignature = elements.get(0).referenceType(data);
-        System.out.println(elementSignature);
         elementSignature.getType(0).applyNewArray(visitor, elementSignature);
         for (int i = 0; i < elements.size(); i++) {
             visitor.visitInsn(DUP); // duplicate reference for all elements.
@@ -46,7 +44,7 @@ public class ListNode extends ExpressionNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
-        return Signature.list().applyGenericReturn(0, elements.get(0).returnType(data));
+    public Signature referenceType(BuildData data) {
+        return Signature.list().applyGenericReturn(0, elements.get(0).referenceType(data));
     }
 }

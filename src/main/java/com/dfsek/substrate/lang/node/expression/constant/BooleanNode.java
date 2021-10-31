@@ -21,7 +21,8 @@ public class BooleanNode extends ConstantExpressionNode {
         }
     }
 
-    public Signature returnType(BuildData data) {
+    @Override
+    public Signature referenceType(BuildData data) {
         return Signature.bool();
     }
 }

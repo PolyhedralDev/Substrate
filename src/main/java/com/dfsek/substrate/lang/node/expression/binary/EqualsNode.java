@@ -16,14 +16,14 @@ public class EqualsNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.returnType(data);
-        Signature rightType = right.returnType(data);
+        Signature leftType = left.referenceType(data).getSimpleReturn();
+        Signature rightType = right.referenceType(data).getSimpleReturn();
 
         if(!rightType.equals(leftType)) {
             throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
         }
 
-        if (left.returnType(data).equals(Signature.integer())) {
+        if (leftType.equals(Signature.integer())) {
             Label f = new Label();
             Label t = new Label();
             visitor.visitJumpInsn(IF_ICMPNE, f);
@@ -54,7 +54,7 @@ public class EqualsNode extends BinaryOperationNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
+    public Signature referenceType(BuildData data) {
         return Signature.bool();
     }
 }

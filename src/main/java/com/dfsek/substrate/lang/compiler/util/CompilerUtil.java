@@ -73,7 +73,7 @@ public final class CompilerUtil implements Opcodes {
             throw new IllegalArgumentException("Cannot extract lambda from node: " + lambdaContainer);
         }
 
-        Signature returnType = lambdaContainer.returnType(data);
+        Signature returnType = lambdaContainer.referenceType(data).getSimpleReturn();
         String ret = returnType.internalDescriptor();
 
         Signature args = lambdaContainer.referenceType(data).getGenericArguments(0);

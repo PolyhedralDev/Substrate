@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.BinaryOperationNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
@@ -17,8 +16,8 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.returnType(data);
-        Signature rightType = right.returnType(data);
+        Signature leftType = left.referenceType(data);
+        Signature rightType = right.referenceType(data);
 
         if(!rightType.equals(leftType)) {
             throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
@@ -37,7 +36,11 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
     protected abstract int doubleOp();
 
     @Override
-    public Signature returnType(BuildData data) {
-        return left.returnType(data);
+    public Signature referenceType(BuildData data) {
+        Signature ref = left.referenceType(data);
+        if(ref.weakEquals(Signature.fun())) {
+            return ref.getGenericReturn(0);
+        }
+        return ref;
     }
 }

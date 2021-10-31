@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.node.expression;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -31,7 +30,7 @@ public class LambdaInvocationNode extends ExpressionNode{
     }
 
     @Override
-    public Signature returnType(BuildData data) {
-        return lambda.returnType(data);
+    public Signature referenceType(BuildData data) {
+        return lambda.referenceType(data);
     }
 }

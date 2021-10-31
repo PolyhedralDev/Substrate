@@ -38,28 +38,29 @@ public class LocalLambdaReferenceFunction implements Function {
     public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
         String ret = returnType.internalDescriptor();
 
-        if (!returnType.isSimple()) {
-            if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
-        }
+        if (returnType.equals(Signature.empty())) ret = "V";
+        else if(returnType.weakEquals(Signature.tup())) ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.expandTuple())) + ";";
+
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(this.args, returnType)),
+                CompilerUtil.internalName(data.lambdaFactory().generate(this.args, returnType.expandTuple())),
                 "apply",
                 "(" + this.args.internalDescriptor() + ")" + ret,
                 true);
-        if (!returnType.isSimple() && !returnType.equals(Signature.empty())) { // tuple deconstruction
+        if (returnType.weakEquals(Signature.tup())) { // tuple deconstruction
             data.offsetInc(1);
             int offset = data.getOffset();
             visitor.visitVarInsn(ASTORE, offset);
 
-            for (int i = 0; i < returnType.size(); i++) {
+            Signature tup = returnType.expandTuple();
+
+            for (int i = 0; i < tup.size(); i++) {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + returnType.classDescriptor(),
+                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + tup.classDescriptor(),
                         "param" + i,
-                        "()" + returnType.getType(i).descriptor(),
+                        "()" + tup.getType(i).descriptor(),
                         false);
             }
         }
@@ -67,11 +68,6 @@ public class LocalLambdaReferenceFunction implements Function {
 
     public List<String> getInternalParameters() {
         return internalParameters;
-    }
-
-    @Override
-    public Signature returnType() {
-        return returnType;
     }
 
     @Override

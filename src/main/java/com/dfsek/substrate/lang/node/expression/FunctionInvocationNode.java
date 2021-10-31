@@ -38,11 +38,11 @@ public class FunctionInvocationNode extends ExpressionNode {
         if (arguments.isEmpty()) {
             argSignature = Signature.empty();
         } else if (arguments.size() == 1) {
-            argSignature = arguments.get(0).returnType(data);
+            argSignature = arguments.get(0).referenceType(data).expandTuple();
         } else {
-            argSignature = arguments.get(0).returnType(data);
+            argSignature = arguments.get(0).referenceType(data).expandTuple();
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).referenceType(data));
+                argSignature = argSignature.and(arguments.get(i).referenceType(data).expandTuple());
             }
         }
 
@@ -59,12 +59,12 @@ public class FunctionInvocationNode extends ExpressionNode {
 
         for (String internalParameter : internalParameters) {
             Value internal = data.getValue(internalParameter);
-            argSignature = argSignature.and(internal.reference());
-            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+            argSignature = argSignature.and(internal.reference().expandTuple());
+            visitor.visitVarInsn(internal.reference().expandTuple().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
         if (!function.argsMatch(argSignature)) {
-            throw new ParseException("Argument signature mismatch. Expected " + function.arguments() + ", got " + argSignature, id.getPosition());
+            throw new ParseException("Argument signature mismatch. \"" + id.getContent() + "\" Expects " + function.arguments() + ", got " + argSignature, id.getPosition());
         }
 
 
@@ -77,7 +77,7 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
-        return data.getValue(id.getContent()).returnType();
+    public Signature referenceType(BuildData data) {
+        return data.getValue(id.getContent()).reference().getGenericReturn(0);
     }
 }

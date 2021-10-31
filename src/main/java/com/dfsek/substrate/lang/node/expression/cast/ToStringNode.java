@@ -14,25 +14,26 @@ public class ToStringNode extends TypeCastNode {
 
     @Override
     public void applyCast(MethodVisitor visitor, BuildData data) {
-        if (value.returnType(data).equals(Signature.integer())) {
+        Signature ref = value.referenceType(data).getSimpleReturn();
+        if (ref.equals(Signature.integer())) {
             visitor.visitMethodInsn(INVOKESTATIC,
                     "java/lang/Integer",
                     "toString",
                     "(I)Ljava/lang/String;",
                     false);
-        } else if (value.returnType(data).equals(Signature.decimal())) {
+        } else if (ref.equals(Signature.decimal())) {
             visitor.visitMethodInsn(INVOKESTATIC,
                     "java/lang/Double",
                     "toString",
                     "(D)Ljava/lang/String;",
                     false);
         } else {
-            throw new ParseException("Expected INT | NUM, got " + value.returnType(data), getPosition());
+            throw new ParseException("Expected INT | NUM, got " + ref, getPosition());
         }
     }
 
     @Override
-    public Signature returnType(BuildData data) {
+    public Signature referenceType(BuildData data) {
         return Signature.string();
     }
 }

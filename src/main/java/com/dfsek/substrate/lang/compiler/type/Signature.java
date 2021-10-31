@@ -151,6 +151,23 @@ public class Signature implements Opcodes {
         return true;
     }
 
+    public Signature getSimpleReturn() {
+        if(this.equals(empty())) return empty();
+        if(!isSimple()) {
+            throw new IllegalStateException("Cannot get simple return value of non-simple Signature " + this);
+        }
+        if(this.weakEquals(fun())) return getGenericReturn(0);
+        if(!getGenericReturn(0).equals(empty())) return getGenericReturn(0);
+        return this;
+    }
+
+    public Signature expandTuple() {
+        if(this.weakEquals(tup())) {
+            return getGenericReturn(0);
+        }
+        return this;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("(");

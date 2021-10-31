@@ -201,9 +201,9 @@ public enum DataType implements Opcodes{
                 } else if(generic.getType(0).equals(STR)) {
                     arr.append("Ljava/lang/String;");
                 } else if(generic.getType(0).equals(FUN)) {
-                    arr.append(CompilerUtil.internalName(Lambda.class));
+                    arr.append('L').append(CompilerUtil.internalName(Lambda.class)).append(';');
                 } else if(generic.getType(0).equals(TUP)) {
-                    arr.append(CompilerUtil.internalName(Tuple.class));
+                    arr.append('L').append(CompilerUtil.internalName(Tuple.class)).append(';');
                 } else if(generic.getType(0).equals(LIST)) {
                     Signature nested = generic.getGenericReturn(0);
                     nestArray(arr, nested);
@@ -212,7 +212,7 @@ public enum DataType implements Opcodes{
                 if(generic.equals(Signature.empty())) {
                     throw new IllegalArgumentException("Cannot construct array of VOID");
                 }
-                arr.append(CompilerUtil.internalName(Tuple.class)); // It's a tuple.
+                arr.append("L").append(CompilerUtil.internalName(Tuple.class)).append(";"); // It's a tuple.
             }
         }
     };

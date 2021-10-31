@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -27,18 +26,16 @@ public class ValueReferenceNode extends ExpressionNode {
         Value value = data.getValue(id.getContent());
         int offset = data.offset(id.getContent());
 
-        if (value.returnType().isSimple()) {
+        if (value.reference().getGenericReturn(0).size() <= 1) {
             visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
-        } else if(value instanceof Function) {
-            visitor.visitVarInsn(ALOAD, offset);
         } else {
-            for (int i = 0; i < value.returnType().size(); i++) {
+            for (int i = 0; i < value.reference().getGenericReturn(0).size(); i++) {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + value.returnType().classDescriptor(),
+                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + value.reference().getGenericReturn(0).classDescriptor(),
                         "param" + i,
-                        "()" + value.returnType().getType(i).descriptor(),
+                        "()" + value.reference().getGenericReturn(0).getType(i).descriptor(),
                         false);
             }
         }
@@ -58,14 +55,6 @@ public class ValueReferenceNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return id.getPosition();
-    }
-
-    @Override
-    public Signature returnType(BuildData data) {
-        if (!data.valueExists(id.getContent())) {
-            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-        }
-        return data.getValue(id.getContent()).returnType();
     }
 
     public String getID() {

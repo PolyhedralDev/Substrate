@@ -86,8 +86,8 @@ public class ScriptBuilder {
         data.getValues().forEach((id, value) -> {
             if (value.ephemeral()) return;
             String descriptor;
-            if (value.returnType().isSimple()) {
-                descriptor = value.returnType().getType(0).descriptor();
+            if (value.reference().isSimple()) {
+                descriptor = value.reference().getType(0).descriptor();
             } else {
                 descriptor = CompilerUtil.internalName(Tuple.class);
             }

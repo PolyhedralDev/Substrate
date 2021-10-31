@@ -28,23 +28,25 @@ public class ValueAssignmentNode implements Node {
         }
 
         value.apply(visitor, data);
+        Signature ref = value.referenceType(data);
 
         if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
-            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), value.returnType(data), id.getContent(), lambdaExpressionNode.internalParameters()), value.returnType(data).frames());
+            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), ref.getSimpleReturn(), id.getContent(), lambdaExpressionNode.internalParameters()), ref.frames());
         } else {
-            data.registerValue(id.getContent(), new PrimitiveValue(value.returnType(data), value.referenceType(data)), value.returnType(data).frames());
+            data.registerValue(id.getContent(), new PrimitiveValue(value.referenceType(data).getSimpleReturn(), ref), value.referenceType(data).frames());
         }
 
+
         int offset = data.offset(id.getContent());
-        if (value.returnType(data).isSimple()) {
-            if (value instanceof LambdaExpressionNode) {
+        if (ref.getSimpleReturn().isSimple()) {
+            if (value instanceof LambdaExpressionNode || ref.weakEquals(Signature.list())) {
                 visitor.visitVarInsn(ASTORE, offset);
             } else {
-                visitor.visitVarInsn(value.returnType(data).getType(0).storeInsn(), offset);
+                visitor.visitVarInsn(ref.getSimpleReturn().getType(0).storeInsn(), offset);
             }
         } else {
-            if(value.returnType(data).equals(Signature.empty()) && !(value instanceof LambdaExpressionNode)) { // void non-lambda expression
+            if(ref.equals(Signature.empty())) { // void non-lambda expression
                 throw new ParseException("Cannot assign VOID expression to value", getPosition());
             }
             visitor.visitVarInsn(ASTORE, offset);

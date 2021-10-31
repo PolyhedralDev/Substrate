@@ -15,8 +15,8 @@ public class AdditionNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.returnType(data);
-        Signature rightType = right.returnType(data);
+        Signature leftType = left.referenceType(data);
+        Signature rightType = right.referenceType(data);
 
         if(!rightType.equals(leftType)) {
             throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
@@ -37,8 +37,12 @@ public class AdditionNode extends BinaryOperationNode {
         }
     }
 
-    @Override
-    public Signature returnType(BuildData data) {
-        return left.returnType(data);
+    public Signature referenceType(BuildData data) {
+        Signature ref = left.referenceType(data);
+        if(ref.weakEquals(Signature.fun())) {
+            return ref.getGenericReturn(0);
+        }
+        return ref;
     }
+
 }

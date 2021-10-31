@@ -4,7 +4,6 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -77,12 +76,7 @@ public class ForEach implements Function {
     }
 
     @Override
-    public Signature returnType() {
-        return Signature.empty();
-    }
-
-    @Override
     public Signature reference() {
-        return Signature.fun().applyGenericReturn(0, returnType()).applyGenericArgument(0, arguments());
+        return Signature.fun().applyGenericReturn(0, Signature.empty()).applyGenericArgument(0, arguments());
     }
 }

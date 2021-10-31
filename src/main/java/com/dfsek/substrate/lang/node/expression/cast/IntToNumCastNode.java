@@ -14,14 +14,14 @@ public class IntToNumCastNode extends TypeCastNode {
 
     @Override
     public void applyCast(MethodVisitor visitor, BuildData data) {
-        if (!value.returnType(data).equals(Signature.integer())) {
-            throw new ParseException("Expected INT, got " + value.returnType(data), getPosition());
+        if (!value.referenceType(data).equals(Signature.integer())) {
+            throw new ParseException("Expected INT, got " + value.referenceType(data), getPosition());
         }
         visitor.visitInsn(I2D);
     }
 
     @Override
-    public Signature returnType(BuildData data) {
+    public Signature referenceType(BuildData data) {
         return Signature.decimal();
     }
 }

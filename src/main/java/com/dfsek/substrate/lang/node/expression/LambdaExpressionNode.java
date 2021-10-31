@@ -67,7 +67,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.parameters = merged;
 
 
-        Class<?> lambda = data.lambdaFactory().implement(merged, content.returnType(delegate), (method, clazz) -> {
+        Class<?> lambda = data.lambdaFactory().implement(merged, content.referenceType(delegate).getSimpleReturn(), (method, clazz) -> {
             content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
@@ -95,7 +95,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
+    public Signature referenceType(BuildData data) {
         BuildData data1 = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 Signature sig = data.getValue(id).reference();
@@ -110,12 +110,6 @@ public class LambdaExpressionNode extends ExpressionNode {
             Signature signature = new Signature(pair.getRight());
             data1.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
         });
-
-        return content.returnType(data1);
-    }
-
-    @Override
-    public Signature referenceType(BuildData data) {
-        return Signature.fun().applyGenericReturn(0, returnType(data)).applyGenericArgument(0, getParameters());
+        return Signature.fun().applyGenericReturn(0, content.referenceType(data1)).applyGenericArgument(0, getParameters());
     }
 }

@@ -19,7 +19,7 @@ public class IntegerNode extends ConstantExpressionNode {
     }
 
     @Override
-    public Signature returnType(BuildData data) {
+    public Signature referenceType(BuildData data) {
         return Signature.integer();
     }
 }

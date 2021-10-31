@@ -49,11 +49,6 @@ public class SubstrateTests {
                 }
 
                 @Override
-                public Signature returnType() {
-                    return Signature.empty();
-                }
-
-                @Override
                 public Signature reference() {
                     return Signature.fun();
                 }
@@ -71,11 +66,6 @@ public class SubstrateTests {
                             "assertTrue",
                             "(Z)V",
                             false);
-                }
-
-                @Override
-                public Signature returnType() {
-                    return Signature.empty();
                 }
 
                 @Override
