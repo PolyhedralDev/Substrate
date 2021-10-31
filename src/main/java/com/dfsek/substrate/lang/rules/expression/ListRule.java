@@ -22,7 +22,7 @@ public class ListRule implements Rule {
 
         while(tokenizer.peek().getType() != Token.Type.LIST_END) {
             elements.add(ExpressionRule.getInstance().assemble(tokenizer));
-            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.LIST_END, Token.Type.STATEMENT_END).getType() == Token.Type.SEPARATOR) {
+            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.LIST_END, Token.Type.STATEMENT_END, Token.Type.GROUP_BEGIN).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }
         }
