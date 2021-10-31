@@ -1,7 +1,9 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.EphemeralValue;
+import com.dfsek.substrate.lang.compiler.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -16,19 +18,19 @@ import java.util.List;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final List<Pair<String, DataType>> types;
+    private final List<Pair<String, Signature>> types;
     private final Position start;
     private final List<String> internalParameters = new ArrayList<>();
     private Signature parameters;
 
-    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, DataType>> types, Position start) {
+    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start) {
         this.content = content;
         this.types = types;
         this.start = start;
         Signature signature = Signature.empty();
 
-        for (Pair<String, DataType> type : types) {
-            signature = signature.and(new Signature(type.getRight()));
+        for (Pair<String, Signature> type : types) {
+            signature = signature.and(type.getRight());
         }
         this.parameters = signature;
     }
@@ -49,8 +51,15 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
         types.forEach(pair -> {
-            Signature signature = new Signature(pair.getRight());
-            delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+            Signature signature = pair.getRight();
+            System.out.println(signature);
+            if (pair.getRight().weakEquals(Signature.fun())) { // register the lambda value as a function
+                LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) data.getValue(pair.getLeft());
+                delegate.registerValue(pair.getLeft(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), signature.getSimpleReturn(), pair.getLeft(), lambdaExpressionNode.internalParameters()), signature.frames());
+            } else {
+                delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+            }
+
         });
 
 
@@ -107,7 +116,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
         types.forEach(pair -> {
-            Signature signature = new Signature(pair.getRight());
+            Signature signature = pair.getRight();
             data1.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
         });
         return Signature.fun().applyGenericReturn(0, content.referenceType(data1)).applyGenericArgument(0, getParameters());

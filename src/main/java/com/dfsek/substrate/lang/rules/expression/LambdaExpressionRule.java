@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.type.DataType;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
@@ -25,13 +26,12 @@ public class LambdaExpressionRule implements Rule {
     public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
-        List<Pair<String, DataType>> types = new ArrayList<>();
+        List<Pair<String, Signature>> types = new ArrayList<>();
 
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
             Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
-            DataType type = DataType.fromToken(ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.FUN_TYPE));
-            types.add(Pair.of(id.getContent(), type));
+            types.add(Pair.of(id.getContent(), ParserUtil.parseSignatureNotation(tokenizer)));
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume();
             }

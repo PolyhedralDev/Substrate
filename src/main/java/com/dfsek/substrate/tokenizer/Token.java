@@ -144,11 +144,11 @@ public class Token {
          */
         NOT_EQUALS_OPERATOR,
         /**
-         * Boolean greater than operator ">"
+         * Boolean greater than operator or generic ending ">"
          */
         GREATER_THAN_OPERATOR,
         /**
-         * Boolean less than operator "<"
+         * Boolean less than operator or generic beginning "<"
          */
         LESS_THAN_OPERATOR,
         /**
@@ -240,7 +240,7 @@ public class Token {
          */
         FUN_TYPE,
         /**
-         * If expression token "if"
+         * List type token "list"
          */
         LIST_TYPE,
         /**

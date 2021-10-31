@@ -1,7 +1,10 @@
 package com.dfsek.substrate.parser;
 
+import com.dfsek.substrate.lang.compiler.type.DataType;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.tokenizer.Tokenizer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +42,26 @@ public final class ParserUtil {
     public static Token checkType(Token token, Token.Type... expected) throws ParseException {
         for (Token.Type type : expected) if (token.getType().equals(type)) return token;
         throw new ParseException("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition());
+    }
+
+    public static Signature parseSignatureNotation(Tokenizer tokenizer) {
+        Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE);
+
+        Signature run = new Signature(DataType.fromToken(type));
+        if(run.weakEquals(Signature.integer())
+        || run.weakEquals(Signature.bool())
+        || run.weakEquals(Signature.decimal())
+        || run.weakEquals(Signature.string())) return run; // no generics
+
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
+
+        while (tokenizer.peek().getType() != Token.Type.GREATER_THAN_OPERATOR) {
+            run = run.applyGenericArgument(0, parseSignatureNotation(tokenizer));
+        }
+
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);
+
+        return run;
     }
 
 
