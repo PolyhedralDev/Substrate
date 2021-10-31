@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -28,6 +29,8 @@ public class ValueReferenceNode extends ExpressionNode {
 
         if (value.returnType().isSimple()) {
             visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
+        } else if(value instanceof Function) {
+            visitor.visitVarInsn(ALOAD, offset);
         } else {
             for (int i = 0; i < value.returnType().size(); i++) {
                 visitor.visitVarInsn(ALOAD, offset);

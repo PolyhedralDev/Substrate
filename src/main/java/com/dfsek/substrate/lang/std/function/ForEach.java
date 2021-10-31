@@ -69,6 +69,7 @@ public class ForEach implements Function {
 
         Signature lambda = argExpressions.get(1).referenceType(data);
 
+        System.out.println(argExpressions);
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(data.lambdaFactory().generate(lambda.getGenericArguments(0), lambda.getGenericReturn(0))),
                 "apply",

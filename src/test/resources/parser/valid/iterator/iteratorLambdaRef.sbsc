@@ -1,0 +1,7 @@
+// create an iterator with a reference to a lambda
+
+a = [1, 2, 3, 5];
+
+f = (b: int) -> println(str(b));
+
+forEach(a, f);
