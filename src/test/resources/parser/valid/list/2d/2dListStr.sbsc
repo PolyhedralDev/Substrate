@@ -1,0 +1,9 @@
+// test a list of lists
+
+
+a = ["a", "b", "c"];
+
+b = ["d", "e"];
+
+
+d = [a, b];

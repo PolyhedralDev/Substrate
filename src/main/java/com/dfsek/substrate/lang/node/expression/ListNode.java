@@ -29,13 +29,14 @@ public class ListNode extends ExpressionNode {
         });
 
         CompilerUtil.pushInt(elements.size(), visitor);
-        Signature params = elements.get(0).referenceType(data);
-        params.getType(0).applyNewArray(visitor, params.getGenericReturn(0));
+        Signature elementSignature = elements.get(0).referenceType(data);
+        System.out.println(elementSignature);
+        elementSignature.getType(0).applyNewArray(visitor, elementSignature);
         for (int i = 0; i < elements.size(); i++) {
             visitor.visitInsn(DUP); // duplicate reference for all elements.
             CompilerUtil.pushInt(i, visitor); // push index
             elements.get(i).applyReferential(visitor, data); // apply value
-            visitor.visitInsn(params.getType(0).arrayStoreInsn());
+            visitor.visitInsn(elementSignature.getType(0).arrayStoreInsn());
         }
     }
 
@@ -46,6 +47,6 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public Signature returnType(BuildData data) {
-        return new Signature(DataType.LIST).applyGenericReturn(0, elements.get(0).returnType(data));
+        return Signature.list().applyGenericReturn(0, elements.get(0).returnType(data));
     }
 }
