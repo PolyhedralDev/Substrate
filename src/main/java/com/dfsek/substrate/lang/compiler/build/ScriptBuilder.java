@@ -40,30 +40,7 @@ public class ScriptBuilder {
 
         String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
 
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
-
-        writer.visit(V1_8,
-                ACC_PUBLIC,
-                implementationClassName,
-                null,
-                "java/lang/Object",
-                new String[]{INTERFACE_CLASS_NAME});
-
-        MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
-                "<init>", // Constructor method name is <init>
-                "()V",
-                null,
-                null);
-
-        constructor.visitCode();
-        constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
-        constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
-                "java/lang/Object",
-                "<init>",
-                "()V",
-                false);
-        constructor.visitInsn(RETURN); // Void return
-        constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
+        ClassWriter writer = CompilerUtil.generateClass(implementationClassName, false, true, INTERFACE_CLASS_NAME);
 
         MethodVisitor absMethod = writer.visitMethod(ACC_PUBLIC,
                 "execute", // Method name
@@ -71,7 +48,6 @@ public class ScriptBuilder {
                 null,
                 null);
         absMethod.visitCode();
-
 
         Label begin = new Label();
 
@@ -94,8 +70,7 @@ public class ScriptBuilder {
             absMethod.visitLocalVariable(id, descriptor, null, begin, end, data.offset(id));
         });
 
-        absMethod.visitInsn(RETURN); // Return double at top of stack (operation leaves one double on stack)
-
+        absMethod.visitInsn(RETURN);
 
         absMethod.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
 

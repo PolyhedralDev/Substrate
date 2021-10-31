@@ -6,16 +6,10 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.pair.Pair;
-import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -28,6 +22,8 @@ public class LambdaFactory {
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
 
+    private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
+
     public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory) {
         this.classLoader = classLoader;
         this.tupleFactory = tupleFactory;
@@ -35,16 +31,8 @@ public class LambdaFactory {
 
     public Class<?> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
-            ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-            String name = CompilerUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor();
-
-            writer.visit(V1_8,
-                    ACC_PUBLIC | ACC_ABSTRACT | ACC_INTERFACE,
-                    name,
-                    null,
-                    "java/lang/Object",
-                    new String[]{CompilerUtil.internalName(Lambda.class)});
-
+            String name = LAMBDA_NAME + "$" + args.classDescriptor() + "$R" + returnType.classDescriptor();
+            ClassWriter writer = CompilerUtil.generateClass(name, true, false, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
 
@@ -60,8 +48,6 @@ public class LambdaFactory {
                     null);
             apply.visitEnd();
 
-
-
             byte[] bytes = writer.toByteArray();
             Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
             CompilerUtil.dump(clazz, bytes);
@@ -75,32 +61,9 @@ public class LambdaFactory {
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
-        ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
-        String name = CompilerUtil.internalName(Lambda.class) + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
+        String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
-        writer.visit(V1_8,
-                ACC_PUBLIC,
-                name,
-                null,
-                "java/lang/Object",
-                new String[]{CompilerUtil.internalName(pair.getLeft())});
-
-        MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
-                "<init>", // Constructor method name is <init>
-                "()V",
-                null,
-                null);
-
-        constructor.visitCode();
-        constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
-        constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
-                "java/lang/Object",
-                "<init>",
-                "()V",
-                false);
-
-        constructor.visitInsn(RETURN); // Void return
-        constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
+        ClassWriter writer = CompilerUtil.generateClass(name, false, true, CompilerUtil.internalName(pair.getLeft()));
 
         String ret = returnType.internalDescriptor();
 

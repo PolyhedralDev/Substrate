@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -93,5 +94,38 @@ public final class CompilerUtil implements Opcodes {
                 "apply",
                 "(" + args.internalDescriptor() + ")" + ret,
                 true);
+    }
+
+    public static ClassWriter generateClass(String name, boolean iface, boolean defaultConstructor, String... ifaces) {
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+
+        writer.visit(V1_8,
+                ACC_PUBLIC | (iface ? (ACC_ABSTRACT | ACC_INTERFACE) : 0),
+                name,
+                null,
+                "java/lang/Object",
+                ifaces);
+
+        if(!iface & defaultConstructor) {
+            MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
+                    "<init>", // Constructor method name is <init>
+                    "()V",
+                    null,
+                    null);
+
+            constructor.visitCode();
+            constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
+            constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
+                    "java/lang/Object",
+                    "<init>",
+                    "()V",
+                    false);
+
+            constructor.visitInsn(RETURN); // Void return
+            constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
+
+        }
+
+        return writer;
     }
 }

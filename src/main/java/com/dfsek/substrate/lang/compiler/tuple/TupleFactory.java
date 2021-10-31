@@ -5,13 +5,9 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,21 +18,18 @@ public class TupleFactory {
 
     private final DynamicClassLoader classLoader;
 
+    private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
+
     public TupleFactory(DynamicClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
-            ClassWriter writer = new ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_FRAMES + org.objectweb.asm.ClassWriter.COMPUTE_MAXS);
+
             String name = CompilerUtil.internalName(Tuple.class) + "IMPL_" + args.classDescriptor();
 
-            writer.visit(V1_8,
-                    ACC_PUBLIC,
-                    name,
-                    null,
-                    "java/lang/Object",
-                    new String[]{CompilerUtil.internalName(Tuple.class)});
+            ClassWriter writer = CompilerUtil.generateClass(name, false, false, TUPLE_NAME);
 
             String constructorSig = "(" + args.internalDescriptor() + ")V";
 
