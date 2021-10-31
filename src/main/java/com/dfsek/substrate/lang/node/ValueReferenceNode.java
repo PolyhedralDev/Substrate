@@ -68,6 +68,10 @@ public class ValueReferenceNode extends ExpressionNode {
         return data.getValue(id.getContent()).returnType();
     }
 
+    public String getID() {
+        return id.getContent();
+    }
+
     @Override
     public Signature referenceType(BuildData data) {
         if (!data.valueExists(id.getContent())) {

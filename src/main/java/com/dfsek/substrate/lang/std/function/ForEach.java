@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -67,14 +68,7 @@ public class ForEach implements Function {
             visitor.visitInsn(AALOAD);
         }
 
-        Signature lambda = argExpressions.get(1).referenceType(data);
-
-        System.out.println(argExpressions);
-        visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(lambda.getGenericArguments(0), lambda.getGenericReturn(0))),
-                "apply",
-                "(" + lambda.getGenericArguments(0).internalDescriptor() + ")V",
-                true);
+        CompilerUtil.invokeLambda(argExpressions.get(1), visitor, data);
 
         visitor.visitIincInsn(iLV, 1);
         visitor.visitJumpInsn(GOTO, start);

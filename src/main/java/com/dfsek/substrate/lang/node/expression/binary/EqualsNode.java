@@ -53,11 +53,6 @@ public class EqualsNode extends BinaryOperationNode {
         }
     }
 
-    private void compJump(MethodVisitor visitor) {
-
-
-    }
-
     @Override
     public Signature returnType(BuildData data) {
         return Signature.bool();

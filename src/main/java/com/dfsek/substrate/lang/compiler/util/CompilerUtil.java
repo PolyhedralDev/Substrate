@@ -1,5 +1,13 @@
 package com.dfsek.substrate.lang.compiler.util;
 
+import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.node.ValueReferenceNode;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
+import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -8,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 
 public final class CompilerUtil implements Opcodes {
     public static String internalName(Class<?> clazz) {
@@ -47,5 +56,42 @@ public final class CompilerUtil implements Opcodes {
         } else {
             visitor.visitLdcInsn(i); // constant pool
         }
+    }
+
+    public static void invokeLambda(ExpressionNode lambdaContainer, MethodVisitor visitor, BuildData data) {
+        if(!lambdaContainer.referenceType(data).weakEquals(Signature.fun())) {
+            throw new ParseException("Expected lambda, got " + lambdaContainer.referenceType(data), lambdaContainer.getPosition());
+        }
+
+        List<String> internalParameters;
+
+        if(lambdaContainer instanceof LambdaExpressionNode) {
+            internalParameters = ((LambdaExpressionNode) lambdaContainer).internalParameters();
+        } else if(lambdaContainer instanceof ValueReferenceNode) {
+            internalParameters = ((LocalLambdaReferenceFunction) data.getValue(((ValueReferenceNode) lambdaContainer).getID())).getInternalParameters();
+        } else {
+            throw new IllegalArgumentException("Cannot extract lambda from node: " + lambdaContainer);
+        }
+
+        Signature returnType = lambdaContainer.returnType(data);
+        String ret = returnType.internalDescriptor();
+
+        Signature args = lambdaContainer.referenceType(data).getGenericArguments(0);
+
+        if (!returnType.isSimple()) {
+            if (returnType.equals(Signature.empty())) ret = "V";
+            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
+        }
+
+        for (String internalParameter : internalParameters) {
+            Value internal = data.getValue(internalParameter);
+            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+        }
+
+        visitor.visitMethodInsn(INVOKEINTERFACE,
+                CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType)),
+                "apply",
+                "(" + args.internalDescriptor() + ")" + ret,
+                true);
     }
 }

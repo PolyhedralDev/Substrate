@@ -1,0 +1,7 @@
+// create an iterator using an external value
+
+a = [1, 2, 3, 5];
+
+e = 2;
+
+forEach(a, (b: int) -> println(str(b + e)));

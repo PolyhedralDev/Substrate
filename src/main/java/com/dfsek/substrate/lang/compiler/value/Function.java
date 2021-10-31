@@ -18,5 +18,4 @@ public interface Function extends Value {
     }
 
     void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions);
-
 }

@@ -22,24 +22,7 @@ public class LambdaInvocationNode extends ExpressionNode{
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         lambda.apply(visitor, data);
 
-        Signature returnType = lambda.returnType(data);
-        String ret = returnType.internalDescriptor();
-
-        if (!returnType.isSimple()) {
-            if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
-        }
-
-        for (String internalParameter : lambda.internalParameters()) {
-            Value internal = data.getValue(internalParameter);
-            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
-        }
-
-        visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(lambda.getParameters(), returnType)),
-                "apply",
-                "(" + lambda.getParameters().internalDescriptor() + ")" + ret,
-                true);
+        CompilerUtil.invokeLambda(lambda, visitor, data);
     }
 
     @Override
