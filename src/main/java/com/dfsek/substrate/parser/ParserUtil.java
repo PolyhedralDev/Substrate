@@ -45,7 +45,7 @@ public final class ParserUtil {
     }
 
     public static Signature parseSignatureNotation(Tokenizer tokenizer) {
-        Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE);
+        Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE, Token.Type.LIST_TYPE);
 
         Signature run = new Signature(DataType.fromToken(type));
         if(run.weakEquals(Signature.integer())
@@ -56,7 +56,7 @@ public final class ParserUtil {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
 
         while (tokenizer.peek().getType() != Token.Type.GREATER_THAN_OPERATOR) {
-            run = run.applyGenericArgument(0, parseSignatureNotation(tokenizer));
+            run = run.applyGenericReturn(0, parseSignatureNotation(tokenizer));
         }
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);
