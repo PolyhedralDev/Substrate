@@ -78,7 +78,6 @@ public class ValueReferenceNode extends ExpressionNode {
     @Override
     public Signature referenceType(BuildData data) {
         if (!data.valueExists(id.getContent())) {
-            System.out.println(data.getClassName());
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
         return data.getValue(id.getContent()).reference();

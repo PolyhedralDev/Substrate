@@ -36,8 +36,6 @@ public class LocalLambdaReferenceFunction implements Function {
                     "scope" + data.getShadowField(id),
                     data.getShadowValue(id).reference().internalDescriptor());
         } else {
-            System.out.println(id);
-            System.out.println(data.isShadowed(id) + ": " + data);
             visitor.visitVarInsn(ALOAD, data.offset(id));
         }
     }

@@ -21,8 +21,6 @@ public class EphemeralFunction implements Function {
 
     @Override
     public Signature arguments() {
-        System.out.println(signature.getGenericArguments(0));
-        System.out.println(signature);
         return signature.getGenericArguments(0);
     }
 

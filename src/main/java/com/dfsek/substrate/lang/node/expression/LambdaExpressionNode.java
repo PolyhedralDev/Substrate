@@ -44,9 +44,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 Signature sig = data.getValue(id).reference();
                 if (!internalParameters.contains(id)) {
-                    System.out.println("Shadowing " + id);
                     buildData.shadowValue(id, data.getValue(id));
-                    System.out.println(buildData.isShadowed(id) + ": " + buildData);
                     internalParameters.add(id);
                     extra.add(sig);
                 }

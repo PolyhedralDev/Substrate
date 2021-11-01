@@ -64,8 +64,6 @@ public class LambdaFactory {
     public Class<?> implement(Signature args, Signature returnType, Signature scope, BiConsumer<MethodVisitor, ClassWriter> consumer) {
         generate(args, returnType);
 
-        System.out.println("scope: " + scope);
-
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
         String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
