@@ -53,11 +53,10 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
         }, d  -> data.lambdaFactory().name(parameters, content.referenceType(d).getSimpleReturn()));
 
-        System.out.println(delegate);
         types.forEach(pair -> {
             Signature signature = pair.getRight();
             if (pair.getRight().weakEquals(Signature.fun())) { // register the lambda value as a function
-                delegate.registerValue(pair.getLeft(), new EphemeralFunction(pair.getRight(), delegate.getOffset() + 1), signature.frames());
+                delegate.registerValue(pair.getLeft(), new EphemeralFunction(pair.getRight(), delegate.getOffset()), signature.frames());
             } else {
                 delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
             }
