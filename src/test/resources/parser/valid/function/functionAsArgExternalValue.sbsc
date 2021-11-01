@@ -1,0 +1,7 @@
+test = (a: fun<int>) -> {
+    a(3);
+};
+
+e = 4;
+
+test((a: int) -> println(str(a + e)));
