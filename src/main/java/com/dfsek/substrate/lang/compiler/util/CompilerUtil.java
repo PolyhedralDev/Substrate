@@ -64,16 +64,6 @@ public final class CompilerUtil implements Opcodes {
             throw new ParseException("Expected lambda, got " + lambdaContainer.referenceType(data), lambdaContainer.getPosition());
         }
 
-        List<String> internalParameters;
-
-        if(lambdaContainer instanceof LambdaExpressionNode) {
-            internalParameters = ((LambdaExpressionNode) lambdaContainer).internalParameters();
-        } else if(lambdaContainer instanceof ValueReferenceNode) {
-            internalParameters = ((LocalLambdaReferenceFunction) data.getValue(((ValueReferenceNode) lambdaContainer).getID())).getInternalParameters();
-        } else {
-            throw new IllegalArgumentException("Cannot extract lambda from node: " + lambdaContainer);
-        }
-
         Signature returnType = lambdaContainer.referenceType(data).getSimpleReturn();
         String ret = returnType.internalDescriptor();
 
@@ -82,11 +72,6 @@ public final class CompilerUtil implements Opcodes {
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
             else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
-        }
-
-        for (String internalParameter : internalParameters) {
-            Value internal = data.getValue(internalParameter);
-            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
         visitor.visitMethodInsn(INVOKEINTERFACE,

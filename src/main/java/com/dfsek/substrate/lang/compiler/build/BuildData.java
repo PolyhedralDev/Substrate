@@ -4,32 +4,41 @@ import com.dfsek.substrate.lang.compiler.lambda.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
+import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.ClassWriter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class BuildData {
     private final TupleFactory tupleFactory;
     private final LambdaFactory lambdaFactory;
 
     private final Map<String, Value> values;
+    private final Map<String, Pair<Integer, Value>> shadowFields;
     private final Map<Pair<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
     private final DynamicClassLoader classLoader;
     private final ClassWriter classWriter;
     private final ValueInterceptor interceptor;
+
+    private final Lazy<String> name;
     private int offset;
 
-    public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter) {
+    private int shadowField = 0;
+
+    public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter, String name) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
         lambdaFactory = new LambdaFactory(classLoader, tupleFactory);
+        this.name = Lazy.of(() -> name);
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
+        shadowFields = new HashMap<>();
         parent = null;
         interceptor = (a, b) -> {
         };
@@ -41,18 +50,20 @@ public class BuildData {
                       TupleFactory tupleFactory,
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
-                      Map<Pair<BuildData, String>, Integer> valueOffsets,
+                      Map<String, Pair<Integer, Value>> shadowFields, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
-                      int offset) {
+                      Function<BuildData, String> name, int offset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
         this.lambdaFactory = lambdaFactory;
         this.values = values;
+        this.shadowFields = shadowFields;
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
+        this.name = Lazy.of(() -> name.apply(this));
         this.offset = offset;
     }
 
@@ -74,8 +85,23 @@ public class BuildData {
     public void shadowValue(String id, Value value) {
         if (!values.containsKey(id))
             throw new IllegalArgumentException("Value with identifier \"" + id + "\" not registered.");
-        values.put(id, value);
-        valueOffsets.put(Pair.of(this, id), offset);
+        shadowFields.put(id, Pair.of(shadowField++, value));
+    }
+
+    public boolean isShadowed(String id) {
+        return shadowFields.containsKey(id);
+    }
+
+    public int getShadowField(String id) {
+        return shadowFields.get(id).getLeft();
+    }
+
+    public Value getShadowValue(String id) {
+        return shadowFields.get(id).getRight();
+    }
+
+    public String getClassName() {
+        return name.get();
     }
 
     protected Map<String, Value> getValues() {
@@ -84,11 +110,6 @@ public class BuildData {
 
     public void registerValue(String id, Value value, int frames) {
         registerValue(id, value);
-        offset += frames;
-    }
-
-    public void shadowValue(String id, Value value, int frames) {
-        shadowValue(id, value);
         offset += frames;
     }
 
@@ -114,7 +135,9 @@ public class BuildData {
 
     public Value getValue(String id) {
         interceptor.fetch(id, this);
-        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\": " + values);
+        if (!values.containsKey(id)) {
+            throw new IllegalArgumentException("No such value \"" + id + "\": " + values);
+        }
         return values.get(id);
     }
 
@@ -130,11 +153,7 @@ public class BuildData {
 
     public boolean valueExists(String id) {
         interceptor.fetch(id, this);
-        return values.containsKey(id);
-    }
-
-    public ClassWriter getClassWriter() {
-        return classWriter;
+        return values.containsKey(id) || shadowFields.containsKey(id);
     }
 
     public BuildData sub() {
@@ -143,21 +162,22 @@ public class BuildData {
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                valueOffsets, // but same JVM scope
+                shadowFields, valueOffsets, // but same JVM scope
                 this,
                 interceptor,
-                offset);
+                ignore -> name.get(), offset);
     }
 
-    public BuildData detach(ValueInterceptor interceptor) {
+    public BuildData detach(ValueInterceptor interceptor, Function<BuildData, String> name) {
         return new BuildData(classLoader,
                 classWriter,
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                new HashMap<>(), // *and* different JVM scope
+                new HashMap<>(), new HashMap<>(), // *and* different JVM scope
                 this,
                 interceptor,
+                name,
                 1);
     }
 }

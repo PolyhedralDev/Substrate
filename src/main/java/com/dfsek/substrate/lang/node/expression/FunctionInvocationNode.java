@@ -46,22 +46,10 @@ public class FunctionInvocationNode extends ExpressionNode {
             }
         }
 
-        List<String> internalParameters = new ArrayList<>();
-        if (function instanceof LocalLambdaReferenceFunction) {
-            LocalLambdaReferenceFunction lambda = (LocalLambdaReferenceFunction) function;
-            internalParameters = lambda.getInternalParameters();
-        }
-
-
         function.preArgsPrep(visitor, data);
 
         arguments.forEach(arg -> arg.apply(visitor, data));
 
-        for (String internalParameter : internalParameters) {
-            Value internal = data.getValue(internalParameter);
-            argSignature = argSignature.and(internal.reference().expandTuple());
-            visitor.visitVarInsn(internal.reference().expandTuple().getType(0).loadInsn(), data.offset(internalParameter));
-        }
 
         if (!function.argsMatch(argSignature)) {
             throw new ParseException("Argument signature mismatch. \"" + id.getContent() + "\" Expects " + function.arguments() + ", got " + argSignature, id.getPosition());

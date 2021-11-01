@@ -5,17 +5,12 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
-import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
-import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +48,7 @@ public class ScriptBuilder {
 
         DynamicClassLoader classLoader = new DynamicClassLoader();
 
-        BuildData data = new BuildData(classLoader, writer);
+        BuildData data = new BuildData(classLoader, writer, implementationClassName);
         macros.forEach(buildDataConsumer -> buildDataConsumer.accept(data));
         ops.forEach(op -> op.apply(absMethod, data));
 

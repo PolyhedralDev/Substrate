@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.MethodVisitor;
@@ -15,13 +16,10 @@ public class LocalLambdaReferenceFunction implements Function {
     private final Signature returnType;
     private final String id;
 
-    private final List<String> internalParameters;
-
-    public LocalLambdaReferenceFunction(Signature args, Signature returnType, String id, List<String> internalParameters) {
+    public LocalLambdaReferenceFunction(Signature args, Signature returnType, String id) {
         this.args = args;
         this.returnType = returnType;
         this.id = id;
-        this.internalParameters = internalParameters;
     }
 
     @Override
@@ -31,7 +29,17 @@ public class LocalLambdaReferenceFunction implements Function {
 
     @Override
     public void preArgsPrep(MethodVisitor visitor, BuildData data) {
-        visitor.visitVarInsn(ALOAD, data.offset(id));
+        if(data.isShadowed(id)) {
+            visitor.visitVarInsn(ALOAD, 0);
+            visitor.visitFieldInsn(GETFIELD,
+                    data.getClassName(),
+                    "scope" + data.getShadowField(id),
+                    data.getShadowValue(id).reference().internalDescriptor());
+        } else {
+            System.out.println(id);
+            System.out.println(data.isShadowed(id) + ": " + data);
+            visitor.visitVarInsn(ALOAD, data.offset(id));
+        }
     }
 
     @Override
@@ -64,10 +72,6 @@ public class LocalLambdaReferenceFunction implements Function {
                         false);
             }
         }
-    }
-
-    public List<String> getInternalParameters() {
-        return internalParameters;
     }
 
     @Override

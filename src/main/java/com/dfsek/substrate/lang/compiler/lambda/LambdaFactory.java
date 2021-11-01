@@ -56,14 +56,53 @@ public class LambdaFactory {
         }).getLeft();
     }
 
-    public Class<?> implement(Signature args, Signature returnType, BiConsumer<MethodVisitor, ClassWriter> consumer) {
+    public String name(Signature args, Signature returnType) {
         generate(args, returnType);
+        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get());
+    }
+
+    public Class<?> implement(Signature args, Signature returnType, Signature scope, BiConsumer<MethodVisitor, ClassWriter> consumer) {
+        generate(args, returnType);
+
+        System.out.println("scope: " + scope);
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
         String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
-        ClassWriter writer = CompilerUtil.generateClass(name, false, true, CompilerUtil.internalName(pair.getLeft()));
+        ClassWriter writer = CompilerUtil.generateClass(name, false, false, CompilerUtil.internalName(pair.getLeft()));
+
+        MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
+                "<init>", // Constructor method name is <init>
+                "(" + scope.internalDescriptor() + ")V",
+                null,
+                null);
+
+        constructor.visitCode();
+        constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
+        constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
+                "java/lang/Object",
+                "<init>",
+                "()V",
+                false);
+
+        for (int i = 0; i < scope.size(); i++) {
+            writer.visitField(ACC_PRIVATE | ACC_FINAL,
+                    "scope" + i,
+                    scope.getType(i).descriptor(),
+                    null,
+                    null);
+            constructor.visitVarInsn(ALOAD, 0);
+            constructor.visitVarInsn(scope.getType(i).loadInsn(), i + 1);
+            constructor.visitFieldInsn(PUTFIELD,
+                    name,
+                    "scope" + i,
+                    scope.getType(i).descriptor());
+        }
+
+        constructor.visitInsn(RETURN); // Void return
+        constructor.visitMaxs(0, 0);
+
 
         String ret = returnType.internalDescriptor();
 

@@ -23,14 +23,13 @@ public class ValueReferenceNode extends ExpressionNode {
         if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
-        Value value = data.getValue(id.getContent());
-        int offset = data.offset(id.getContent());
 
+        Value value = data.getValue(id.getContent());
         if (value.reference().getGenericReturn(0).size() <= 1) {
-            visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
+            load(visitor, data);
         } else {
             for (int i = 0; i < value.reference().getGenericReturn(0).size(); i++) {
-                visitor.visitVarInsn(ALOAD, offset);
+                load(visitor, data);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
                         CompilerUtil.internalName(Tuple.class) + "IMPL_" + value.reference().getGenericReturn(0).classDescriptor(),
@@ -38,6 +37,21 @@ public class ValueReferenceNode extends ExpressionNode {
                         "()" + value.reference().getGenericReturn(0).getType(i).descriptor(),
                         false);
             }
+        }
+    }
+
+    private void load(MethodVisitor visitor, BuildData data) {
+        if(data.isShadowed(id.getContent())) {
+            Value value = data.getShadowValue(id.getContent());
+            visitor.visitVarInsn(ALOAD, 0);
+            visitor.visitFieldInsn(GETFIELD,
+                    data.getClassName(),
+                    "scope" + data.getShadowField(id.getContent()),
+                    value.reference().internalDescriptor());
+        } else {
+            Value value = data.getValue(id.getContent());
+            int offset = data.offset(id.getContent());
+            visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
         }
     }
 
@@ -64,6 +78,7 @@ public class ValueReferenceNode extends ExpressionNode {
     @Override
     public Signature referenceType(BuildData data) {
         if (!data.valueExists(id.getContent())) {
+            System.out.println(data.getClassName());
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
         return data.getValue(id.getContent()).reference();
