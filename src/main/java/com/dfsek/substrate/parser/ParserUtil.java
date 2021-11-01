@@ -56,7 +56,11 @@ public final class ParserUtil {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
 
         while (tokenizer.peek().getType() != Token.Type.GREATER_THAN_OPERATOR) {
-            run = run.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+            if(run.weakEquals(Signature.fun())) {
+                run = run.applyGenericArgument(0, parseSignatureNotation(tokenizer));
+            } else {
+                run = run.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+            }
         }
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);

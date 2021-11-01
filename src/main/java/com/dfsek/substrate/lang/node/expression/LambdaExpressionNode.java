@@ -1,10 +1,8 @@
 package com.dfsek.substrate.lang.node.expression;
 
+import com.dfsek.substrate.lang.compiler.EphemeralFunction;
 import com.dfsek.substrate.lang.compiler.EphemeralValue;
-import com.dfsek.substrate.lang.compiler.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
-import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -54,8 +52,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             Signature signature = pair.getRight();
             System.out.println(signature);
             if (pair.getRight().weakEquals(Signature.fun())) { // register the lambda value as a function
-                LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) data.getValue(pair.getLeft());
-                delegate.registerValue(pair.getLeft(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), signature.getSimpleReturn(), pair.getLeft(), lambdaExpressionNode.internalParameters()), signature.frames());
+                delegate.registerValue(pair.getLeft(), new EphemeralFunction(pair.getRight(), delegate.getOffset() + 1), signature.frames());
             } else {
                 delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
             }

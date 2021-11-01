@@ -114,7 +114,7 @@ public class BuildData {
 
     public Value getValue(String id) {
         interceptor.fetch(id, this);
-        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
+        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\": " + values);
         return values.get(id);
     }
 
