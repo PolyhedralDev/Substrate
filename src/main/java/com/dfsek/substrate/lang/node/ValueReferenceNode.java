@@ -40,8 +40,16 @@ public class ValueReferenceNode extends ExpressionNode {
         }
     }
 
+    @Override
+    public void applyReferential(MethodVisitor visitor, BuildData data) {
+        if (!data.valueExists(id.getContent())) {
+            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
+        }
+        load(visitor, data);
+    }
+
     private void load(MethodVisitor visitor, BuildData data) {
-        if(data.isShadowed(id.getContent())) {
+        if (data.isShadowed(id.getContent())) {
             Value value = data.getShadowValue(id.getContent());
             visitor.visitVarInsn(ALOAD, 0);
             visitor.visitFieldInsn(GETFIELD,
@@ -53,17 +61,6 @@ public class ValueReferenceNode extends ExpressionNode {
             int offset = data.offset(id.getContent());
             visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
         }
-    }
-
-    @Override
-    public void applyReferential(MethodVisitor visitor, BuildData data) {
-        if (!data.valueExists(id.getContent())) {
-            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-        }
-        Value value = data.getValue(id.getContent());
-        int offset = data.offset(id.getContent());
-
-        visitor.visitVarInsn(value.reference().getType(0).loadInsn(), offset);
     }
 
     @Override

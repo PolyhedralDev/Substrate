@@ -60,7 +60,11 @@ public final class ParserUtil {
                     other = other.applyGenericArgument(0, parseSignatureNotation(tokenizer));
                     if(tokenizer.peek().getType() == Token.Type.ARROW) {
                         tokenizer.consume();
-                        other = other.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+                        Signature ret = parseSignatureNotation(tokenizer);
+                        if(!ret.isSimple()) {
+                            ret = Signature.tup().applyGenericReturn(0, ret);
+                        }
+                        other = other.applyGenericReturn(0, ret);
                     }
                 }
                 ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);

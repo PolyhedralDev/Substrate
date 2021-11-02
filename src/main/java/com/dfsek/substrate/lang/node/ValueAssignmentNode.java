@@ -39,14 +39,14 @@ public class ValueAssignmentNode implements Node {
 
 
         int offset = data.offset(id.getContent());
-        if (ref.getSimpleReturn().isSimple()) {
+        if (ref.isSimple() && ref.getSimpleReturn().isSimple()) {
             if (value instanceof LambdaExpressionNode || ref.weakEquals(Signature.list())) {
                 visitor.visitVarInsn(ASTORE, offset);
             } else {
                 visitor.visitVarInsn(ref.getSimpleReturn().getType(0).storeInsn(), offset);
             }
         } else {
-            if(ref.equals(Signature.empty())) { // void non-lambda expression
+            if (ref.equals(Signature.empty())) { // void non-lambda expression
                 throw new ParseException("Cannot assign VOID expression to value", getPosition());
             }
             visitor.visitVarInsn(ASTORE, offset);

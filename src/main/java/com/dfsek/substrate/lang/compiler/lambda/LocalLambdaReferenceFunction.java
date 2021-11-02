@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
+import com.dfsek.substrate.lang.compiler.EphemeralFunction;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -42,16 +43,10 @@ public class LocalLambdaReferenceFunction implements Function {
 
     @Override
     public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
-        String ret = returnType.internalDescriptor();
-
-        if (returnType.equals(Signature.empty())) ret = "V";
-        else if(returnType.weakEquals(Signature.tup())) ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.expandTuple())) + ";";
-
-
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(data.lambdaFactory().generate(this.args, returnType.expandTuple())),
                 "apply",
-                "(" + this.args.internalDescriptor() + ")" + ret,
+                "(" + this.args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, returnType),
                 true);
         if (returnType.weakEquals(Signature.tup())) { // tuple deconstruction
             data.offsetInc(1);
@@ -64,7 +59,7 @@ public class LocalLambdaReferenceFunction implements Function {
                 visitor.visitVarInsn(ALOAD, offset);
 
                 visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + tup.classDescriptor(),
+                        CompilerUtil.internalName(data.tupleFactory().generate(tup)),
                         "param" + i,
                         "()" + tup.getType(i).descriptor(),
                         false);

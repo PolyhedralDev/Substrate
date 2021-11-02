@@ -65,19 +65,14 @@ public final class CompilerUtil implements Opcodes {
         }
 
         Signature returnType = lambdaContainer.referenceType(data).getSimpleReturn();
-        String ret = returnType.internalDescriptor();
 
         Signature args = lambdaContainer.referenceType(data).getGenericArguments(0);
 
-        if (!returnType.isSimple()) {
-            if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
-        }
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType)),
                 "apply",
-                "(" + args.internalDescriptor() + ")" + ret,
+                "(" + args.internalDescriptor() + ")" + buildReturnType(data, returnType),
                 true);
     }
 
@@ -112,5 +107,17 @@ public final class CompilerUtil implements Opcodes {
         }
 
         return writer;
+    }
+
+    public static String buildReturnType(BuildData data, Signature returnType) {
+        String ret = returnType.internalDescriptor();
+
+        if (!returnType.isSimple()) {
+            if (returnType.equals(Signature.empty())) ret = "V";
+            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
+        } else if(!returnType.getSimpleReturn().isSimple()) {
+            ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.getSimpleReturn())) + ";";
+        }
+        return ret;
     }
 }

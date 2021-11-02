@@ -1,0 +1,18 @@
+d = 5;
+
+print = (a: num, b: str) -> {
+    println(str(a));
+    println(b);
+};
+
+test = (a: fun<list<int>, int -> num, str>) -> {
+    tuple = a([1, 2, d], 4);
+    print(tuple);
+};
+
+c = 3;
+
+test((a: list<int>, b: int) -> {
+    forEach(a, (i: int) -> println(str(i)));
+    return (num(b + c), "bazinga");
+});

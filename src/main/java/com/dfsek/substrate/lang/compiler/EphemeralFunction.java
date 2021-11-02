@@ -32,16 +32,11 @@ public class EphemeralFunction implements Function {
     @Override
     public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
         Signature returnType = signature.getGenericReturn(0);
-        String ret = returnType.internalDescriptor();
-
-        if (returnType.equals(Signature.empty())) ret = "V";
-        else if(returnType.weakEquals(Signature.tup())) ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.expandTuple())) + ";";
-
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(data.lambdaFactory().generate(signature.getGenericArguments(0), returnType.expandTuple())),
                 "apply",
-                "(" + signature.getGenericArguments(0).internalDescriptor() + ")" + ret,
+                "(" + signature.getGenericArguments(0).internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, returnType),
                 true);
     }
 

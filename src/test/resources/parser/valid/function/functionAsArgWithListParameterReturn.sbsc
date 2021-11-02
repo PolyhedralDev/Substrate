@@ -1,0 +1,12 @@
+d = 5;
+
+test = (a: fun<list<int>, int -> num>) -> {
+    println(str(a([1, 2, d], 4)));
+};
+
+c = 3;
+
+test((a: list<int>, b: int) -> {
+    forEach(a, (i: int) -> println(str(i)));
+    return num(b + c);
+});
