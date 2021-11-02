@@ -1,0 +1,11 @@
+d = 5;
+
+test = (a: fun<int, int -> num>) -> {
+    println(str(a(d, 4)));
+};
+
+c = 3;
+
+test((a: int, b: int) -> {
+    return num(a + b + c);
+});

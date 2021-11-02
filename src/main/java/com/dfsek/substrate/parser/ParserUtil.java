@@ -45,29 +45,34 @@ public final class ParserUtil {
     }
 
     public static Signature parseSignatureNotation(Tokenizer tokenizer) {
-        Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE, Token.Type.LIST_TYPE);
+        Signature signature = Signature.empty();
+        while(tokenizer.peek().isType()) {
+            Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE, Token.Type.LIST_TYPE);
+            Signature other = new Signature(DataType.fromToken(type));
+            if(!(other.weakEquals(Signature.integer())
+                    || other.weakEquals(Signature.bool())
+                    || other.weakEquals(Signature.decimal())
+                    || other.weakEquals(Signature.string()))) {
+                ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
+                if(other.weakEquals(Signature.list())) {
+                    other = other.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+                } else if(other.weakEquals(Signature.fun())) {
+                    other = other.applyGenericArgument(0, parseSignatureNotation(tokenizer));
+                    if(tokenizer.peek().getType() == Token.Type.ARROW) {
+                        tokenizer.consume();
+                        other = other.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+                    }
+                }
+                ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);
+            }
+            signature = signature.and(other);
 
-        Signature run = new Signature(DataType.fromToken(type));
-        if(run.weakEquals(Signature.integer())
-        || run.weakEquals(Signature.bool())
-        || run.weakEquals(Signature.decimal())
-        || run.weakEquals(Signature.string())) return run; // no generics
-
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
-
-        while (tokenizer.peek().getType() != Token.Type.GREATER_THAN_OPERATOR) {
-            if(run.weakEquals(Signature.fun())) {
-                run = run.applyGenericArgument(0, parseSignatureNotation(tokenizer));
-            } else {
-                run = run.applyGenericReturn(0, parseSignatureNotation(tokenizer));
+            if(tokenizer.peek().getType() == Token.Type.SEPARATOR &&tokenizer.peek(2).getType() != Token.Type.TYPE) {
+                tokenizer.consume();
             }
         }
-
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GREATER_THAN_OPERATOR);
-
-        return run;
+        return signature;
     }
-
 
     /**
      * Checks if token is a binary operator

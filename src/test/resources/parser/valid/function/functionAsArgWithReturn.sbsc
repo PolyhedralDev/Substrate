@@ -1,0 +1,7 @@
+test = (a: fun<int -> num>) -> {
+    println(str(a(3)));
+};
+
+test((a: int) -> {
+    return num(a);
+});
