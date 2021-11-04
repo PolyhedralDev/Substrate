@@ -1,0 +1,5 @@
+// get a value from a list
+
+a = [5, 4, 3, 2, 1];
+
+assert(a[2] + a[1] == 7);

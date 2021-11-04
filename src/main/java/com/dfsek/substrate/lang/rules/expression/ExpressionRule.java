@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
@@ -57,6 +58,16 @@ public class ExpressionRule implements Rule {
             node = new RangeNode(node, assemble(tokenizer), pos);
         }
 
+        if(tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
+            tokenizer.consume();
+
+            ExpressionNode index = assemble(tokenizer);
+
+            node = new ListIndexNode(node, index);
+
+            ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
+        }
+
         return node;
     }
 
@@ -66,12 +77,9 @@ public class ExpressionRule implements Rule {
 
         Token next = tokenizer.peek();
         if (next.isBinaryOperator()) {
-            System.out.println(op.getType() + " / " + next.getType());
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                System.out.println("right");
                 return join(left, op, assembleBinaryOperator(right, tokenizer));
             } else {
-                System.out.println("left");
                 return assembleBinaryOperator(join(left, op, right), tokenizer);
             }
         }
