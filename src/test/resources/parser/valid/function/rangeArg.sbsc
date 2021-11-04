@@ -1,0 +1,3 @@
+a = 3;
+
+forEach(a..a+3, (i: int) -> println(str(i)));
