@@ -3,9 +3,11 @@ package com.dfsek.substrate.lang.rules.expression;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ListNode;
+import com.dfsek.substrate.lang.node.expression.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
 
@@ -60,6 +62,10 @@ public class ExpressionRule implements Rule {
             }else {
                 throw new ParseException("Unexpected token: " + op, op.getPosition());
             }
+        }
+        if(tokenizer.peek().getType() == Token.Type.RANGE) {
+            Position pos = tokenizer.consume().getPosition();
+            node = new RangeNode(node, assemble(tokenizer), pos);
         }
 
         return node;
