@@ -2,10 +2,10 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.ListNode;
 import com.dfsek.substrate.lang.node.expression.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
@@ -20,6 +20,14 @@ public class ExpressionRule implements Rule {
 
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
+        ExpressionNode node = simple(tokenizer);
+        if (tokenizer.peek().isBinaryOperator()) {
+            node = assembleBinaryOperator(node, tokenizer);
+        }
+        return node;
+    }
+
+    private ExpressionNode simple(Tokenizer tokenizer) {
         Token test = tokenizer.peek();
 
         ExpressionNode node;
@@ -34,40 +42,58 @@ public class ExpressionRule implements Rule {
             node = CastRule.getInstance().assemble(tokenizer);
         } else if (test.getType() == Token.Type.IF) {
             node = IfExpressionRule.getInstance().assemble(tokenizer);
-        } else if(test.getType() == Token.Type.LIST_BEGIN) {
+        } else if (test.getType() == Token.Type.LIST_BEGIN) {
             node = ListRule.getInstance().assemble(tokenizer);
-        } else if((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
-        || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
+        } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
+                || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer);
         } else {
             node = TupleRule.getInstance().assemble(tokenizer);
         }
 
-        if (tokenizer.peek().isBinaryOperator()) {
-            ExpressionNode left = node;
-            Token op = tokenizer.consume();
-            ExpressionNode right = assemble(tokenizer);
-            if (op.getType() == Token.Type.ADDITION_OPERATOR) {
-                node = new AdditionNode(left, right, op);
-            } else if(op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
-                node = new SubtractionNode(left, right, op);
-            } else if(op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
-                node = new MultiplyNode(left, right, op);
-            } else if(op.getType() == Token.Type.DIVISION_OPERATOR) {
-                node = new DivisionNode(left, right, op);
-            } else if(op.getType() == Token.Type.MODULO_OPERATOR) {
-                node = new ModulusNode(left, right, op);
-            } else if(op.getType() == Token.Type.EQUALS_OPERATOR) {
-                node = new EqualsNode(left, right, op);
-            }else {
-                throw new ParseException("Unexpected token: " + op, op.getPosition());
-            }
-        }
-        if(tokenizer.peek().getType() == Token.Type.RANGE) {
+
+        if (tokenizer.peek().getType() == Token.Type.RANGE) {
             Position pos = tokenizer.consume().getPosition();
             node = new RangeNode(node, assemble(tokenizer), pos);
         }
 
         return node;
+    }
+
+    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer) {
+        Token op = tokenizer.consume();
+        ExpressionNode right = simple(tokenizer);
+
+        Token next = tokenizer.peek();
+        if (next.isBinaryOperator()) {
+            System.out.println(op.getType() + " / " + next.getType());
+            if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
+                System.out.println("right");
+                return join(left, op, assembleBinaryOperator(right, tokenizer));
+            } else {
+                System.out.println("left");
+                return assembleBinaryOperator(join(left, op, right), tokenizer);
+            }
+        }
+
+        return join(left, op, right);
+    }
+
+    private ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right) {
+        if (op.getType() == Token.Type.ADDITION_OPERATOR) {
+            return new AdditionNode(left, right, op);
+        } else if (op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
+            return new SubtractionNode(left, right, op);
+        } else if (op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
+            return new MultiplyNode(left, right, op);
+        } else if (op.getType() == Token.Type.DIVISION_OPERATOR) {
+            return new DivisionNode(left, right, op);
+        } else if (op.getType() == Token.Type.MODULO_OPERATOR) {
+            return new ModulusNode(left, right, op);
+        } else if (op.getType() == Token.Type.EQUALS_OPERATOR) {
+            return new EqualsNode(left, right, op);
+        } else {
+            throw new ParseException("Unexpected token: " + op, op.getPosition());
+        }
     }
 }
