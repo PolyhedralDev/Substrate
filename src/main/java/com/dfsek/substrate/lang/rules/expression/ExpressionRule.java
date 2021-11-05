@@ -109,6 +109,8 @@ public class ExpressionRule implements Rule {
             return new LessThanNode(left, right, op);
         } else if (op.getType() == Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR) {
             return new GreaterThanOrEqualsNode(left, right, op);
+        } else if (op.getType() == Token.Type.LESS_THAN_OR_EQUALS_OPERATOR) {
+            return new LessThanOrEqualsNode(left, right, op);
         } else {
             throw new ParseException("Unexpected token: " + op, op.getPosition());
         }
