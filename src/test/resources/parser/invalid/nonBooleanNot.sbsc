@@ -1,0 +1,3 @@
+// parser should fail when using the NOT operator on something that isnt a boolean
+
+a = !"hello";
