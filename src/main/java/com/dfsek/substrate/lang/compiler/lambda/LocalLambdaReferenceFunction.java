@@ -44,9 +44,9 @@ public class LocalLambdaReferenceFunction implements Function {
     @Override
     public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
         visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(this.args, returnType.expandTuple())),
+                CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType.expandTuple())),
                 "apply",
-                "(" + this.args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, returnType),
+                "(" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, returnType),
                 true);
         if (returnType.weakEquals(Signature.tup())) { // tuple deconstruction
             data.offsetInc(1);

@@ -1,0 +1,8 @@
+// pass a stdlib function as an argument
+
+test = (function: fun<str>, a: str) -> {
+    function(a);
+};
+
+
+test(println, "bazinga");

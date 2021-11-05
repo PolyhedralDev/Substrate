@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 
 
@@ -206,6 +205,16 @@ public class Signature implements Opcodes {
 
     public String classDescriptor() {
         StringBuilder sig = new StringBuilder();
+        for (int i = 0; i < types.size(); i++) {
+            sig.append(types.get(i).descriptorChar());
+            Pair<Signature, Signature> gen = generic.get(i);
+            if(!gen.getLeft().equals(empty())) {
+                sig.append("_").append(gen.getLeft().classDescriptor()).append("_");
+            }
+            if(!gen.getRight().equals(empty())) {
+                sig.append("__").append(gen.getRight().classDescriptor()).append("__");
+            }
+        }
         types.forEach(type -> sig.append(type.descriptorChar()));
         return sig.toString();
     }
