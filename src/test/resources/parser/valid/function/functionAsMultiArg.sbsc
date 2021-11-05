@@ -1,0 +1,6 @@
+test = (a: fun<int>, b: fun<int>) -> {
+    a(3);
+    b(4);
+};
+
+test((a: int) -> println(str(a)), (a: int) -> println(str(a)));
