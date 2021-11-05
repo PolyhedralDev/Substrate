@@ -1,0 +1,6 @@
+// test the less than operator
+
+a = 2.0;
+b = 2.1;
+
+assert(a < b);
