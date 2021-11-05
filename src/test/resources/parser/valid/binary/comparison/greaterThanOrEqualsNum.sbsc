@@ -1,0 +1,11 @@
+// test the greater than or equals operator
+
+a = 2.1;
+b = 2.0;
+
+assert(a >= b);
+
+c = 4.0;
+d = 4.0;
+
+assert(c >= d);

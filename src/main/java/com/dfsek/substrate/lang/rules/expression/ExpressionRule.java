@@ -5,10 +5,7 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
-import com.dfsek.substrate.lang.node.expression.binary.comparison.EqualsNode;
-import com.dfsek.substrate.lang.node.expression.binary.comparison.GreaterThanNode;
-import com.dfsek.substrate.lang.node.expression.binary.comparison.LessThanNode;
-import com.dfsek.substrate.lang.node.expression.binary.comparison.NotEqualsNode;
+import com.dfsek.substrate.lang.node.expression.binary.comparison.*;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -108,8 +105,10 @@ public class ExpressionRule implements Rule {
             return new NotEqualsNode(left, right, op);
         } else if (op.getType() == Token.Type.GREATER_THAN_OPERATOR) {
             return new GreaterThanNode(left, right, op);
-        }  else if (op.getType() == Token.Type.LESS_THAN_OPERATOR) {
+        } else if (op.getType() == Token.Type.LESS_THAN_OPERATOR) {
             return new LessThanNode(left, right, op);
+        } else if (op.getType() == Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR) {
+            return new GreaterThanOrEqualsNode(left, right, op);
         } else {
             throw new ParseException("Unexpected token: " + op, op.getPosition());
         }
