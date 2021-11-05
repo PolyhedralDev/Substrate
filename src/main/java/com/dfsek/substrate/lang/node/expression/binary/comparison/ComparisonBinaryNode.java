@@ -9,6 +9,8 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import javax.naming.OperationNotSupportedException;
+
 public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     public ComparisonBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
         super(left, right, op);
@@ -43,15 +45,25 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
             visitor.visitInsn(ICONST_0);
             visitor.visitLabel(t);
         } else if (leftType.equals(Signature.string())) {
-            applyStrComparison(visitor);
+            if(string()) {
+                applyStrComparison(visitor);
+            } else {
+                throw new ParseException("Expected [INT, NUM], got " + leftType, left.getPosition());
+            }
         } else {
             throw new ParseException("Expected [INT, NUM, STR], got " + leftType, left.getPosition());
         }
+    }
+
+    protected boolean string() {
+        return false;
     }
 
     protected abstract int intInsn();
 
     protected abstract int doubleInsn();
 
-    protected abstract void applyStrComparison(MethodVisitor visitor);
+    protected void applyStrComparison(MethodVisitor visitor) {
+        throw new UnsupportedOperationException();
+    }
 }
