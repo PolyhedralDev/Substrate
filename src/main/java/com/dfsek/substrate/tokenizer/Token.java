@@ -57,22 +57,6 @@ public class Token {
                 || type.equals(Type.MODULO_OPERATOR);
     }
 
-    public boolean isStrictNumericOperator() {
-        return type.equals(Type.SUBTRACTION_OPERATOR)
-                || type.equals(Type.MULTIPLICATION_OPERATOR)
-                || type.equals(Type.DIVISION_OPERATOR)
-                || type.equals(Type.GREATER_THAN_OPERATOR)
-                || type.equals(Type.LESS_THAN_OPERATOR)
-                || type.equals(Type.LESS_THAN_OR_EQUALS_OPERATOR)
-                || type.equals(Type.GREATER_THAN_OR_EQUALS_OPERATOR)
-                || type.equals(Type.MODULO_OPERATOR);
-    }
-
-    public boolean isStrictBooleanOperator() {
-        return type.equals(Type.BOOLEAN_AND)
-                || type.equals(Type.BOOLEAN_OR);
-    }
-
     public boolean isIdentifier() {
         return type.equals(Type.IDENTIFIER);
     }
