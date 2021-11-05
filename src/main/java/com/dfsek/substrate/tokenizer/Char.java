@@ -1,6 +1,6 @@
 package com.dfsek.substrate.tokenizer;
 
-public class Char {
+public class Char implements Positioned{
     private final char character;
     private final int index;
     private final int line;
@@ -52,5 +52,10 @@ public class Char {
     @Override
     public String toString() {
         return Character.toString(character);
+    }
+
+    @Override
+    public Position getPosition() {
+        return new Position(line, index);
     }
 }

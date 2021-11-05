@@ -1,6 +1,6 @@
 package com.dfsek.substrate.tokenizer;
 
-public class Token {
+public class Token implements Positioned {
     private final String content;
     private final Type type;
     private final com.dfsek.substrate.tokenizer.Position start;
@@ -19,7 +19,7 @@ public class Token {
         return content;
     }
 
-    public com.dfsek.substrate.tokenizer.Position getPosition() {
+    public Position getPosition() {
         return start;
     }
 
