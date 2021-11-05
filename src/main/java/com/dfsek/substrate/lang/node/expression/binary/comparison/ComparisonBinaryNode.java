@@ -66,4 +66,9 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     protected void applyStrComparison(MethodVisitor visitor) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Signature referenceType(BuildData data) {
+        return Signature.bool();
+    }
 }

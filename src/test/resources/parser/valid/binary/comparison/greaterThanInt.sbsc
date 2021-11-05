@@ -1,0 +1,6 @@
+// test the greater than operator
+
+a = 3;
+b = 2;
+
+assert(a > b);

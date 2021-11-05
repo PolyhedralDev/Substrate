@@ -37,9 +37,4 @@ public class EqualsNode extends ComparisonBinaryNode {
     protected boolean string() {
         return true;
     }
-
-    @Override
-    public Signature referenceType(BuildData data) {
-        return Signature.bool();
-    }
 }
