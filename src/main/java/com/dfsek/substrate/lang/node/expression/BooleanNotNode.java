@@ -18,8 +18,8 @@ public class BooleanNotNode extends ExpressionNode{
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!node.referenceType(data).getSimpleReturn().equals(Signature.bool())) {
-            throw new ParseException("Expected BOOL, got " + node.referenceType(data).getSimpleReturn(), node.getPosition());
+        if(!node.reference(data).getSimpleReturn().equals(Signature.bool())) {
+            throw new ParseException("Expected BOOL, got " + node.reference(data).getSimpleReturn(), node.getPosition());
         }
 
         node.apply(visitor, data);
@@ -32,7 +32,7 @@ public class BooleanNotNode extends ExpressionNode{
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return Signature.bool();
     }
 }

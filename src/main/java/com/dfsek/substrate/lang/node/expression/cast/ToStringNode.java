@@ -14,7 +14,7 @@ public class ToStringNode extends TypeCastNode {
 
     @Override
     public void applyCast(MethodVisitor visitor, BuildData data) {
-        Signature ref = value.referenceType(data).getSimpleReturn();
+        Signature ref = value.reference(data).getSimpleReturn();
         if (ref.equals(Signature.integer())) {
             visitor.visitMethodInsn(INVOKESTATIC,
                     "java/lang/Integer",
@@ -33,7 +33,7 @@ public class ToStringNode extends TypeCastNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return Signature.string();
     }
 }

@@ -28,13 +28,13 @@ public class ValueAssignmentNode implements Node {
         }
 
         value.apply(visitor, data);
-        Signature ref = value.referenceType(data);
+        Signature ref = value.reference(data);
 
         if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
             data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), ref.getSimpleReturn(), id.getContent()), ref.frames());
         } else {
-            data.registerValue(id.getContent(), new PrimitiveValue(ref), value.referenceType(data).frames());
+            data.registerValue(id.getContent(), new PrimitiveValue(ref), value.reference(data).frames());
         }
 
 

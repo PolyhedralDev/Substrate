@@ -77,7 +77,7 @@ public class ValueReferenceNode extends ExpressionNode {
                     int finalI = i;
                     internalArgs.add(new ExpressionNode() {
                         @Override
-                        public Signature referenceType(BuildData data) {
+                        public Signature reference(BuildData data) {
                             return new Signature(function.arguments().getType(finalI))
                                     .applyGenericReturn(0, function.arguments().getGenericReturn(finalI))
                                     .applyGenericArgument(0, function.arguments().getGenericArguments(finalI));
@@ -125,7 +125,7 @@ public class ValueReferenceNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }

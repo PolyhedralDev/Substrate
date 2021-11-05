@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
@@ -10,7 +9,6 @@ import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionInvocationNode extends ExpressionNode {
@@ -38,11 +36,11 @@ public class FunctionInvocationNode extends ExpressionNode {
         if (arguments.isEmpty()) {
             argSignature = Signature.empty();
         } else if (arguments.size() == 1) {
-            argSignature = arguments.get(0).referenceType(data).expandTuple();
+            argSignature = arguments.get(0).reference(data).expandTuple();
         } else {
-            argSignature = arguments.get(0).referenceType(data).expandTuple();
+            argSignature = arguments.get(0).reference(data).expandTuple();
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).referenceType(data).expandTuple());
+                argSignature = argSignature.and(arguments.get(i).reference(data).expandTuple());
             }
         }
 
@@ -65,7 +63,7 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return data.getValue(id.getContent()).reference().getGenericReturn(0);
     }
 }

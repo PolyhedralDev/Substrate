@@ -30,7 +30,7 @@ public class LambdaInvocationNode extends ExpressionNode{
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
-        return lambda.referenceType(data);
+    public Signature reference(BuildData data) {
+        return lambda.reference(data);
     }
 }

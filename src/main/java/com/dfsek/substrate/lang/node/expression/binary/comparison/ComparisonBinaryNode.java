@@ -9,8 +9,6 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import javax.naming.OperationNotSupportedException;
-
 public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     public ComparisonBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
         super(left, right, op);
@@ -18,8 +16,8 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.referenceType(data).getSimpleReturn();
-        Signature rightType = right.referenceType(data).getSimpleReturn();
+        Signature leftType = left.reference(data).getSimpleReturn();
+        Signature rightType = right.reference(data).getSimpleReturn();
 
         if (!rightType.equals(leftType)) {
             throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
@@ -68,7 +66,7 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return Signature.bool();
     }
 }

@@ -46,7 +46,7 @@ public class IfExpressionRule implements Rule {
             caseFalse = new ExpressionNode() {
 
                 @Override
-                public Signature referenceType(BuildData data) {
+                public Signature reference(BuildData data) {
                     return Signature.empty();
                 }
 

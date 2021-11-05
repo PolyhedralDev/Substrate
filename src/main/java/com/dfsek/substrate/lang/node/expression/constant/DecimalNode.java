@@ -17,7 +17,7 @@ public class DecimalNode extends ConstantExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return Signature.decimal();
     }
 }

@@ -23,7 +23,7 @@ public class ReturnNode implements Node {
         if (value == null) visitor.visitInsn(RETURN);
         else {
             value.apply(visitor, data);
-            Signature ret = value.referenceType(data);
+            Signature ret = value.reference(data);
             if (ret.size() == 1) visitor.visitInsn(ret.getType(0).returnInsn());
             else visitor.visitInsn(ARETURN);
         }
@@ -36,6 +36,6 @@ public class ReturnNode implements Node {
 
     public Signature type(BuildData data) {
         if (value == null) return Signature.empty();
-        return value.referenceType(data);
+        return value.reference(data);
     }
 }

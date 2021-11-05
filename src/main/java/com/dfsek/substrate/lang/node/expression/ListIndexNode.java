@@ -20,14 +20,14 @@ public class ListIndexNode extends ExpressionNode {
         listReference.apply(visitor, data);
         index.apply(visitor, data);
 
-        if(!index.referenceType(data).equals(Signature.integer())) {
-            throw new ParseException("Expected INT, got " + index.referenceType(data), index.getPosition());
+        if(!index.reference(data).equals(Signature.integer())) {
+            throw new ParseException("Expected INT, got " + index.reference(data), index.getPosition());
         }
 
-        Signature ref = referenceType(data);
+        Signature ref = reference(data);
 
-        if(!listReference.referenceType(data).weakEquals(Signature.list())) {
-            throw new ParseException("Expected LIST<?>, got " + listReference.referenceType(data), listReference.getPosition());
+        if(!listReference.reference(data).weakEquals(Signature.list())) {
+            throw new ParseException("Expected LIST<?>, got " + listReference.reference(data), listReference.getPosition());
         }
 
         if(ref.isSimple()) {
@@ -43,7 +43,7 @@ public class ListIndexNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
-        return listReference.referenceType(data).getSimpleReturn();
+    public Signature reference(BuildData data) {
+        return listReference.reference(data).getSimpleReturn();
     }
 }

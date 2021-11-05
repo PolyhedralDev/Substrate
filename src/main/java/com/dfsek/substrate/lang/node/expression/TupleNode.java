@@ -20,7 +20,7 @@ public class TupleNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        Signature signature = referenceType(data).getGenericReturn(0);
+        Signature signature = reference(data).getGenericReturn(0);
 
         Class<?> tuple = data.tupleFactory().generate(signature);
 
@@ -39,16 +39,16 @@ public class TupleNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         Signature signature;
         if (args.isEmpty()) {
             signature = Signature.empty();
         } else if (args.size() == 1) {
-            signature = args.get(0).referenceType(data).expandTuple();
+            signature = args.get(0).reference(data).expandTuple();
         } else {
-            signature = args.get(0).referenceType(data).expandTuple();
+            signature = args.get(0).reference(data).expandTuple();
             for (int i = 1; i < args.size(); i++) {
-                signature = signature.and(args.get(i).referenceType(data).expandTuple());
+                signature = signature.and(args.get(i).reference(data).expandTuple());
             }
         }
         return Signature.tup().applyGenericReturn(0, signature);

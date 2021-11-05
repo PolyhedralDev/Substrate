@@ -15,8 +15,8 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.referenceType(data);
-        Signature rightType = right.referenceType(data);
+        Signature leftType = left.reference(data);
+        Signature rightType = right.reference(data);
 
         if(!rightType.equals(leftType)) {
             throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
@@ -35,8 +35,8 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
     protected abstract int doubleOp();
 
     @Override
-    public Signature referenceType(BuildData data) {
-        Signature ref = left.referenceType(data);
+    public Signature reference(BuildData data) {
+        Signature ref = left.reference(data);
         if(ref.weakEquals(Signature.fun())) {
             return ref.getGenericReturn(0);
         }

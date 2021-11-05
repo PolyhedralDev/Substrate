@@ -6,10 +6,8 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -49,7 +47,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                     extra.add(sig);
                 }
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.referenceType(d).getSimpleReturn()));
+        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()));
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
@@ -70,7 +68,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             merged = merged.and(signature);
         }
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.referenceType(delegate).getSimpleReturn(), merged, (method, clazz) -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).getSimpleReturn(), merged, (method, clazz) -> {
             content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
@@ -100,17 +98,17 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         BuildData data1 = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 buildData.shadowValue(id, data.getValue(id));
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.referenceType(d).getSimpleReturn()));
+        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()));
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
             data1.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
         });
-        return Signature.fun().applyGenericReturn(0, content.referenceType(data1)).applyGenericArgument(0, getParameters());
+        return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
     }
 }

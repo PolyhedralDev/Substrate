@@ -20,15 +20,15 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        Signature signature = elements.get(0).referenceType(data);
+        Signature signature = elements.get(0).reference(data);
         elements.forEach(arg -> {
-            if(!arg.referenceType(data).equals(signature)) {
-                throw new ParseException("Array element mismatch. Expected " + signature + ", got " + arg.referenceType(data), position);
+            if(!arg.reference(data).equals(signature)) {
+                throw new ParseException("Array element mismatch. Expected " + signature + ", got " + arg.reference(data), position);
             }
         });
 
         CompilerUtil.pushInt(elements.size(), visitor);
-        Signature elementSignature = elements.get(0).referenceType(data);
+        Signature elementSignature = elements.get(0).reference(data);
         elementSignature.getType(0).applyNewArray(visitor, elementSignature);
         for (int i = 0; i < elements.size(); i++) {
             visitor.visitInsn(DUP); // duplicate reference for all elements.
@@ -44,7 +44,7 @@ public class ListNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
-        return Signature.list().applyGenericReturn(0, elements.get(0).referenceType(data));
+    public Signature reference(BuildData data) {
+        return Signature.list().applyGenericReturn(0, elements.get(0).reference(data));
     }
 }

@@ -75,7 +75,7 @@ public class RangeNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         return Signature.list().applyGenericReturn(0, Signature.integer());
     }
 }

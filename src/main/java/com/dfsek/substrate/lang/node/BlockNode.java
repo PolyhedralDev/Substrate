@@ -34,7 +34,7 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public Signature referenceType(BuildData data) {
+    public Signature reference(BuildData data) {
         if (returnType.isEmpty()) return Signature.empty();
         Signature test = returnType.get(0).type(data);
         returnType.forEach(type -> {

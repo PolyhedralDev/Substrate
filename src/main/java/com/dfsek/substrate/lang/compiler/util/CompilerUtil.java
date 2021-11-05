@@ -1,12 +1,8 @@
 package com.dfsek.substrate.lang.compiler.util;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lang.node.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
@@ -18,7 +14,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 
 public final class CompilerUtil implements Opcodes {
     public static String internalName(Class<?> clazz) {
@@ -72,13 +67,13 @@ public final class CompilerUtil implements Opcodes {
     }
 
     public static void invokeLambda(ExpressionNode lambdaContainer, MethodVisitor visitor, BuildData data) {
-        if(!lambdaContainer.referenceType(data).weakEquals(Signature.fun())) {
-            throw new ParseException("Expected lambda, got " + lambdaContainer.referenceType(data), lambdaContainer.getPosition());
+        if(!lambdaContainer.reference(data).weakEquals(Signature.fun())) {
+            throw new ParseException("Expected lambda, got " + lambdaContainer.reference(data), lambdaContainer.getPosition());
         }
 
-        Signature returnType = lambdaContainer.referenceType(data).getSimpleReturn();
+        Signature returnType = lambdaContainer.reference(data).getSimpleReturn();
 
-        Signature args = lambdaContainer.referenceType(data).getGenericArguments(0);
+        Signature args = lambdaContainer.reference(data).getGenericArguments(0);
 
 
         visitor.visitMethodInsn(INVOKEINTERFACE,
