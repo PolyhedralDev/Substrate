@@ -1,0 +1,5 @@
+// parser should fail when indexing something that isn't a list
+
+a = 5;
+
+println(str(a[3]));
