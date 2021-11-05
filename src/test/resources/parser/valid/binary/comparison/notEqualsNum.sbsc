@@ -1,0 +1,6 @@
+// test the not equals operator !=
+
+a = 2.1;
+b = 2.2;
+
+assert(a != b);
