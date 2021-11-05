@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.compiler;
+package com.dfsek.substrate.lang.compiler.value;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;

@@ -1,12 +1,9 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
-import com.dfsek.substrate.lang.compiler.EphemeralFunction;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
-import com.dfsek.substrate.lang.internal.Lambda;
-import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.MethodVisitor;
 

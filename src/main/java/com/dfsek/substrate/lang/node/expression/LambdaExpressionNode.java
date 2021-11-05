@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.node.expression;
 
-import com.dfsek.substrate.lang.compiler.EphemeralFunction;
-import com.dfsek.substrate.lang.compiler.EphemeralValue;
+import com.dfsek.substrate.lang.compiler.value.EphemeralFunction;
+import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
