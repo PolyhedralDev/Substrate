@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.node.expression.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
 import com.dfsek.substrate.lang.node.expression.binary.comparison.EqualsNode;
+import com.dfsek.substrate.lang.node.expression.binary.comparison.NotEqualsNode;
 import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -101,6 +102,8 @@ public class ExpressionRule implements Rule {
             return new ModulusNode(left, right, op);
         } else if (op.getType() == Token.Type.EQUALS_OPERATOR) {
             return new EqualsNode(left, right, op);
+        } else if (op.getType() == Token.Type.NOT_EQUALS_OPERATOR) {
+            return new NotEqualsNode(left, right, op);
         } else {
             throw new ParseException("Unexpected token: " + op, op.getPosition());
         }
