@@ -10,6 +10,7 @@ import com.dfsek.substrate.lang.node.expression.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -33,6 +34,17 @@ public final class CompilerUtil implements Opcodes {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public static void invertBoolean(MethodVisitor visitor) {
+        Label caseTrue = new Label();
+        Label caseFalse = new Label();
+        visitor.visitJumpInsn(IFNE, caseFalse);
+        visitor.visitInsn(ICONST_1);
+        visitor.visitJumpInsn(GOTO, caseTrue);
+        visitor.visitLabel(caseFalse);
+        visitor.visitInsn(ICONST_0);
+        visitor.visitLabel(caseTrue);
     }
 
     public static void pushInt(int i, MethodVisitor visitor) {

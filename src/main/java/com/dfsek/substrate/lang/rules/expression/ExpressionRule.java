@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.RangeNode;
@@ -31,6 +32,15 @@ public class ExpressionRule implements Rule {
 
     private ExpressionNode simple(Tokenizer tokenizer) {
         Token test = tokenizer.peek();
+
+        boolean not = false;
+        Position booleanNot = null;
+
+        if(test.getType() == Token.Type.BOOLEAN_NOT) {
+            not = true;
+            booleanNot = tokenizer.consume().getPosition();
+            test = tokenizer.peek();
+        }
 
         ExpressionNode node;
 
@@ -69,6 +79,7 @@ public class ExpressionRule implements Rule {
             ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
         }
 
+        if(not) return new BooleanNotNode(booleanNot, node);
         return node;
     }
 

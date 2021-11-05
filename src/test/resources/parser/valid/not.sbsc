@@ -1,0 +1,5 @@
+assert(!false);
+
+b = false;
+
+assert(!b);
