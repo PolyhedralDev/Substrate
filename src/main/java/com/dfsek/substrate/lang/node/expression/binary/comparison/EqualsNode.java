@@ -9,48 +9,28 @@ import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-public class EqualsNode extends BinaryOperationNode {
+public class EqualsNode extends ComparisonBinaryNode {
     public EqualsNode(ExpressionNode left, ExpressionNode right, Token op) {
         super(left, right, op);
     }
 
     @Override
-    public void applyOp(MethodVisitor visitor, BuildData data) {
-        Signature leftType = left.referenceType(data).getSimpleReturn();
-        Signature rightType = right.referenceType(data).getSimpleReturn();
+    protected int intInsn() {
+        return IF_ICMPNE;
+    }
 
-        if(!rightType.equals(leftType)) {
-            throw new ParseException("Expected " + leftType + ", got " + rightType, right.getPosition());
-        }
+    @Override
+    protected int doubleInsn() {
+        return IFNE;
+    }
 
-        if (leftType.equals(Signature.integer())) {
-            Label f = new Label();
-            Label t = new Label();
-            visitor.visitJumpInsn(IF_ICMPNE, f);
-            visitor.visitInsn(ICONST_1);
-            visitor.visitJumpInsn(GOTO, t);
-            visitor.visitLabel(f);
-            visitor.visitInsn(ICONST_0);
-            visitor.visitLabel(t);
-        } else if(leftType.equals(Signature.decimal())){
-            Label f = new Label();
-            Label t = new Label();
-            visitor.visitInsn(DCMPL);
-            visitor.visitJumpInsn(IFNE, f);
-            visitor.visitInsn(ICONST_1);
-            visitor.visitJumpInsn(GOTO, t);
-            visitor.visitLabel(f);
-            visitor.visitInsn(ICONST_0);
-            visitor.visitLabel(t);
-        } else if(leftType.equals(Signature.string())) {
-            visitor.visitMethodInsn(INVOKEVIRTUAL,
-                    "java/lang/String",
-                    "equals",
-                    "(Ljava/lang/Object;)Z",
-                    false);
-        } else {
-            throw new ParseException("Expected [INT, NUM, STR], got " + leftType, left.getPosition());
-        }
+    @Override
+    protected void applyStrComparison(MethodVisitor visitor) {
+        visitor.visitMethodInsn(INVOKEVIRTUAL,
+                "java/lang/String",
+                "equals",
+                "(Ljava/lang/Object;)Z",
+                false);
     }
 
     @Override
