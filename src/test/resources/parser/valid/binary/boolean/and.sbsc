@@ -1,0 +1,9 @@
+assert(true && true);
+
+a = true && false;
+
+assert(!a);
+
+b = false && true;
+
+assert(!b);

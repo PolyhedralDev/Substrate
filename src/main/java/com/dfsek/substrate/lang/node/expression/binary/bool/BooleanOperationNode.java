@@ -26,12 +26,4 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     public Position getPosition() {
         return op.getPosition();
     }
-
-    boolean or(boolean a, boolean b) {
-        return a || b;
-    }
-
-    boolean and(boolean a, boolean b) {
-        return a && b;
-    }
 }
