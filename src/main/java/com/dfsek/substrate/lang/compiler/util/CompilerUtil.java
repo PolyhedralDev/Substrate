@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.compiler.util;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
@@ -67,9 +68,7 @@ public final class CompilerUtil implements Opcodes {
     }
 
     public static void invokeLambda(ExpressionNode lambdaContainer, MethodVisitor visitor, BuildData data) {
-        if(!lambdaContainer.reference(data).weakEquals(Signature.fun())) {
-            throw new ParseException("Expected lambda, got " + lambdaContainer.reference(data), lambdaContainer.getPosition());
-        }
+        ParserUtil.checkWeakReferenceType(lambdaContainer, data, Signature.fun());
 
         Signature returnType = lambdaContainer.reference(data).getSimpleReturn();
 

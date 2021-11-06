@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.node.expression;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -18,11 +19,7 @@ public class BooleanNotNode extends ExpressionNode{
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!node.reference(data).getSimpleReturn().equals(Signature.bool())) {
-            throw new ParseException("Expected BOOL, got " + node.reference(data).getSimpleReturn(), node.getPosition());
-        }
-
-        node.apply(visitor, data);
+        ParserUtil.checkType(node, data, Signature.bool()).apply(visitor, data);
         CompilerUtil.invertBoolean(visitor);
     }
 

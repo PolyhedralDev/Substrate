@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.Label;
@@ -20,12 +21,8 @@ public class IfExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        if(!predicate.reference(data).equals(Signature.bool())) {
-            throw new ParseException("If expression predicate must return BOOL, got " + predicate.reference(data), predicate.getPosition());
-        }
-        if(!caseTrue.reference(data).equals(caseFalse.reference(data))) {
-            throw new ParseException("If expression case has invalid return type, expected " + caseTrue.reference(data) + ", got " + caseFalse.reference(data), caseFalse.getPosition());
-        }
+        ParserUtil.checkType(predicate, data, Signature.bool());
+        ParserUtil.checkType(caseTrue, data, caseFalse.reference(data).getSimpleReturn());
 
         Label equal = new Label();
         Label end = new Label();

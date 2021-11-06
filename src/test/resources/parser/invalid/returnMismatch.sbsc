@@ -1,0 +1,5 @@
+a = if(true) {
+    return "a";
+
+    return 2;
+};

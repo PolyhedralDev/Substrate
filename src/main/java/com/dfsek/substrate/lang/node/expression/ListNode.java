@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.node.expression;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -21,11 +22,7 @@ public class ListNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Signature signature = elements.get(0).reference(data);
-        elements.forEach(arg -> {
-            if(!arg.reference(data).equals(signature)) {
-                throw new ParseException("Array element mismatch. Expected " + signature + ", got " + arg.reference(data), position);
-            }
-        });
+        elements.forEach(element -> ParserUtil.checkReferenceType(element, data, signature));
 
         CompilerUtil.pushInt(elements.size(), visitor);
         Signature elementSignature = elements.get(0).reference(data);

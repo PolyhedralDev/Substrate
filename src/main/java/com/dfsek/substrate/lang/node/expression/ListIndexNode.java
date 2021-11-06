@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -17,18 +18,13 @@ public class ListIndexNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        listReference.apply(visitor, data);
-        index.apply(visitor, data);
+        ParserUtil.checkWeakReferenceType(listReference, data, Signature.list())
+                .apply(visitor, data);
 
-        if(!index.reference(data).equals(Signature.integer())) {
-            throw new ParseException("Expected INT, got " + index.reference(data), index.getPosition());
-        }
+        ParserUtil.checkType(index, data, Signature.integer())
+                .apply(visitor, data);
 
         Signature ref = reference(data);
-
-        if(!listReference.reference(data).weakEquals(Signature.list())) {
-            throw new ParseException("Expected LIST<?>, got " + listReference.reference(data), listReference.getPosition());
-        }
 
         if(ref.isSimple()) {
             visitor.visitInsn(ref.getType(0).arrayLoadInsn());

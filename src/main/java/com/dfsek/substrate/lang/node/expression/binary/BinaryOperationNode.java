@@ -11,7 +11,7 @@ public abstract class BinaryOperationNode extends ExpressionNode {
     protected final ExpressionNode left;
     protected final ExpressionNode right;
 
-    private final Token op;
+    protected final Token op;
 
     public BinaryOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
         this.left = left;

@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -36,12 +37,8 @@ public class BlockNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         if (returnType.isEmpty()) return Signature.empty();
-        Signature test = returnType.get(0).type(data);
-        returnType.forEach(type -> {
-            if (!test.equals(type.type(data))) {
-                throw new ParseException("Mismatched return types in block: expected " + test + ", got " + type.type(data), type.getPosition());
-            }
-        });
+        Signature test = returnType.get(0).reference(data);
+        returnType.forEach(type -> ParserUtil.checkReferenceType(type, data, test));
         return test;
     }
 }
