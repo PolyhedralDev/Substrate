@@ -1,0 +1,5 @@
+// parser shouldn't let us invoke something that isn't a function.
+
+a = 5;
+
+a();
