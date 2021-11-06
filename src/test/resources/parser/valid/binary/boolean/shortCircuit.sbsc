@@ -1,0 +1,6 @@
+a = () -> {
+    fail();
+    return false;
+};
+
+b = false && a();

@@ -188,10 +188,6 @@ public class Token implements Positioned {
          */
         BREAK,
         /**
-         * Fail statement. Like return keyword, but specifies that generation has failed.
-         */
-        FAIL,
-        /**
          * Arrow token "->"
          */
         ARROW,
