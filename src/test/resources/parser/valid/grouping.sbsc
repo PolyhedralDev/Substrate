@@ -1,0 +1,5 @@
+// test grouping with parentheses
+
+a = (2+2) * (2+2);
+
+assert(a == 16);

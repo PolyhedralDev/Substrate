@@ -38,9 +38,13 @@ public class TupleRule implements Rule {
                 }
                 tokenizer.consume();
             }
-            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END, Token.Type.STATEMENT_END, Token.Type.LIST_END).getType() == Token.Type.SEPARATOR) {
+            if (tokenizer.peek().getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }
+        }
+
+        if(args.size() == 1) {
+            return args.get(0); // expand out 1-tuples
         }
         return new TupleNode(args, begin.getPosition());
     }
