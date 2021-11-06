@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-
 public class Signature implements Opcodes {
     private static final Signature VOID = new Signature();
     private static final Signature BOOL = new Signature(DataType.BOOL);
@@ -134,7 +133,7 @@ public class Signature implements Opcodes {
         }
 
         for (int i = 0; i < generic.size(); i++) {
-            if(!this.generic.get(i).equals(that.generic.get(i))) return false;
+            if (!this.generic.get(i).equals(that.generic.get(i))) return false;
         }
 
         return true;
@@ -151,17 +150,17 @@ public class Signature implements Opcodes {
     }
 
     public Signature getSimpleReturn() {
-        if(this.equals(empty())) return empty();
-        if(!isSimple()) {
+        if (this.equals(empty())) return empty();
+        if (!isSimple()) {
             throw new IllegalStateException("Cannot get simple return value of non-simple Signature " + this);
         }
-        if(this.weakEquals(fun())) return getGenericReturn(0);
-        if(!getGenericReturn(0).equals(empty())) return getGenericReturn(0);
+        if (this.weakEquals(fun())) return getGenericReturn(0);
+        if (!getGenericReturn(0).equals(empty())) return getGenericReturn(0);
         return this;
     }
 
     public Signature expandTuple() {
-        if(this.weakEquals(tup())) {
+        if (this.weakEquals(tup())) {
             return getGenericReturn(0);
         }
         return this;
@@ -172,9 +171,9 @@ public class Signature implements Opcodes {
         StringBuilder builder = new StringBuilder("(");
         for (int i = 0; i < types.size(); i++) {
             builder.append(types.get(i));
-            if(!getGenericArguments(i).equals(empty()) || !getGenericReturn(i).equals(empty())){
+            if (!getGenericArguments(i).equals(empty()) || !getGenericReturn(i).equals(empty())) {
                 builder.append('<');
-                if(!getGenericArguments(i).equals(empty())) {
+                if (!getGenericArguments(i).equals(empty())) {
                     builder.append(getGenericArguments(i).toString());
                     builder.append("->");
                 }
@@ -195,8 +194,12 @@ public class Signature implements Opcodes {
     }
 
     public int frames() {
-        if (this.equals(decimal())) return 2;
-        return 1;
+        int frames = 0;
+        for (DataType type : types) {
+            if (type == DataType.NUM) frames += 2;
+            else frames += 1;
+        }
+        return frames;
     }
 
     public boolean isSimple() {
@@ -208,10 +211,10 @@ public class Signature implements Opcodes {
         for (int i = 0; i < types.size(); i++) {
             sig.append(types.get(i).descriptorChar());
             Pair<Signature, Signature> gen = generic.get(i);
-            if(!gen.getLeft().equals(empty())) {
+            if (!gen.getLeft().equals(empty())) {
                 sig.append("_").append(gen.getLeft().classDescriptor()).append("_");
             }
-            if(!gen.getRight().equals(empty())) {
+            if (!gen.getRight().equals(empty())) {
                 sig.append("__").append(gen.getRight().classDescriptor()).append("__");
             }
         }
@@ -224,7 +227,7 @@ public class Signature implements Opcodes {
 
         for (int i = 0; i < types.size(); i++) {
             sig.append(types.get(i).descriptor());
-            if(types.get(i) == DataType.LIST) {
+            if (types.get(i) == DataType.LIST) {
                 sig.append(getGenericReturn(i).internalDescriptor());
             }
         }

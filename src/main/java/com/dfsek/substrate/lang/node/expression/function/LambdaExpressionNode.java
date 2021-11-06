@@ -20,7 +20,6 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
     private final List<Pair<String, Signature>> types;
     private final Position start;
-    private final List<String> internalParameters = new ArrayList<>();
     private final Signature parameters;
 
     public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start) {
@@ -38,6 +37,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         List<Signature> extra = new ArrayList<>();
+        List<String> internalParameters = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
@@ -48,7 +48,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                     extra.add(sig);
                 }
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()));
+        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
@@ -104,7 +104,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 buildData.shadowValue(id, data.getValue(id));
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()));
+        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();

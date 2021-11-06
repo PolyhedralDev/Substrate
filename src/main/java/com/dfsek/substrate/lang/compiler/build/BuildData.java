@@ -6,7 +6,10 @@ import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,8 @@ public class BuildData {
 
     private int shadowField = 0;
 
+    private final int implArgsOffset;
+
     public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter, String name) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
@@ -43,6 +48,7 @@ public class BuildData {
         interceptor = (a, b) -> {
         };
         this.offset = 2;
+        this.implArgsOffset = 1;
     }
 
     private BuildData(DynamicClassLoader classLoader,
@@ -53,7 +59,7 @@ public class BuildData {
                       Map<String, Pair<Integer, Value>> shadowFields, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
-                      Function<BuildData, String> name, int offset) {
+                      Function<BuildData, String> name, int offset, int implArgsOffset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
@@ -65,6 +71,7 @@ public class BuildData {
         this.interceptor = interceptor;
         this.name = Lazy.of(() -> name.apply(this));
         this.offset = offset;
+        this.implArgsOffset = implArgsOffset;
     }
 
     public LambdaFactory lambdaFactory() {
@@ -165,10 +172,14 @@ public class BuildData {
                 shadowFields, valueOffsets, // but same JVM scope
                 this,
                 interceptor,
-                ignore -> name.get(), offset);
+                ignore -> name.get(), offset, implArgsOffset);
     }
 
-    public BuildData detach(ValueInterceptor interceptor, Function<BuildData, String> name) {
+    public void loadImplementationArguments(MethodVisitor visitor) {
+        visitor.visitVarInsn(Opcodes.ALOAD, implArgsOffset);
+    }
+
+    public BuildData detach(ValueInterceptor interceptor, Function<BuildData, String> name, int args) {
         return new BuildData(classLoader,
                 classWriter,
                 tupleFactory,
@@ -178,6 +189,6 @@ public class BuildData {
                 this,
                 interceptor,
                 name,
-                1);
+                1, args + 1);
     }
 }

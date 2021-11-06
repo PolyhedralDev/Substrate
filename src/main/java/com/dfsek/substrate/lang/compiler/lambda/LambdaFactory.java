@@ -47,7 +47,7 @@ public class LambdaFactory {
 
             MethodVisitor apply = writer.visitMethod(ACC_PUBLIC | ACC_ABSTRACT,
                     "apply",
-                    "(" + args.internalDescriptor() + ")" + ret,
+                    "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret,
                     null,
                     null);
             apply.visitEnd();
@@ -66,10 +66,11 @@ public class LambdaFactory {
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodVisitor visitor) {
+        data.loadImplementationArguments(visitor);
         visitor.visitMethodInsn(INVOKEINTERFACE,
                 CompilerUtil.internalName(generate(args, ret)),
                 "apply",
-                "(" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret),
+                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret),
                 true);
     }
 
@@ -123,7 +124,7 @@ public class LambdaFactory {
 
         MethodVisitor apply = writer.visitMethod(ACC_PUBLIC,
                 "apply",
-                "(" + args.internalDescriptor() + ")" + ret,
+                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret,
                 null,
                 null);
 
