@@ -74,12 +74,7 @@ public final class CompilerUtil implements Opcodes {
 
         Signature args = lambdaContainer.reference(data).getGenericArguments(0);
 
-
-        visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(data.lambdaFactory().generate(args, returnType)),
-                "apply",
-                "(" + args.internalDescriptor() + ")" + buildReturnType(data, returnType),
-                true);
+        data.lambdaFactory().invoke(args, returnType, data, visitor);
     }
 
     public static ClassWriter generateClass(String name, boolean iface, boolean defaultConstructor, String... ifaces) {

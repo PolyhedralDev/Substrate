@@ -1,5 +1,7 @@
 package com.dfsek.substrate.lang.compiler.lambda;
 
+import com.dfsek.substrate.ImplementationArguments;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -21,6 +23,8 @@ public class LambdaFactory {
 
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
+
+    private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
 
     private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
 
@@ -59,6 +63,14 @@ public class LambdaFactory {
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
         return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get());
+    }
+
+    public void invoke(Signature args, Signature ret, BuildData data, MethodVisitor visitor) {
+        visitor.visitMethodInsn(INVOKEINTERFACE,
+                CompilerUtil.internalName(generate(args, ret)),
+                "apply",
+                "(" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret),
+                true);
     }
 
     public Class<?> implement(Signature args, Signature returnType, Signature scope, BiConsumer<MethodVisitor, ClassWriter> consumer) {
