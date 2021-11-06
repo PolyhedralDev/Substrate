@@ -4,6 +4,8 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.*;
+import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
+import com.dfsek.substrate.lang.node.expression.function.LambdaInvocationNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;

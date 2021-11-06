@@ -1,8 +1,9 @@
-package com.dfsek.substrate.lang.node.expression;
+package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.MethodVisitor;
@@ -10,7 +11,7 @@ import org.objectweb.asm.MethodVisitor;
 /**
  * immediately invokes a lambda
  */
-public class LambdaInvocationNode extends ExpressionNode{
+public class LambdaInvocationNode extends ExpressionNode {
     private final LambdaExpressionNode lambda;
 
     public LambdaInvocationNode(LambdaExpressionNode lambda) {

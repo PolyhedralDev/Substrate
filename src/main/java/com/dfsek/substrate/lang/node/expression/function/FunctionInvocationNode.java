@@ -1,9 +1,10 @@
-package com.dfsek.substrate.lang.node.expression;
+package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;

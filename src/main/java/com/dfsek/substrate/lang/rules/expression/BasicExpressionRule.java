@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
-import com.dfsek.substrate.lang.node.ValueReferenceNode;
+import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;

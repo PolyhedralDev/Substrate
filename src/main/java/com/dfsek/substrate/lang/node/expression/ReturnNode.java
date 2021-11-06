@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.node;
+package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;

@@ -2,8 +2,8 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
-import com.dfsek.substrate.lang.node.BlockNode;
-import com.dfsek.substrate.lang.node.ReturnNode;
+import com.dfsek.substrate.lang.node.expression.BlockNode;
+import com.dfsek.substrate.lang.node.expression.ReturnNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;

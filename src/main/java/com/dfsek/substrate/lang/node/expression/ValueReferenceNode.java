@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.node;
+package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
@@ -8,8 +8,7 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.FunctionInvocationNode;
+import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;

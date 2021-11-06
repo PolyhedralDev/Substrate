@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.FunctionInvocationNode;
+import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
