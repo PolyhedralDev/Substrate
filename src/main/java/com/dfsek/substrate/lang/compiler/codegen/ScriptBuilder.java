@@ -21,8 +21,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ScriptBuilder {
     private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));
-    private static final String INTERFACE_CLASS_NAME = Script.class.getCanonicalName().replace('.', '/');
-    private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
+    private static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
+    private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
     private final List<Node> ops = new ArrayList<>();
 
@@ -45,19 +45,17 @@ public class ScriptBuilder {
                 null);
         absMethod.visitCode();
 
-        Label begin = new Label();
-
         DynamicClassLoader classLoader = new DynamicClassLoader();
 
         BuildData data = new BuildData(classLoader, writer, implementationClassName);
         macros.forEach(buildDataConsumer -> buildDataConsumer.accept(data));
         ops.forEach(op -> op.apply(absMethod, data));
 
-        Label end = new Label();
-
         absMethod.visitInsn(RETURN);
 
         absMethod.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
+
+        absMethod.visitEnd();
 
         byte[] bytes = writer.toByteArray();
 

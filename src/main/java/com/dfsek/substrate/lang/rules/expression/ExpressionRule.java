@@ -3,18 +3,21 @@ package com.dfsek.substrate.lang.rules.expression;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
-import com.dfsek.substrate.lang.node.expression.list.RangeNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanAndNode;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanOrNode;
 import com.dfsek.substrate.lang.node.expression.binary.comparison.*;
-import com.dfsek.substrate.lang.rules.FunctionInvocationRule;
+import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
+import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
+import com.dfsek.substrate.lang.node.expression.list.RangeNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExpressionRule implements Rule {
     private static final ExpressionRule INSTANCE = new ExpressionRule();
@@ -38,7 +41,7 @@ public class ExpressionRule implements Rule {
         boolean not = false;
         Position booleanNot = null;
 
-        if(test.getType() == Token.Type.BOOLEAN_NOT) {
+        if (test.getType() == Token.Type.BOOLEAN_NOT) {
             not = true;
             booleanNot = tokenizer.consume().getPosition();
             test = tokenizer.peek();
@@ -47,11 +50,7 @@ public class ExpressionRule implements Rule {
         ExpressionNode node;
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
-            if (tokenizer.peek(1).getType() == Token.Type.GROUP_BEGIN) {
-                node = FunctionInvocationRule.getInstance().assemble(tokenizer);
-            } else {
-                node = BasicExpressionRule.getInstance().assemble(tokenizer);
-            }
+            node = BasicExpressionRule.getInstance().assemble(tokenizer);
         } else if (test.isType()) {
             node = CastRule.getInstance().assemble(tokenizer);
         } else if (test.getType() == Token.Type.IF) {
@@ -71,7 +70,7 @@ public class ExpressionRule implements Rule {
             node = new RangeNode(node, assemble(tokenizer), pos);
         }
 
-        if(tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
+        if (tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
             tokenizer.consume();
 
             ExpressionNode index = assemble(tokenizer);
@@ -81,7 +80,22 @@ public class ExpressionRule implements Rule {
             ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
         }
 
-        if(not) return new BooleanNotNode(booleanNot, node);
+        if (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) {
+            ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
+
+            List<ExpressionNode> args = new ArrayList<>();
+            while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
+                args.add(ExpressionRule.getInstance().assemble(tokenizer));
+                if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
+                    tokenizer.consume(); // consume separator
+                }
+            }
+            ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+
+            node = new FunctionInvocationNode(node, args);
+        }
+
+        if (not) return new BooleanNotNode(booleanNot, node);
         return node;
     }
 

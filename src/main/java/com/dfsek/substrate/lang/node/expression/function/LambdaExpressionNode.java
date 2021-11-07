@@ -1,10 +1,8 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.value.function.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.function.EphemeralFunction;
 import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -43,7 +41,6 @@ public class LambdaExpressionNode extends ExpressionNode {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 Signature sig = data.getValue(id).reference();
                 if (!internalParameters.contains(Pair.of(sig, id))) {
-                    buildData.shadowValue(id, data.getValue(id));
                     internalParameters.add(Pair.of(sig, id));
                 }
             }
@@ -51,11 +48,8 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
-            if (pair.getRight().weakEquals(Signature.fun())) { // register the lambda value as a function
-                delegate.registerValue(pair.getLeft(), new EphemeralFunction(pair.getRight(), delegate.getOffset()), signature.frames());
-            } else {
-                delegate.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
-            }
+
+            delegate.registerValue(pair.getLeft(), new EphemeralValue(signature, delegate.getOffset()), signature.frames());
         });
 
 
@@ -65,14 +59,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         Signature merged = Signature.empty();
 
         for (Pair<Signature, String> pair : internalParameters) {
-            String internalParameter = pair.getRight();
-            Value internal = data.getValue(internalParameter);
-            if (internal instanceof LocalLambdaReferenceFunction && ((LocalLambdaReferenceFunction) internal).getNode().equals(this)) {
-                // self-reference
-                delegate.setSelf(internalParameter);
-            } else {
-                merged = merged.and(pair.getLeft());
-            }
+            merged = merged.and(pair.getLeft());
         }
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).getSimpleReturn(), merged, (method, clazz) -> {
@@ -86,10 +73,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         for (Pair<Signature, String> pair : internalParameters) {
             String internalParameter = pair.getRight();
             Value internal = data.getValue(internalParameter);
-            if (!(internal instanceof LocalLambdaReferenceFunction && ((LocalLambdaReferenceFunction) internal).getNode().equals(this))) {
-                // not self-reference
-                visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
-            }
+            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
         visitor.visitMethodInsn(INVOKESPECIAL,
@@ -111,14 +95,11 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         BuildData data1 = data.detach((id, buildData) -> {
-            if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
-                buildData.shadowValue(id, data.getValue(id));
-            }
         }, d -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
-            data1.registerValue(pair.getLeft(), new EphemeralValue(signature), signature.frames());
+            data1.registerValue(pair.getLeft(), new EphemeralValue(signature, data1.getOffset()), signature.frames());
         });
         return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
     }

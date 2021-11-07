@@ -19,7 +19,6 @@ public class BuildData {
     private final LambdaFactory lambdaFactory;
 
     private final Map<String, Value> values;
-    private final Map<String, Pair<Integer, Value>> shadowFields;
     private final Map<Pair<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
@@ -30,11 +29,7 @@ public class BuildData {
     private final Lazy<String> name;
     private int offset;
 
-    private int shadowField = 0;
-
     private final int implArgsOffset;
-
-    private String self;
 
     public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter, String name) {
         this.classLoader = classLoader;
@@ -44,7 +39,6 @@ public class BuildData {
         this.name = Lazy.of(() -> name);
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
-        shadowFields = new HashMap<>();
         parent = null;
         interceptor = (a, b) -> {
         };
@@ -52,36 +46,26 @@ public class BuildData {
         this.implArgsOffset = 1;
     }
 
-    public void setSelf(String self) {
-        this.self = self;
-    }
-
-    public String getSelf() {
-        return self;
-    }
-
     private BuildData(DynamicClassLoader classLoader,
                       ClassWriter classWriter,
                       TupleFactory tupleFactory,
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
-                      Map<String, Pair<Integer, Value>> shadowFields, Map<Pair<BuildData, String>, Integer> valueOffsets,
+                      Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
-                      Function<BuildData, String> name, int offset, int implArgsOffset, String self) {
+                      Function<BuildData, String> name, int offset, int implArgsOffset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
         this.lambdaFactory = lambdaFactory;
         this.values = values;
-        this.shadowFields = shadowFields;
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
         this.name = Lazy.of(() -> name.apply(this));
         this.offset = offset;
         this.implArgsOffset = implArgsOffset;
-        this.self = self;
     }
 
     public LambdaFactory lambdaFactory() {
@@ -97,24 +81,6 @@ public class BuildData {
             throw new IllegalArgumentException("Value with identifier \"" + id + "\" already registered.");
         values.put(id, value);
         valueOffsets.put(Pair.of(this, id), offset);
-    }
-
-    public void shadowValue(String id, Value value) {
-        if (!values.containsKey(id))
-            throw new IllegalArgumentException("Value with identifier \"" + id + "\" not registered.");
-        shadowFields.put(id, Pair.of(shadowField++, value));
-    }
-
-    public boolean isShadowed(String id) {
-        return shadowFields.containsKey(id);
-    }
-
-    public int getShadowField(String id) {
-        return shadowFields.get(id).getLeft();
-    }
-
-    public Value getShadowValue(String id) {
-        return shadowFields.get(id).getRight();
     }
 
     public String getClassName() {
@@ -166,7 +132,7 @@ public class BuildData {
 
     public boolean valueExists(String id) {
         interceptor.fetch(id, this);
-        return values.containsKey(id) || shadowFields.containsKey(id);
+        return values.containsKey(id);
     }
 
     public BuildData sub() {
@@ -175,10 +141,10 @@ public class BuildData {
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                shadowFields, valueOffsets, // but same JVM scope
+                valueOffsets, // but same JVM scope
                 this,
                 interceptor,
-                ignore -> name.get(), offset, implArgsOffset, self);
+                ignore -> name.get(), offset, implArgsOffset);
     }
 
     public void loadImplementationArguments(MethodVisitor visitor) {
@@ -191,10 +157,10 @@ public class BuildData {
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                new HashMap<>(), new HashMap<>(), // *and* different JVM scope
+                new HashMap<>(), // *and* different JVM scope
                 this,
                 interceptor,
                 name,
-                1, args + 1, null);
+                1, args + 1);
     }
 }

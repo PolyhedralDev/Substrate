@@ -1,18 +1,15 @@
-package com.dfsek.substrate.lang.node;
+package com.dfsek.substrate.lang.node.expression;
 
-import com.dfsek.substrate.lang.Node;
-import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.value.function.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.MethodVisitor;
 
-public class ValueAssignmentNode implements Node {
+public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
     private final ExpressionNode value;
 
@@ -29,14 +26,15 @@ public class ValueAssignmentNode implements Node {
 
         Signature ref = value.reference(data);
 
-        if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
-            LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
-            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), ref.getSimpleReturn(), id.getContent(), lambdaExpressionNode), ref.frames());
-        } else {
-            data.registerValue(id.getContent(), new PrimitiveValue(ref), value.reference(data).frames());
-        }
+        data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference(data).frames());
 
         value.apply(visitor, data);
+
+        if (ref.equals(Signature.decimal())) {
+            visitor.visitInsn(DUP2);
+        } else {
+            visitor.visitInsn(DUP);
+        }
 
 
         int offset = data.offset(id.getContent());
@@ -57,5 +55,10 @@ public class ValueAssignmentNode implements Node {
     @Override
     public Position getPosition() {
         return id.getPosition();
+    }
+
+    @Override
+    public Signature reference(BuildData data) {
+        return value.reference(data);
     }
 }

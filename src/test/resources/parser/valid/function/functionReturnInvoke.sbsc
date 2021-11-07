@@ -1,0 +1,9 @@
+a = (f: fun<int -> int>) -> {
+    return (b: num) -> {
+        return num(f(int(b)));
+    };
+};
+
+println(str(a((b: int) -> {
+    return b + 5;
+})(0.5)));

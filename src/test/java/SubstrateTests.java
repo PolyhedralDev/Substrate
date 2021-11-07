@@ -32,48 +32,8 @@ public class SubstrateTests {
 
     private Parser createParser(String script) {
         Parser parser = new Parser(script, new BaseRule());
-        parser.registerMacro(data -> {
-            data.registerValue("fail", new com.dfsek.substrate.lang.compiler.value.function.Function() {
-                @Override
-                public Signature arguments() {
-                    return Signature.empty();
-                }
 
-                @Override
-                public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
-                    visitor.visitMethodInsn(INVOKESTATIC,
-                            CompilerUtil.internalName(Assertions.class),
-                            "fail",
-                            "()V",
-                            false);
-                }
 
-                @Override
-                public Signature reference() {
-                    return Signature.fun();
-                }
-            });
-            data.registerValue("assert", new com.dfsek.substrate.lang.compiler.value.function.Function() {
-                @Override
-                public Signature arguments() {
-                    return Signature.bool();
-                }
-
-                @Override
-                public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
-                    visitor.visitMethodInsn(INVOKESTATIC,
-                            CompilerUtil.internalName(Assertions.class),
-                            "assertTrue",
-                            "(Z)V",
-                            false);
-                }
-
-                @Override
-                public Signature reference() {
-                    return Signature.fun().applyGenericArgument(0, Signature.bool());
-                }
-            });
-        });
         return parser;
     }
 

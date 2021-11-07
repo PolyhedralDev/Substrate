@@ -4,18 +4,22 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import org.objectweb.asm.MethodVisitor;
 
-public class EphemeralValue implements Value {
+public class ShadowValue implements Value {
     private final Signature signature;
-    private final int argument;
+    private final int field;
 
-    public EphemeralValue(Signature signature, int argument) {
+    public ShadowValue(Signature signature, int field) {
         this.signature = signature;
-        this.argument = argument;
+        this.field = field;
     }
 
     @Override
     public void load(MethodVisitor visitor, BuildData data) {
-        visitor.visitVarInsn(reference().getType(0).loadInsn(), argument);
+        visitor.visitVarInsn(ALOAD, 0);
+        visitor.visitFieldInsn(GETFIELD,
+                data.getClassName(),
+                "scope" + field,
+                reference().internalDescriptor());
     }
 
     @Override
