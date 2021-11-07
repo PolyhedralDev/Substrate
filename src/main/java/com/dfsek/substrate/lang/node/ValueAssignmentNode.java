@@ -3,7 +3,7 @@ package com.dfsek.substrate.lang.node;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
+import com.dfsek.substrate.lang.compiler.value.function.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;

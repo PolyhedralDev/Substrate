@@ -1,12 +1,11 @@
 package com.dfsek.substrate.lang.compiler.build;
 
-import com.dfsek.substrate.lang.compiler.lambda.LambdaFactory;
-import com.dfsek.substrate.lang.compiler.tuple.TupleFactory;
+import com.dfsek.substrate.lang.compiler.codegen.LambdaFactory;
+import com.dfsek.substrate.lang.compiler.codegen.TupleFactory;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -120,10 +119,6 @@ public class BuildData {
 
     public String getClassName() {
         return name.get();
-    }
-
-    protected Map<String, Value> getValues() {
-        return values;
     }
 
     public void registerValue(String id, Value value, int frames) {

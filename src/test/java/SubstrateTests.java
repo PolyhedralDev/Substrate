@@ -33,7 +33,7 @@ public class SubstrateTests {
     private Parser createParser(String script) {
         Parser parser = new Parser(script, new BaseRule());
         parser.registerMacro(data -> {
-            data.registerValue("fail", new com.dfsek.substrate.lang.compiler.value.Function() {
+            data.registerValue("fail", new com.dfsek.substrate.lang.compiler.value.function.Function() {
                 @Override
                 public Signature arguments() {
                     return Signature.empty();
@@ -53,7 +53,7 @@ public class SubstrateTests {
                     return Signature.fun();
                 }
             });
-            data.registerValue("assert", new com.dfsek.substrate.lang.compiler.value.Function() {
+            data.registerValue("assert", new com.dfsek.substrate.lang.compiler.value.function.Function() {
                 @Override
                 public Signature arguments() {
                     return Signature.bool();

@@ -1,11 +1,11 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
+import com.dfsek.substrate.lang.compiler.value.function.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.compiler.value.function.Function;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;

@@ -1,4 +1,4 @@
-package com.dfsek.substrate.lang.compiler.tuple;
+package com.dfsek.substrate.lang.compiler.codegen;
 
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;

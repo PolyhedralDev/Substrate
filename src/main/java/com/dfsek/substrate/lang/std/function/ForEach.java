@@ -3,7 +3,7 @@ package com.dfsek.substrate.lang.std.function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Function;
+import com.dfsek.substrate.lang.compiler.value.function.Function;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

@@ -1,8 +1,9 @@
-package com.dfsek.substrate.lang.compiler.build;
+package com.dfsek.substrate.lang.compiler.codegen;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
@@ -53,17 +54,6 @@ public class ScriptBuilder {
         ops.forEach(op -> op.apply(absMethod, data));
 
         Label end = new Label();
-
-        data.getValues().forEach((id, value) -> {
-            if (value.ephemeral()) return;
-            String descriptor;
-            if (value.reference().isSimple()) {
-                descriptor = value.reference().getType(0).descriptor();
-            } else {
-                descriptor = CompilerUtil.internalName(Tuple.class);
-            }
-            absMethod.visitLocalVariable(id, descriptor, null, begin, end, data.offset(id));
-        });
 
         absMethod.visitInsn(RETURN);
 
