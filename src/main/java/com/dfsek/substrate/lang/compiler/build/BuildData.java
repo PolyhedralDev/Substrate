@@ -35,6 +35,8 @@ public class BuildData {
 
     private final int implArgsOffset;
 
+    private String self;
+
     public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter, String name) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
@@ -51,6 +53,14 @@ public class BuildData {
         this.implArgsOffset = 1;
     }
 
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
+    public String getSelf() {
+        return self;
+    }
+
     private BuildData(DynamicClassLoader classLoader,
                       ClassWriter classWriter,
                       TupleFactory tupleFactory,
@@ -59,7 +69,7 @@ public class BuildData {
                       Map<String, Pair<Integer, Value>> shadowFields, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
-                      Function<BuildData, String> name, int offset, int implArgsOffset) {
+                      Function<BuildData, String> name, int offset, int implArgsOffset, String self) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
@@ -72,6 +82,7 @@ public class BuildData {
         this.name = Lazy.of(() -> name.apply(this));
         this.offset = offset;
         this.implArgsOffset = implArgsOffset;
+        this.self = self;
     }
 
     public LambdaFactory lambdaFactory() {
@@ -172,7 +183,7 @@ public class BuildData {
                 shadowFields, valueOffsets, // but same JVM scope
                 this,
                 interceptor,
-                ignore -> name.get(), offset, implArgsOffset);
+                ignore -> name.get(), offset, implArgsOffset, self);
     }
 
     public void loadImplementationArguments(MethodVisitor visitor) {
@@ -189,6 +200,6 @@ public class BuildData {
                 this,
                 interceptor,
                 name,
-                1, args + 1);
+                1, args + 1, null);
     }
 }

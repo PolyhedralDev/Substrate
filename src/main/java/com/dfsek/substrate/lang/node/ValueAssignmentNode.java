@@ -27,15 +27,16 @@ public class ValueAssignmentNode implements Node {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
 
-        value.apply(visitor, data);
         Signature ref = value.reference(data);
 
         if (value instanceof LambdaExpressionNode) { // register the lambda value as a function
             LambdaExpressionNode lambdaExpressionNode = (LambdaExpressionNode) value;
-            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), ref.getSimpleReturn(), id.getContent()), ref.frames());
+            data.registerValue(id.getContent(), new LocalLambdaReferenceFunction(lambdaExpressionNode.getParameters(), ref.getSimpleReturn(), id.getContent(), lambdaExpressionNode), ref.frames());
         } else {
             data.registerValue(id.getContent(), new PrimitiveValue(ref), value.reference(data).frames());
         }
+
+        value.apply(visitor, data);
 
 
         int offset = data.offset(id.getContent());

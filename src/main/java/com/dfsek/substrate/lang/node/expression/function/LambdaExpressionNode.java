@@ -1,10 +1,11 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
-import com.dfsek.substrate.lang.compiler.value.EphemeralFunction;
-import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.lambda.LocalLambdaReferenceFunction;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.EphemeralFunction;
+import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -36,19 +37,17 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        List<Signature> extra = new ArrayList<>();
-        List<String> internalParameters = new ArrayList<>();
+        List<Pair<Signature, String>> internalParameters = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 Signature sig = data.getValue(id).reference();
-                if (!internalParameters.contains(id)) {
+                if (!internalParameters.contains(Pair.of(sig, id))) {
                     buildData.shadowValue(id, data.getValue(id));
-                    internalParameters.add(id);
-                    extra.add(sig);
+                    internalParameters.add(Pair.of(sig, id));
                 }
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
+        }, d -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
@@ -65,8 +64,15 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         Signature merged = Signature.empty();
 
-        for (Signature signature : extra) {
-            merged = merged.and(signature);
+        for (Pair<Signature, String> pair : internalParameters) {
+            String internalParameter = pair.getRight();
+            Value internal = data.getValue(internalParameter);
+            if (internal instanceof LocalLambdaReferenceFunction && ((LocalLambdaReferenceFunction) internal).getNode().equals(this)) {
+                // self-reference
+                delegate.setSelf(internalParameter);
+            } else {
+                merged = merged.and(pair.getLeft());
+            }
         }
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).getSimpleReturn(), merged, (method, clazz) -> {
@@ -77,9 +83,13 @@ public class LambdaExpressionNode extends ExpressionNode {
         visitor.visitTypeInsn(NEW, CompilerUtil.internalName(lambda));
         visitor.visitInsn(DUP);
 
-        for (String internalParameter : internalParameters) {
+        for (Pair<Signature, String> pair : internalParameters) {
+            String internalParameter = pair.getRight();
             Value internal = data.getValue(internalParameter);
-            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+            if (!(internal instanceof LocalLambdaReferenceFunction && ((LocalLambdaReferenceFunction) internal).getNode().equals(this))) {
+                // not self-reference
+                visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+            }
         }
 
         visitor.visitMethodInsn(INVOKESPECIAL,
@@ -104,7 +114,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
                 buildData.shadowValue(id, data.getValue(id));
             }
-        }, d  -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
+        }, d -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
