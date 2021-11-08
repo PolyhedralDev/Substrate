@@ -16,8 +16,6 @@ public class ShadowValue implements Value {
     @Override
     public void load(MethodVisitor visitor, BuildData data) {
         visitor.visitVarInsn(ALOAD, 0);
-        System.out.println(data);
-        System.out.println(data.getClassName());
         visitor.visitFieldInsn(GETFIELD,
                 data.getClassName(),
                 "scope" + field,
