@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.value.function.Function;
+import com.dfsek.substrate.lang.compiler.api.Function;
 import org.objectweb.asm.MethodVisitor;
 
 public class Println implements Function {

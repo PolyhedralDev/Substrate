@@ -24,8 +24,7 @@ public class ListNode extends ExpressionNode {
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Signature signature = elements.get(0).reference(data);
         elements.forEach(element -> {
-            System.out.println(element.reference(data));
-            //ParserUtil.checkReferenceType(element, data, signature);
+            ParserUtil.checkReferenceType(element, data, signature);
         });
 
         CompilerUtil.pushInt(elements.size(), visitor);
