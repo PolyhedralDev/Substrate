@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 
 public final class CompilerUtil implements Opcodes {
     public static String internalName(Class<?> clazz) {
@@ -120,5 +121,20 @@ public final class CompilerUtil implements Opcodes {
             ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.getSimpleReturn())) + ";";
         }
         return ret;
+    }
+
+    public static Signature expandArguments(BuildData data, List<ExpressionNode> arguments) {
+        Signature argSignature;
+        if (arguments.isEmpty()) {
+            argSignature = Signature.empty();
+        } else if (arguments.size() == 1) {
+            argSignature = arguments.get(0).reference(data).expandTuple();
+        } else {
+            argSignature = arguments.get(0).reference(data).expandTuple();
+            for (int i = 1; i < arguments.size(); i++) {
+                argSignature = argSignature.and(arguments.get(i).reference(data).expandTuple());
+            }
+        }
+        return argSignature;
     }
 }

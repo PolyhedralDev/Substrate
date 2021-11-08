@@ -24,17 +24,7 @@ public class FunctionInvocationNode extends ExpressionNode {
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         ParserUtil.checkWeakReferenceType(function, data, Signature.fun());
 
-        Signature argSignature;
-        if (arguments.isEmpty()) {
-            argSignature = Signature.empty();
-        } else if (arguments.size() == 1) {
-            argSignature = arguments.get(0).reference(data).expandTuple();
-        } else {
-            argSignature = arguments.get(0).reference(data).expandTuple();
-            for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).reference(data).expandTuple());
-            }
-        }
+        Signature argSignature = CompilerUtil.expandArguments(data, arguments);
 
         if(!function.reference(data).getGenericArguments(0).equals(argSignature)) {
             throw new ParseException("Function argument mismatch, expected " + function.reference(data).getGenericArguments(0) + ", got " + argSignature, function.getPosition());
