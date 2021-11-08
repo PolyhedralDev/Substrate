@@ -2,13 +2,9 @@ package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.function.Function;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-
-import java.util.List;
 
 public class ForEach implements Function {
     @Override
@@ -27,7 +23,7 @@ public class ForEach implements Function {
 
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions) {
+    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);
         int lambdaLV = data.getOffset();
@@ -67,7 +63,7 @@ public class ForEach implements Function {
             visitor.visitInsn(AALOAD);
         }
 
-        CompilerUtil.invokeLambda(argExpressions.get(1), visitor, data);
+        data.lambdaFactory().invoke(args, reference(data).getSimpleReturn(), data, visitor);
 
         visitor.visitIincInsn(iLV, 1);
         visitor.visitJumpInsn(GOTO, start);
@@ -76,7 +72,7 @@ public class ForEach implements Function {
     }
 
     @Override
-    public Signature reference() {
+    public Signature reference(BuildData data) {
         return Signature.fun().applyGenericReturn(0, Signature.empty()).applyGenericArgument(0, arguments());
     }
 }

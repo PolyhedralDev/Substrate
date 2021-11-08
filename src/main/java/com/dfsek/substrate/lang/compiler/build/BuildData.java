@@ -68,6 +68,10 @@ public class BuildData {
         this.implArgsOffset = implArgsOffset;
     }
 
+    public ClassWriter getClassWriter() {
+        return classWriter;
+    }
+
     public LambdaFactory lambdaFactory() {
         return lambdaFactory;
     }

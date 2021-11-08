@@ -39,6 +39,10 @@ public class FunctionInvocationNode extends ExpressionNode {
         }
 
         function.apply(visitor, data);
+
+        arguments.forEach(arg -> arg.apply(visitor, data));
+
+        data.lambdaFactory().invoke(argSignature, reference(data).getSimpleReturn(), data, visitor);
     }
 
     @Override

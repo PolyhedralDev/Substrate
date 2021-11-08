@@ -4,6 +4,7 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
+import com.dfsek.substrate.lang.compiler.value.function.Function;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -18,8 +19,8 @@ public class Parser {
 
     public Parser(String data, Rule base) throws ParseException {
         tokenizer = new Tokenizer(data);
-        builder.registerMacro(buildData -> buildData.registerValue("println", new Println()));
-        builder.registerMacro(buildData -> buildData.registerValue("forEach", new ForEach()));
+        builder.registerFunction("println", new Println());
+        //builder.registerFunction(new ForEach());
         this.base = base;
     }
 
@@ -32,5 +33,9 @@ public class Parser {
 
     public void registerMacro(Consumer<BuildData> buildDataConsumer) {
         builder.registerMacro(buildDataConsumer);
+    }
+
+    public void registerFunction(String id, Function function) {
+        builder.registerFunction(id, function);
     }
 }

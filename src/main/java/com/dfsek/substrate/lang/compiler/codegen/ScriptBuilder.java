@@ -4,10 +4,15 @@ import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.type.DataType;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.compiler.value.function.Function;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -28,6 +33,8 @@ public class ScriptBuilder {
 
     private final List<Consumer<BuildData>> macros = new ArrayList<>();
 
+    private final List<Pair<String, Function>> functions = new ArrayList<>();
+
     public void addOperation(Node op) {
         ops.add(op);
     }
@@ -38,6 +45,75 @@ public class ScriptBuilder {
 
         ClassWriter writer = CompilerUtil.generateClass(implementationClassName, false, true, INTERFACE_CLASS_NAME);
 
+        DynamicClassLoader classLoader = new DynamicClassLoader();
+        BuildData data = new BuildData(classLoader, writer, implementationClassName);
+
+        // prepare functions.
+
+        MethodVisitor clinit = writer.visitMethod(ACC_PUBLIC | ACC_STATIC,
+                "<clinit>",
+                "()V",
+                null,
+                null);
+        clinit.visitCode();
+        for (int i = 0; i < functions.size(); i++) {
+            Function function = functions.get(i).getRight();
+
+            BuildData separate = data.detach((id, d) -> {},
+                    d -> data.lambdaFactory().name(function.arguments(), function.reference(d).getSimpleReturn()), function.arguments().frames());
+            Signature ref = function.reference(separate);
+
+
+            Class<?> delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method, clazz) -> {
+                function.prepare(method);
+                Signature args = function.arguments();
+                int frame = 1;
+                for (int arg = 0; arg < args.size(); arg++) {
+                    method.visitVarInsn(args.getType(arg).loadInsn(), frame);
+                    frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
+                }
+                function.invoke(method, separate, args);
+                method.visitInsn(RETURN);
+            });
+
+            writer.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC,
+                    "fun" + i,
+                    "L" + CompilerUtil.internalName(delegate) + ";",
+                    null,
+                    null);
+            clinit.visitTypeInsn(NEW, CompilerUtil.internalName(delegate));
+            clinit.visitInsn(DUP);
+            clinit.visitMethodInsn(INVOKESPECIAL,
+                    CompilerUtil.internalName(delegate),
+                    "<init>",
+                    "()V",
+                    false);
+            clinit.visitFieldInsn(PUTSTATIC,
+                    implementationClassName,
+                    "fun" + i,
+                    "L" + CompilerUtil.internalName(delegate) + ";");
+
+            int finalI = i;
+            data.registerValue(functions.get(i).getLeft(), new Value() {
+                @Override
+                public Signature reference() {
+                    return function.reference(data);
+                }
+
+                @Override
+                public void load(MethodVisitor visitor, BuildData data) {
+                    visitor.visitFieldInsn(GETSTATIC,
+                            implementationClassName,
+                            "fun" + finalI,
+                            "L" + CompilerUtil.internalName(delegate) + ";");
+                }
+            });
+        }
+        clinit.visitInsn(RETURN);
+        clinit.visitMaxs(0, 0); // bogus
+        clinit.visitEnd();
+
+
         MethodVisitor absMethod = writer.visitMethod(ACC_PUBLIC,
                 "execute", // Method name
                 "(L" + IMPL_ARG_CLASS_NAME + ";)V", // Method descriptor (no args, return double)
@@ -45,9 +121,7 @@ public class ScriptBuilder {
                 null);
         absMethod.visitCode();
 
-        DynamicClassLoader classLoader = new DynamicClassLoader();
 
-        BuildData data = new BuildData(classLoader, writer, implementationClassName);
         macros.forEach(buildDataConsumer -> buildDataConsumer.accept(data));
         ops.forEach(op -> op.apply(absMethod, data));
 
@@ -69,6 +143,10 @@ public class ScriptBuilder {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void registerFunction(String id, Function function) {
+        functions.add(Pair.of(id, function));
     }
 
     public void registerMacro(Consumer<BuildData> buildDataConsumer) {

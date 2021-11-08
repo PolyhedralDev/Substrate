@@ -1,7 +1,6 @@
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -32,8 +31,46 @@ public class SubstrateTests {
 
     private Parser createParser(String script) {
         Parser parser = new Parser(script, new BaseRule());
+        parser.registerFunction("fail", new com.dfsek.substrate.lang.compiler.value.function.Function() {
+            @Override
+            public Signature arguments() {
+                return Signature.empty();
+            }
 
+            @Override
+            public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+                visitor.visitMethodInsn(INVOKESTATIC,
+                        CompilerUtil.internalName(Assertions.class),
+                        "fail",
+                        "()V",
+                        false);
+            }
 
+            @Override
+            public Signature reference(BuildData data) {
+                return Signature.fun();
+            }
+        });
+        parser.registerFunction("assert", new com.dfsek.substrate.lang.compiler.value.function.Function() {
+            @Override
+            public Signature arguments() {
+                return Signature.bool();
+            }
+
+            @Override
+            public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+                visitor.visitMethodInsn(INVOKESTATIC,
+                        CompilerUtil.internalName(Assertions.class),
+                        "assertTrue",
+                        "(Z)V",
+                        false);
+            }
+
+            @Override
+            public Signature reference(BuildData data) {
+                return Signature.fun().applyGenericArgument(0, Signature.bool());
+            }
+        });
         return parser;
     }
 

@@ -2,21 +2,19 @@ package com.dfsek.substrate.lang.compiler.value.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.compiler.type.Typed;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-import java.util.List;
-
-public interface Function extends Value {
+public interface Function extends Typed, Opcodes {
     Signature arguments();
 
     default boolean argsMatch(Signature attempt) {
         return arguments().equals(attempt);
     }
 
-    default void preArgsPrep(MethodVisitor visitor, BuildData data) {
+    default void prepare(MethodVisitor visitor) {
     }
 
-    void invoke(MethodVisitor visitor, BuildData data, Signature args, List<ExpressionNode> argExpressions);
+    void invoke(MethodVisitor visitor, BuildData data, Signature args);
 }
