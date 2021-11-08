@@ -218,7 +218,6 @@ public class Signature implements Opcodes {
                 sig.append("__").append(gen.getRight().classDescriptor()).append("__");
             }
         }
-        types.forEach(type -> sig.append(type.descriptorChar()));
         return sig.toString();
     }
 
