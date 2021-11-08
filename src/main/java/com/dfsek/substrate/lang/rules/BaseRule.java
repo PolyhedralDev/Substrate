@@ -16,8 +16,6 @@ import java.util.List;
  * The base rule of the parser.
  */
 public class BaseRule implements Rule {
-    private final StatementRule statementRule = new StatementRule();
-    private final BlockRule blockRule = new BlockRule();
 
     @Override
     public Node assemble(Tokenizer tokenizer) throws ParseException {
@@ -26,10 +24,11 @@ public class BaseRule implements Rule {
         Position begin = tokenizer.peek().getPosition();
 
         while (tokenizer.hasNext()) {
+            System.out.println(tokenizer.peek());
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(blockRule.assemble(tokenizer));
+                contents.add(BlockRule.getInstance().assemble(tokenizer));
             } else { // Parse a statement.
-                contents.add(statementRule.assemble(tokenizer));
+                contents.add(StatementRule.getInstance().assemble(tokenizer));
             }
         }
 

@@ -41,7 +41,11 @@ public class Tokenizer {
             if (!hasNext()) throw new ParseException("Unexpected end of input", current.getPosition());
             cache.add(fetch());
         }
-        return cache.get(n);
+        Token result = cache.get(n);
+        if(result == null) {
+            throw new ParseException("Unexpected end of input", current.getPosition());
+        }
+        return result;
     }
 
     /**

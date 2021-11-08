@@ -38,6 +38,10 @@ public class FunctionInvocationNode extends ExpressionNode {
             }
         }
 
+        if(!function.reference(data).getGenericArguments(0).equals(argSignature)) {
+            throw new ParseException("Function argument mismatch, expected " + function.reference(data).getGenericArguments(0) + ", got " + argSignature, function.getPosition());
+        }
+
         function.apply(visitor, data);
 
         arguments.forEach(arg -> arg.apply(visitor, data));
