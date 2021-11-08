@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -43,7 +44,27 @@ public class FunctionInvocationNode extends ExpressionNode {
 
         arguments.forEach(arg -> arg.apply(visitor, data));
 
-        data.lambdaFactory().invoke(argSignature, reference(data).getSimpleReturn(), data, visitor);
+
+        Signature ref = reference(data);
+        data.lambdaFactory().invoke(argSignature, ref.getSimpleReturn(), data, visitor);
+
+        if(ref.weakEquals(Signature.tup())) {
+            data.offsetInc(1);
+            int offset = data.getOffset();
+            visitor.visitVarInsn(ASTORE, offset);
+
+            Signature tup = ref.expandTuple();
+
+            for (int i = 0; i < tup.size(); i++) {
+                visitor.visitVarInsn(ALOAD, offset);
+
+                visitor.visitMethodInsn(INVOKEVIRTUAL,
+                        CompilerUtil.internalName(data.tupleFactory().generate(tup)),
+                        "param" + i,
+                        "()" + tup.getType(i).descriptor(),
+                        false);
+            }
+        }
     }
 
     @Override
