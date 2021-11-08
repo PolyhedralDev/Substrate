@@ -87,6 +87,11 @@ public class BuildData {
         valueOffsets.put(Pair.of(this, id), offset);
     }
 
+    public void registerUnchecked(String id, Value value) {
+        values.put(id, value);
+        valueOffsets.put(Pair.of(this, id), offset);
+    }
+
     public String getClassName() {
         return name.get();
     }

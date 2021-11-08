@@ -61,7 +61,7 @@ public class LambdaFactory {
 
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
-        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get());
+        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get()-1);
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodVisitor visitor) {

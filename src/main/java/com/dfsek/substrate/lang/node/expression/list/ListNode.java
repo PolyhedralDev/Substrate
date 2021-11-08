@@ -23,7 +23,10 @@ public class ListNode extends ExpressionNode {
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         Signature signature = elements.get(0).reference(data);
-        elements.forEach(element -> ParserUtil.checkReferenceType(element, data, signature));
+        elements.forEach(element -> {
+            System.out.println(element.reference(data));
+            //ParserUtil.checkReferenceType(element, data, signature);
+        });
 
         CompilerUtil.pushInt(elements.size(), visitor);
         Signature elementSignature = elements.get(0).reference(data);

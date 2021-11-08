@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
+import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -58,8 +59,11 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         Signature merged = Signature.empty();
 
-        for (Pair<Signature, String> pair : internalParameters) {
+
+        for (int i = 0; i < internalParameters.size(); i++) {
+            Pair<Signature, String> pair = internalParameters.get(i);
             merged = merged.and(pair.getLeft());
+            delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
         }
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).getSimpleReturn(), merged, (method, clazz) -> {
