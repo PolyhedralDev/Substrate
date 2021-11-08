@@ -76,7 +76,7 @@ public class ScriptBuilder {
                 method.visitInsn(RETURN);
             });
 
-            writer.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC,
+            writer.visitField(ACC_PUBLIC | ACC_FINAL | ACC_STATIC,
                     "fun" + i,
                     "L" + CompilerUtil.internalName(delegate) + ";",
                     null,
