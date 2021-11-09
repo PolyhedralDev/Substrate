@@ -23,8 +23,4 @@ public class PrimitiveValue implements Value {
         return reference;
     }
 
-    @Override
-    public boolean ephemeral() {
-        return false;
-    }
 }

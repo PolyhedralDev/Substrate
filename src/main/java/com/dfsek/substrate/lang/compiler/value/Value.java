@@ -10,7 +10,4 @@ public interface Value extends Opcodes {
 
     void load(MethodVisitor visitor, BuildData data);
 
-    default boolean ephemeral() {
-        return true;
-    }
 }
