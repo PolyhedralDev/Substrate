@@ -8,9 +8,7 @@ import org.objectweb.asm.Opcodes;
 public interface Value extends Opcodes {
     Signature reference();
 
-    default void load(MethodVisitor visitor, BuildData data) {
-
-    }
+    void load(MethodVisitor visitor, BuildData data);
 
     default boolean ephemeral() {
         return true;

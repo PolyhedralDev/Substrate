@@ -4,6 +4,8 @@ a = (f: fun<int -> int>) -> {
     };
 };
 
-println(str(a((b: int) -> {
-    return b + 5;
-})(0.5)));
+result = a((b: int) -> {
+             return b + 5;
+         })(0.5);
+
+println(str(result));

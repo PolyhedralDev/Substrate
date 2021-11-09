@@ -22,6 +22,7 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+        System.out.println("fun: " + function.reference(data));
         ParserUtil.checkWeakReferenceType(function, data, Signature.fun());
 
         Signature argSignature = CompilerUtil.expandArguments(data, arguments);
@@ -36,7 +37,8 @@ public class FunctionInvocationNode extends ExpressionNode {
 
 
         Signature ref = reference(data);
-        data.lambdaFactory().invoke(argSignature, ref.getSimpleReturn(), data, visitor);
+        System.out.println("reference: " + ref);
+        data.lambdaFactory().invoke(argSignature, ref.expandTuple(), data, visitor);
 
         if(ref.weakEquals(Signature.tup())) {
             data.offsetInc(1);

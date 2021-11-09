@@ -15,6 +15,7 @@ public class EphemeralValue implements Value {
 
     @Override
     public void load(MethodVisitor visitor, BuildData data) {
+        System.out.println("Referencing value " + argument + " with op " + reference().getType(0) + ", " + hashCode());
         visitor.visitVarInsn(reference().getType(0).loadInsn(), argument);
     }
 

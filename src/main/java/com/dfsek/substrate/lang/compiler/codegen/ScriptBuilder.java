@@ -8,7 +8,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -16,13 +16,11 @@ import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
-import javax.crypto.Mac;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -98,20 +96,7 @@ public class ScriptBuilder {
                     "L" + CompilerUtil.internalName(delegate) + ";");
 
             int finalI = i;
-            data.registerValue(functions.get(i).getLeft(), new Value() {
-                @Override
-                public Signature reference() {
-                    return function.reference(data);
-                }
-
-                @Override
-                public void load(MethodVisitor visitor, BuildData data) {
-                    visitor.visitFieldInsn(GETSTATIC,
-                            implementationClassName,
-                            "fun" + finalI,
-                            "L" + CompilerUtil.internalName(delegate) + ";");
-                }
-            });
+            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, finalI, delegate));
         }
         clinit.visitInsn(RETURN);
         clinit.visitMaxs(0, 0); // bogus
@@ -156,4 +141,5 @@ public class ScriptBuilder {
     public void registerMacro(String id, Macro macro) {
         macros.put(id, macro);
     }
+
 }

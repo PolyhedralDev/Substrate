@@ -94,7 +94,7 @@ public class ExpressionRule implements Rule {
             ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
         }
 
-        if (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN && possibleFunctionSite) {
+        while (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN && possibleFunctionSite) {
             node = new FunctionInvocationNode(node, parseArguments(tokenizer, data));
         }
 

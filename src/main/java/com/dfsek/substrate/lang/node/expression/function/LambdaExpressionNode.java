@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
+import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -39,13 +40,13 @@ public class LambdaExpressionNode extends ExpressionNode {
         List<Pair<Signature, String>> internalParameters = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
-            if (data.valueExists(id) && !data.getValue(id).ephemeral() && !buildData.hasOffset(id)) {
+            if (data.valueExists(id) && !(data.getValue(id) instanceof FunctionValue)) {
                 Signature sig = data.getValue(id).reference();
                 if (!internalParameters.contains(Pair.of(sig, id))) {
                     internalParameters.add(Pair.of(sig, id));
                 }
             }
-        }, d -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
+        }, d -> data.lambdaFactory().name(parameters, content.reference(d).expandTuple()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
@@ -63,10 +64,11 @@ public class LambdaExpressionNode extends ExpressionNode {
         for (int i = 0; i < internalParameters.size(); i++) {
             Pair<Signature, String> pair = internalParameters.get(i);
             merged = merged.and(pair.getLeft());
+            System.out.println("shadowing " + pair.getRight());
             delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
         }
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).getSimpleReturn(), merged, (method, clazz) -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method, clazz) -> {
             content.apply(method, delegate);
             method.visitInsn(RETURN);
         });
@@ -99,7 +101,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         BuildData data1 = data.detach((id, buildData) -> {
-        }, d -> data.lambdaFactory().name(parameters, content.reference(d).getSimpleReturn()), parameters.frames());
+        }, d -> data.lambdaFactory().name(parameters, content.reference(d).expandTuple()), parameters.frames());
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();

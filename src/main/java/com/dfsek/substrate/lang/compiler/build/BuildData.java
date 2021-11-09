@@ -152,6 +152,11 @@ public class BuildData {
         return values.containsKey(id) || macros.containsKey(id);
     }
 
+    public boolean valueExistsParent(String id) {
+        if(parent == null) return false;
+        return parent.valueExists(id);
+    }
+
     public BuildData sub() {
         return new BuildData(classLoader,
                 classWriter,
