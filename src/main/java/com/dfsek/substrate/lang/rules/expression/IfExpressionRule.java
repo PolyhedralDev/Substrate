@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.*;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
@@ -19,41 +20,41 @@ import java.util.Collections;
 public class IfExpressionRule implements Rule {
     private static final IfExpressionRule INSTANCE = new IfExpressionRule();
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.IF);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
-        ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer);
+        ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer, data);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
         ExpressionNode caseTrue;
 
         if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            ExpressionNode block = BlockRule.getInstance().assemble(tokenizer);
+            ExpressionNode block = BlockRule.getInstance().assemble(tokenizer, data);
             LambdaExpressionNode lambda = new LambdaExpressionNode(block, Collections.emptyList(), block.getPosition());
             caseTrue = new LambdaInvocationNode(lambda);
         } else {
-            caseTrue = ExpressionRule.getInstance().assemble(tokenizer);
+            caseTrue = ExpressionRule.getInstance().assemble(tokenizer, data);
         }
 
         ExpressionNode caseFalse;
         if(tokenizer.peek().getType() == Token.Type.ELSE) {
             tokenizer.consume();
             if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-                ExpressionNode block = BlockRule.getInstance().assemble(tokenizer);
+                ExpressionNode block = BlockRule.getInstance().assemble(tokenizer, data);
                 LambdaExpressionNode lambda = new LambdaExpressionNode(block, Collections.emptyList(), block.getPosition());
                 caseFalse = new LambdaInvocationNode(lambda);
             } else {
-                caseFalse = ExpressionRule.getInstance().assemble(tokenizer);
+                caseFalse = ExpressionRule.getInstance().assemble(tokenizer, data);
             }
         } else {
             caseFalse = new ExpressionNode() {
 
                 @Override
-                public Signature reference(BuildData data) {
+                public Signature reference(BuildData buildData) {
                     return Signature.empty();
                 }
 
                 @Override
-                public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+                public void apply(MethodVisitor visitor, BuildData buildData) throws ParseException {
 
                 }
 

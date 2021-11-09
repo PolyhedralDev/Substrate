@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.ReturnNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
@@ -17,14 +18,14 @@ public class ReturnRule implements Rule {
     }
 
     @Override
-    public ReturnNode assemble(Tokenizer tokenizer) throws ParseException {
+    public ReturnNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         Token r = ParserUtil.checkType(tokenizer.consume(), Token.Type.RETURN);
 
         ReturnNode node;
         if (tokenizer.peek().getType() == Token.Type.STATEMENT_END) {
             node = new ReturnNode(r.getPosition(), null);
         } else {
-            ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer);
+            ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, data);
             node = new ReturnNode(r.getPosition(), expressionNode);
         }
 

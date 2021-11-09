@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
@@ -22,7 +23,7 @@ public class LambdaExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
@@ -41,9 +42,9 @@ public class LambdaExpressionRule implements Rule {
 
         ExpressionNode expression;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            expression = BlockRule.getInstance().assemble(tokenizer);
+            expression = BlockRule.getInstance().assemble(tokenizer, data);
         } else {
-            expression = ExpressionRule.getInstance().assemble(tokenizer);
+            expression = ExpressionRule.getInstance().assemble(tokenizer, data);
         }
 
 

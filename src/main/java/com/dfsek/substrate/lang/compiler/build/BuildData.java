@@ -137,13 +137,6 @@ public class BuildData {
         macros.put(id, macro);
     }
 
-    public Macro getMacro(String id) {
-        if(!macros.containsKey(id)) {
-            throw new IllegalArgumentException("No such macro \"" + id + "\": " + values);
-        }
-        return macros.get(id);
-    }
-
     public int offset(String id) {
         interceptor.fetch(id, this);
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");

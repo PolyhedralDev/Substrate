@@ -37,6 +37,8 @@ public class ScriptBuilder {
 
     private final List<Pair<String, Function>> functions = new ArrayList<>();
 
+    private final DynamicClassLoader classLoader = new DynamicClassLoader();
+
     public void addOperation(Node op) {
         ops.add(op);
     }
@@ -47,7 +49,7 @@ public class ScriptBuilder {
 
         ClassWriter writer = CompilerUtil.generateClass(implementationClassName, false, true, INTERFACE_CLASS_NAME);
 
-        DynamicClassLoader classLoader = new DynamicClassLoader();
+
         BuildData data = new BuildData(classLoader, writer, implementationClassName);
 
         // prepare functions.

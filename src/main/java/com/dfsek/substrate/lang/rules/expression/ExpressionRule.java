@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
@@ -27,15 +28,15 @@ public class ExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
-        ExpressionNode node = simple(tokenizer);
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
+        ExpressionNode node = simple(tokenizer, data);
         if (tokenizer.peek().isBinaryOperator()) {
-            node = assembleBinaryOperator(node, tokenizer);
+            node = assembleBinaryOperator(node, tokenizer, data);
         }
         return node;
     }
 
-    private ExpressionNode simple(Tokenizer tokenizer) {
+    private ExpressionNode simple(Tokenizer tokenizer, ParseData data) {
         Token test = tokenizer.peek();
 
         boolean not = false;
@@ -50,30 +51,30 @@ public class ExpressionRule implements Rule {
         ExpressionNode node;
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
-            node = BasicExpressionRule.getInstance().assemble(tokenizer);
+            node = BasicExpressionRule.getInstance().assemble(tokenizer, data);
         } else if (test.isType()) {
-            node = CastRule.getInstance().assemble(tokenizer);
+            node = CastRule.getInstance().assemble(tokenizer, data);
         } else if (test.getType() == Token.Type.IF) {
-            node = IfExpressionRule.getInstance().assemble(tokenizer);
+            node = IfExpressionRule.getInstance().assemble(tokenizer, data);
         } else if (test.getType() == Token.Type.LIST_BEGIN) {
-            node = ListRule.getInstance().assemble(tokenizer);
+            node = ListRule.getInstance().assemble(tokenizer, data);
         } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
                 || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
-            node = LambdaExpressionRule.getInstance().assemble(tokenizer);
+            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data);
         } else {
-            node = TupleRule.getInstance().assemble(tokenizer);
+            node = TupleRule.getInstance().assemble(tokenizer, data);
         }
 
 
         if (tokenizer.peek().getType() == Token.Type.RANGE) {
             Position pos = tokenizer.consume().getPosition();
-            node = new RangeNode(node, assemble(tokenizer), pos);
+            node = new RangeNode(node, assemble(tokenizer, data), pos);
         }
 
         if (tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
             tokenizer.consume();
 
-            ExpressionNode index = assemble(tokenizer);
+            ExpressionNode index = assemble(tokenizer, data);
 
             node = new ListIndexNode(node, index);
 
@@ -85,7 +86,7 @@ public class ExpressionRule implements Rule {
 
             List<ExpressionNode> args = new ArrayList<>();
             while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-                args.add(ExpressionRule.getInstance().assemble(tokenizer));
+                args.add(ExpressionRule.getInstance().assemble(tokenizer, data));
                 if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                     tokenizer.consume(); // consume separator
                 }
@@ -99,16 +100,16 @@ public class ExpressionRule implements Rule {
         return node;
     }
 
-    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer) {
+    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data) {
         Token op = tokenizer.consume();
-        ExpressionNode right = simple(tokenizer);
+        ExpressionNode right = simple(tokenizer, data);
 
         Token next = tokenizer.peek();
         if (next.isBinaryOperator()) {
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                return join(left, op, assembleBinaryOperator(right, tokenizer));
+                return join(left, op, assembleBinaryOperator(right, tokenizer, data));
             } else {
-                return assembleBinaryOperator(join(left, op, right), tokenizer);
+                return assembleBinaryOperator(join(left, op, right), tokenizer, data);
             }
         }
 

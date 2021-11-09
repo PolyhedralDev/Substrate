@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -18,7 +19,7 @@ import java.util.List;
 public class BaseRule implements Rule {
 
     @Override
-    public Node assemble(Tokenizer tokenizer) throws ParseException {
+    public Node assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         Position begin = tokenizer.peek().getPosition();
@@ -26,9 +27,9 @@ public class BaseRule implements Rule {
         while (tokenizer.hasNext()) {
             System.out.println(tokenizer.peek());
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(BlockRule.getInstance().assemble(tokenizer));
+                contents.add(BlockRule.getInstance().assemble(tokenizer, data));
             } else { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(tokenizer));
+                contents.add(StatementRule.getInstance().assemble(tokenizer, data));
             }
         }
 

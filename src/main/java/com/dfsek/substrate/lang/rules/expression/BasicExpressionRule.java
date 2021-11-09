@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
@@ -21,7 +22,7 @@ public class BasicExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER, Token.Type.STRING, Token.Type.BOOLEAN, Token.Type.NUMBER, Token.Type.INT);
         if (tokenizer.peek().getType() == Token.Type.STRING) {
             return new StringNode(tokenizer.consume());
@@ -34,7 +35,7 @@ public class BasicExpressionRule implements Rule {
         } else {
             ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
             if(tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
-                return ValueAssignmentRule.getInstance().assemble(tokenizer);
+                return ValueAssignmentRule.getInstance().assemble(tokenizer, data);
             }
             return new ValueReferenceNode(tokenizer.consume());
         }
