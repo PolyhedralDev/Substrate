@@ -51,6 +51,8 @@ public class ExpressionRule implements Rule {
 
         ExpressionNode node;
 
+        boolean possibleFunctionSite = true;
+
         if (test.isConstant() || test.isIdentifier()) { // simple expression
             if(test.isIdentifier() && data.hasMacro(test.getContent())) {
                 tokenizer.consume();
@@ -60,15 +62,20 @@ public class ExpressionRule implements Rule {
             }
         } else if (test.isType()) {
             node = CastRule.getInstance().assemble(tokenizer, data);
+            possibleFunctionSite = false;
         } else if (test.getType() == Token.Type.IF) {
             node = IfExpressionRule.getInstance().assemble(tokenizer, data);
         } else if (test.getType() == Token.Type.LIST_BEGIN) {
             node = ListRule.getInstance().assemble(tokenizer, data);
+            possibleFunctionSite = false;
         } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
                 || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer, data);
-        } else {
+        } else if(test.getType() == Token.Type.GROUP_BEGIN) {
             node = TupleRule.getInstance().assemble(tokenizer, data);
+            possibleFunctionSite = false;
+        } else {
+            throw new ParseException("Unexpected token: " + test, test.getPosition());
         }
 
 
@@ -87,7 +94,7 @@ public class ExpressionRule implements Rule {
             ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
         }
 
-        if (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) {
+        if (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN && possibleFunctionSite) {
             node = new FunctionInvocationNode(node, parseArguments(tokenizer, data));
         }
 
