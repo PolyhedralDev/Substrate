@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanAndNode;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanOrNode;
 import com.dfsek.substrate.lang.node.expression.binary.comparison.*;
 import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
+import com.dfsek.substrate.lang.node.expression.function.MacroNode;
 import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.list.RangeNode;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -51,7 +52,12 @@ public class ExpressionRule implements Rule {
         ExpressionNode node;
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
-            node = BasicExpressionRule.getInstance().assemble(tokenizer, data);
+            if(test.isIdentifier() && data.hasMacro(test.getContent())) {
+                tokenizer.consume();
+                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(tokenizer, data));
+            } else {
+                node = BasicExpressionRule.getInstance().assemble(tokenizer, data);
+            }
         } else if (test.isType()) {
             node = CastRule.getInstance().assemble(tokenizer, data);
         } else if (test.getType() == Token.Type.IF) {
@@ -82,22 +88,25 @@ public class ExpressionRule implements Rule {
         }
 
         if (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) {
-            ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
-
-            List<ExpressionNode> args = new ArrayList<>();
-            while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-                args.add(ExpressionRule.getInstance().assemble(tokenizer, data));
-                if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
-                    tokenizer.consume(); // consume separator
-                }
-            }
-            ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
-
-            node = new FunctionInvocationNode(node, args);
+            node = new FunctionInvocationNode(node, parseArguments(tokenizer, data));
         }
 
         if (not) return new BooleanNotNode(booleanNot, node);
         return node;
+    }
+
+    private List<ExpressionNode> parseArguments(Tokenizer tokenizer, ParseData data) {
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
+
+        List<ExpressionNode> args = new ArrayList<>();
+        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
+            args.add(ExpressionRule.getInstance().assemble(tokenizer, data));
+            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
+                tokenizer.consume(); // consume separator
+            }
+        }
+        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+        return args;
     }
 
     private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data) {

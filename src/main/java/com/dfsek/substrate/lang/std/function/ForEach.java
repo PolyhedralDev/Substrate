@@ -62,7 +62,7 @@ public class ForEach implements Macro {
             visitor.visitInsn(AALOAD);
         }
 
-        data.lambdaFactory().invoke(args, reference(data).getSimpleReturn(), data, visitor);
+        data.lambdaFactory().invoke(args.getGenericReturn(0), Signature.empty(), data, visitor);
 
         visitor.visitIincInsn(iLV, 1);
         visitor.visitJumpInsn(GOTO, start);
