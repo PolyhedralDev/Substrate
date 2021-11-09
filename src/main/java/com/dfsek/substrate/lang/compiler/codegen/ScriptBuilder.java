@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.compiler.codegen;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -15,9 +16,12 @@ import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
+import javax.crypto.Mac;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -29,7 +33,7 @@ public class ScriptBuilder {
     private static int builds = 0;
     private final List<Node> ops = new ArrayList<>();
 
-    private final List<Consumer<BuildData>> macros = new ArrayList<>();
+    private final Map<String, Macro> macros = new HashMap<>();
 
     private final List<Pair<String, Function>> functions = new ArrayList<>();
 
@@ -119,8 +123,8 @@ public class ScriptBuilder {
                 null);
         absMethod.visitCode();
 
+        macros.forEach(data::registerMacro);
 
-        macros.forEach(buildDataConsumer -> buildDataConsumer.accept(data));
         ops.forEach(op -> op.apply(absMethod, data));
 
         absMethod.visitInsn(RETURN);
@@ -147,7 +151,7 @@ public class ScriptBuilder {
         functions.add(Pair.of(id, function));
     }
 
-    public void registerMacro(Consumer<BuildData> buildDataConsumer) {
-        macros.add(buildDataConsumer);
+    public void registerMacro(String id, Macro macro) {
+        macros.put(id, macro);
     }
 }

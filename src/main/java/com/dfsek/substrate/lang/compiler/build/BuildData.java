@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.build;
 
+import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.codegen.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.codegen.TupleFactory;
 import com.dfsek.substrate.lang.compiler.value.Value;
@@ -19,6 +20,7 @@ public class BuildData {
     private final LambdaFactory lambdaFactory;
 
     private final Map<String, Value> values;
+    private final Map<String, Macro> macros;
     private final Map<Pair<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
@@ -44,6 +46,7 @@ public class BuildData {
         };
         this.offset = 2;
         this.implArgsOffset = 1;
+        this.macros = new HashMap<>();
     }
 
     private BuildData(DynamicClassLoader classLoader,
@@ -51,7 +54,7 @@ public class BuildData {
                       TupleFactory tupleFactory,
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
-                      Map<Pair<BuildData, String>, Integer> valueOffsets,
+                      Map<String, Macro> macros, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
                       Function<BuildData, String> name, int offset, int implArgsOffset) {
@@ -60,6 +63,7 @@ public class BuildData {
         this.tupleFactory = tupleFactory;
         this.lambdaFactory = lambdaFactory;
         this.values = values;
+        this.macros = macros;
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
@@ -129,6 +133,17 @@ public class BuildData {
         return values.get(id);
     }
 
+    public void registerMacro(String id, Macro macro) {
+        macros.put(id, macro);
+    }
+
+    public Macro getMacro(String id) {
+        if(!macros.containsKey(id)) {
+            throw new IllegalArgumentException("No such macro \"" + id + "\": " + values);
+        }
+        return macros.get(id);
+    }
+
     public int offset(String id) {
         interceptor.fetch(id, this);
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
@@ -141,7 +156,7 @@ public class BuildData {
 
     public boolean valueExists(String id) {
         interceptor.fetch(id, this);
-        return values.containsKey(id);
+        return values.containsKey(id) || macros.containsKey(id);
     }
 
     public BuildData sub() {
@@ -150,7 +165,7 @@ public class BuildData {
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                valueOffsets, // but same JVM scope
+                macros, valueOffsets, // but same JVM scope
                 this,
                 interceptor,
                 ignore -> name.get(), offset, implArgsOffset);
@@ -166,7 +181,7 @@ public class BuildData {
                 tupleFactory,
                 lambdaFactory,
                 new HashMap<>(values), // new scope
-                new HashMap<>(), // *and* different JVM scope
+                macros, new HashMap<>(), // *and* different JVM scope
                 this,
                 interceptor,
                 name,
