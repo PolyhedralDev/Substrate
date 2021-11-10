@@ -20,6 +20,8 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Position start;
     private final Signature parameters;
 
+    private String self;
+
     public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start) {
         this.content = content;
         this.types = types;
@@ -32,6 +34,10 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.parameters = signature;
     }
 
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
         List<Pair<Signature, String>> internalParameters = new ArrayList<>();
@@ -39,7 +45,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         BuildData delegate = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !(data.getValue(id) instanceof FunctionValue)) {
                 Signature sig = data.getValue(id).reference();
-                if (!internalParameters.contains(Pair.of(sig, id))) {
+                if (!internalParameters.contains(Pair.of(sig, id)) && !id.equals(self)) {
                     internalParameters.add(Pair.of(sig, id));
                 }
             }
@@ -47,7 +53,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
-
             delegate.registerValue(pair.getLeft(), new PrimitiveValue(signature, delegate.getOffset()), signature.frames());
         });
 
@@ -61,7 +66,12 @@ public class LambdaExpressionNode extends ExpressionNode {
         for (int i = 0; i < internalParameters.size(); i++) {
             Pair<Signature, String> pair = internalParameters.get(i);
             merged = merged.and(pair.getLeft());
+
+            System.out.println("attempt:" + self + "," + pair.getRight());
             delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
+        }
+        if (self != null) {
+            delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
         }
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method, clazz) -> {
