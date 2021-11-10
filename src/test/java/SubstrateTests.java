@@ -18,10 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -73,7 +72,7 @@ public class SubstrateTests {
     }
 
     @TestFactory
-    public Collection<DynamicNode> tests() {
+    public Stream<DynamicNode> tests() {
         List<DynamicNode> nodes = new ArrayList<>();
 
         List<DynamicNode> parserNodes = new ArrayList<>();
@@ -99,7 +98,7 @@ public class SubstrateTests {
             }
             fail();
         }));
-        nodes.add(DynamicContainer.dynamicContainer("parser", parserNodes));
+        nodes.add(DynamicContainer.dynamicContainer("parser", parserNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
 
         List<DynamicNode> tokenizerNodes = new ArrayList<>();
 
@@ -133,9 +132,9 @@ public class SubstrateTests {
             }
         }));
 
-        nodes.add(DynamicContainer.dynamicContainer("tokenizer", tokenizerNodes));
+        nodes.add(DynamicContainer.dynamicContainer("tokenizer", tokenizerNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
 
-        return nodes;
+        return nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName));
     }
 
     public DynamicContainer register(String name, Path parent, Function<Path, Executable> executable) {
@@ -154,6 +153,6 @@ public class SubstrateTests {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return DynamicContainer.dynamicContainer(name, nodes);
+        return DynamicContainer.dynamicContainer(name, nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName)));
     }
 }
