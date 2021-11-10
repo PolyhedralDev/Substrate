@@ -3,10 +3,7 @@ package com.dfsek.substrate.lang.node.expression.function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.EphemeralValue;
-import com.dfsek.substrate.lang.compiler.value.FunctionValue;
-import com.dfsek.substrate.lang.compiler.value.ShadowValue;
-import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.compiler.value.*;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -51,7 +48,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         types.forEach(pair -> {
             Signature signature = pair.getRight();
 
-            delegate.registerValue(pair.getLeft(), new EphemeralValue(signature, delegate.getOffset()), signature.frames());
+            delegate.registerValue(pair.getLeft(), new PrimitiveValue(signature, delegate.getOffset()), signature.frames());
         });
 
 
@@ -105,7 +102,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
-            data1.registerValue(pair.getLeft(), new EphemeralValue(signature, data1.getOffset()), signature.frames());
+            data1.registerValue(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()), signature.frames());
         });
         return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
     }

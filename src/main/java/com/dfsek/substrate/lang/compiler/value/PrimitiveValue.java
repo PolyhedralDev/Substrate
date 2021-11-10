@@ -10,7 +10,11 @@ public class PrimitiveValue implements Value {
 
     @Override
     public void load(MethodVisitor visitor, BuildData data) {
-        visitor.visitVarInsn(reference().getType(0).loadInsn(), offset);
+        if(!reference.isSimple()) {
+            visitor.visitVarInsn(ALOAD, offset);
+        } else {
+            visitor.visitVarInsn(reference().getType(0).loadInsn(), offset);
+        }
     }
 
     public PrimitiveValue(Signature reference, int offset) {
