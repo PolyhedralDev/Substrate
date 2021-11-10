@@ -13,4 +13,9 @@ public class Position {
     public String toString() {
         return (line + 1) + ":" + index;
     }
+
+
+    public int getLine() {
+        return line;
+    }
 }
