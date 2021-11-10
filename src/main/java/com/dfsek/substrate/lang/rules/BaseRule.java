@@ -25,7 +25,6 @@ public class BaseRule implements Rule {
         Position begin = tokenizer.peek().getPosition();
 
         while (tokenizer.hasNext()) {
-            System.out.println(tokenizer.peek());
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
                 contents.add(BlockRule.getInstance().assemble(tokenizer, data));
             } else { // Parse a statement.

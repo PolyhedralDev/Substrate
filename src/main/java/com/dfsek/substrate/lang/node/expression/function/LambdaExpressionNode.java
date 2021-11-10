@@ -61,7 +61,6 @@ public class LambdaExpressionNode extends ExpressionNode {
         for (int i = 0; i < internalParameters.size(); i++) {
             Pair<Signature, String> pair = internalParameters.get(i);
             merged = merged.and(pair.getLeft());
-            System.out.println("shadowing " + pair.getRight());
             delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
         }
 

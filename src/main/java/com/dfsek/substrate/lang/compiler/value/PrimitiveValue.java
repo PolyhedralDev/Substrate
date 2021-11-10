@@ -10,7 +10,6 @@ public class PrimitiveValue implements Value {
 
     @Override
     public void load(MethodVisitor visitor, BuildData data) {
-        System.out.println("offset: " + offset);
         if(!reference.isSimple()) {
             visitor.visitVarInsn(ALOAD, offset);
         } else {

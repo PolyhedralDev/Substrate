@@ -25,8 +25,7 @@ public class ValueAssignmentNode extends ExpressionNode {
         }
 
         Signature ref = value.reference(data);
-        System.out.println(id);
-        System.out.println(ref);System.out.println(value);
+
 
         data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference(data).frames());
 

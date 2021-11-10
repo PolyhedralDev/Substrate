@@ -22,7 +22,6 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        System.out.println("fun: " + function.reference(data));
         ParserUtil.checkWeakReferenceType(function, data, Signature.fun());
 
         Signature argSignature = CompilerUtil.expandArguments(data, arguments);
@@ -34,7 +33,6 @@ public class FunctionInvocationNode extends ExpressionNode {
         function.apply(visitor, data);
 
         arguments.forEach(arg -> {
-            System.out.println("Applying " + arg);
             arg.apply(visitor, data);
             CompilerUtil.deconstructTuple(arg, data, visitor);
         });

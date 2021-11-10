@@ -21,9 +21,7 @@ public class ValueReferenceNode extends ExpressionNode {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
 
-        System.out.println("Referencing: " + id);
         Value value = data.getValue(id.getContent());
-        System.out.println(value + ", " + value.reference());
         value.load(visitor, data);
     }
 
