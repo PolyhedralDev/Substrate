@@ -29,7 +29,10 @@ public class TupleNode extends ExpressionNode {
         visitor.visitTypeInsn(NEW, tupleName);
         visitor.visitInsn(DUP);
 
-        args.forEach(arg -> arg.apply(visitor, data));
+        args.forEach(arg -> {
+            arg.apply(visitor, data);
+            CompilerUtil.deconstructTuple(arg, data, visitor);
+        });
 
         visitor.visitMethodInsn(INVOKESPECIAL, tupleName, "<init>", "(" + signature.internalDescriptor() + ")V", false);
     }

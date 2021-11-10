@@ -2,9 +2,7 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
@@ -23,20 +21,10 @@ public class ValueReferenceNode extends ExpressionNode {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
 
+        System.out.println("Referencing: " + id);
         Value value = data.getValue(id.getContent());
-        if (!value.reference().weakEquals(Signature.tup())) {
-            value.load(visitor, data);
-        } else {
-            for (int i = 0; i < value.reference().getGenericReturn(0).size(); i++) {
-                value.load(visitor, data);
-
-                visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        CompilerUtil.internalName(Tuple.class) + "IMPL_" + value.reference().getGenericReturn(0).classDescriptor(),
-                        "param" + i,
-                        "()" + value.reference().getGenericReturn(0).getType(i).descriptor(),
-                        false);
-            }
-        }
+        System.out.println(value + ", " + value.reference());
+        value.load(visitor, data);
     }
 
     @Override

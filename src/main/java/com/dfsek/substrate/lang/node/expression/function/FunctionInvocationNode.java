@@ -27,36 +27,21 @@ public class FunctionInvocationNode extends ExpressionNode {
 
         Signature argSignature = CompilerUtil.expandArguments(data, arguments);
 
-        if(!function.reference(data).getGenericArguments(0).equals(argSignature)) {
+        if (!function.reference(data).getGenericArguments(0).equals(argSignature)) {
             throw new ParseException("Function argument mismatch, expected " + function.reference(data).getGenericArguments(0) + ", got " + argSignature, function.getPosition());
         }
 
         function.apply(visitor, data);
 
-        arguments.forEach(arg -> arg.apply(visitor, data));
+        arguments.forEach(arg -> {
+            System.out.println("Applying " + arg);
+            arg.apply(visitor, data);
+            CompilerUtil.deconstructTuple(arg, data, visitor);
+        });
 
 
         Signature ref = reference(data);
-        System.out.println("reference: " + ref);
         data.lambdaFactory().invoke(argSignature, ref.expandTuple(), data, visitor);
-
-        if(ref.weakEquals(Signature.tup())) {
-            data.offsetInc(1);
-            int offset = data.getOffset();
-            visitor.visitVarInsn(ASTORE, offset);
-
-            Signature tup = ref.expandTuple();
-
-            for (int i = 0; i < tup.size(); i++) {
-                visitor.visitVarInsn(ALOAD, offset);
-
-                visitor.visitMethodInsn(INVOKEVIRTUAL,
-                        CompilerUtil.internalName(data.tupleFactory().generate(tup)),
-                        "param" + i,
-                        "()" + tup.getType(i).descriptor(),
-                        false);
-            }
-        }
     }
 
     @Override
