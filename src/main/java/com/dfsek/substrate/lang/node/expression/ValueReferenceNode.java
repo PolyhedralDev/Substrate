@@ -24,7 +24,7 @@ public class ValueReferenceNode extends ExpressionNode {
         }
 
         Value value = data.getValue(id.getContent());
-        if (value.reference().getGenericReturn(0).size() <= 1) {
+        if (!value.reference().weakEquals(Signature.tup())) {
             value.load(visitor, data);
         } else {
             for (int i = 0; i < value.reference().getGenericReturn(0).size(); i++) {
