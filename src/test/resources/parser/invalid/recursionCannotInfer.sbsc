@@ -1,0 +1,4 @@
+// parser should fail if function return type cannot be inferred due to only returning recursive invocations.
+test = (a: int) -> {
+    return test(a);
+};
