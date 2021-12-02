@@ -1,2 +1,2 @@
-rootProject.name = "Substrate"
+rootProject.name = "substrate"
 
