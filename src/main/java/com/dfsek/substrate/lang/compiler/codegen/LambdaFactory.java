@@ -81,7 +81,7 @@ public class LambdaFactory {
 
         String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
-        ClassBuilder builder = new ClassBuilder(name);
+        ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft()));
 
         MethodBuilder constructor = builder.method("<init>",
                         "(" + scope.internalDescriptor() + ")V")
