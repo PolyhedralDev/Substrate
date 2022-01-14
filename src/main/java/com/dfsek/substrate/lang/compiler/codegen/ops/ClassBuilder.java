@@ -70,7 +70,7 @@ public class ClassBuilder {
         return this;
     }
 
-    public Class<?> build() {
+    public Class<?> build(DynamicClassLoader loader) {
         methods.forEach(methodBuilder -> {
             MethodVisitor visitor = classWriter.visitMethod(methodBuilder.access(),
                     methodBuilder.getName(),
@@ -83,9 +83,8 @@ public class ClassBuilder {
         });
 
         fields.forEach(consumer -> consumer.accept(classWriter));
-        DynamicClassLoader dynamicClassLoader = new DynamicClassLoader();
         byte[] bytes = classWriter.toByteArray();
-        Class<?> clazz = dynamicClassLoader.defineClass(name.replace('/', '.'), bytes);
+        Class<?> clazz = loader.defineClass(name.replace('/', '.'), bytes);
         CompilerUtil.dump(clazz, bytes);
         return clazz;
     }

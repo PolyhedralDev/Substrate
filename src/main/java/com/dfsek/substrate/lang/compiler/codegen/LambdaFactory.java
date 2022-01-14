@@ -110,6 +110,6 @@ public class LambdaFactory {
 
         consumer.accept(builder.method("apply", "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret).access(MethodBuilder.Access.PUBLIC));
 
-        return builder.build();
+        return builder.build(classLoader);
     }
 }

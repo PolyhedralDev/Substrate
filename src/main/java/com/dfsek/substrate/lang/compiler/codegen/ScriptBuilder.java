@@ -37,13 +37,12 @@ public class ScriptBuilder {
 
     private final List<Pair<String, Function>> functions = new ArrayList<>();
 
-    private final DynamicClassLoader classLoader = new DynamicClassLoader();
-
     public void addOperation(Node op) {
         ops.add(op);
     }
 
     public Script build() throws ParseException {
+        DynamicClassLoader classLoader = new DynamicClassLoader();
 
         String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
 
@@ -101,7 +100,7 @@ public class ScriptBuilder {
         ops.forEach(op -> op.apply(absMethod, data));
 
 
-        Class<?> clazz = builder.build();
+        Class<?> clazz = builder.build(classLoader);
 
         builds++;
         try {
