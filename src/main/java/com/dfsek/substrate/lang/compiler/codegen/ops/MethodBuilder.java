@@ -220,6 +220,14 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder insn(int opCode) {
+        if(opCode == RETURN ||
+                opCode == IRETURN ||
+                opCode == DRETURN ||
+                opCode == ARETURN ||
+                opCode == LRETURN ||
+                opCode == FRETURN) {
+            return insn(new ReturnOpCode(opCode));
+        }
         return insn(visitor -> visitor.visitInsn(opCode));
     }
 
@@ -269,7 +277,7 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder pushBoolean(boolean value) {
-        if(value) pushInt(1);
+        if (value) pushInt(1);
         else pushInt(0);
         return this;
     }
@@ -358,14 +366,14 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder getStatic(java.lang.String owner,
-                                  java.lang.String name,
-                                  java.lang.String descriptor) {
+                                   java.lang.String name,
+                                   java.lang.String descriptor) {
         return fieldInsn(Field.GETSTATIC, owner, name, descriptor);
     }
 
     public MethodBuilder putStatic(java.lang.String owner,
-                                  java.lang.String name,
-                                  java.lang.String descriptor) {
+                                   java.lang.String name,
+                                   java.lang.String descriptor) {
         return fieldInsn(Field.PUTSTATIC, owner, name, descriptor);
     }
 
@@ -388,6 +396,9 @@ public class MethodBuilder implements Opcodes {
 
     void apply(MethodVisitor visitor) {
         opCodes.forEach(opCode -> opCode.generate(visitor));
+        if(! (opCodes.get(opCodes.size()-1) instanceof ReturnOpCode)) {
+            visitor.visitInsn(RETURN); // return void if no return
+        }
     }
 
     int access() {
@@ -475,6 +486,19 @@ public class MethodBuilder implements Opcodes {
         @Override
         public int getCode() {
             return 0;
+        }
+    }
+
+    private class ReturnOpCode implements OpCode {
+        private final int opCode;
+
+        private ReturnOpCode(int opCode) {
+            this.opCode = opCode;
+        }
+
+        @Override
+        public void generate(MethodVisitor visitor) {
+            visitor.visitInsn(opCode);
         }
     }
 }
