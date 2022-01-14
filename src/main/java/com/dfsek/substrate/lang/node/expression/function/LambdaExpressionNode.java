@@ -82,7 +82,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         Signature closureSignature = closure.apply(closureFinder);
         System.out.println("Closure argument signature:" + closureSignature);
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn().expandTuple(), closureSignature, methodBuilder -> {
             int argWidth = 0;
             for (Pair<String, Signature> argument : types) {
                 argWidth += argument.getRight().frames();
