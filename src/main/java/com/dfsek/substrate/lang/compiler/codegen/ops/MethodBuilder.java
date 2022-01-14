@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public class MethodBuilder implements Opcodes {
     private AtomicInteger localVariableIndex = new AtomicInteger(0);
@@ -19,16 +20,20 @@ public class MethodBuilder implements Opcodes {
 
     private final String name, descriptor, signature;
     private final String[] exceptions;
+    private final BiConsumer<LocalVariable, MethodBuilder> delegateLoader;
 
     private final AtomicInteger maxLocals = new AtomicInteger(0), maxStack = new AtomicInteger(0);
     private final Deque<Signature> locals = new ArrayDeque<>();
 
-    public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions) {
+
+
+    public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions, BiConsumer<LocalVariable, MethodBuilder> delegateLoader) {
         this.classBuilder = classBuilder;
         this.name = name;
         this.descriptor = descriptor;
         this.signature = signature;
         this.exceptions = descriptions;
+        this.delegateLoader = delegateLoader;
     }
 
     public MethodBuilder access(Access access) {
@@ -126,6 +131,29 @@ public class MethodBuilder implements Opcodes {
         return typeInsn(ANEWARRAY, type);
     }
 
+    public LocalVariable createLocalVariable(String name, Signature type) {
+        if (localVariableMap.containsKey(name)) {
+            throw new IllegalArgumentException("Duplicate Local Variable name: " + name);
+        }
+        int width = type.frames();
+        LocalVariable variable = new LocalVariable(this, type, width, localVariableIndex.addAndGet(width), name);
+        localVariableMap.put(name, variable);
+        return variable;
+    }
+
+    public MethodBuilder storeLocalVariable(LocalVariable variable) {
+        return varInsn(variable.getType().getType(0).storeInsn(), variable.getOffset());
+    }
+
+    public MethodBuilder loadLocal(LocalVariable variable) {
+        if(variable.getParent() == this) {
+            varInsn(variable.getType().getType(0).loadInsn(), variable.getOffset());
+        } else {
+            delegateLoader.accept(variable, this);
+        }
+        return this;
+    }
+
     public MethodBuilder label(Label label) {
         return insn(visitor -> visitor.visitLabel(label));
     }
@@ -220,7 +248,7 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder insn(int opCode) {
-        if(opCode == RETURN ||
+        if (opCode == RETURN ||
                 opCode == IRETURN ||
                 opCode == DRETURN ||
                 opCode == ARETURN ||
@@ -396,7 +424,7 @@ public class MethodBuilder implements Opcodes {
 
     void apply(MethodVisitor visitor) {
         opCodes.forEach(opCode -> opCode.generate(visitor));
-        if(! (opCodes.get(opCodes.size()-1) instanceof ReturnOpCode)) {
+        if (!(opCodes.get(opCodes.size() - 1) instanceof ReturnOpCode)) {
             visitor.visitInsn(RETURN); // return void if no return
         }
     }

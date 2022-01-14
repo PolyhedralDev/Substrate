@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ClassBuilder {
@@ -45,7 +46,13 @@ public class ClassBuilder {
     }
 
     public MethodBuilder method(String name, String descriptor, String signature, String... exceptions) {
-        MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions);
+        MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions, (a, b) -> {});
+        methods.add(builder);
+        return builder;
+    }
+
+    public MethodBuilder method(String name, String descriptor, String signature, BiConsumer<LocalVariable, MethodBuilder> delegateLoader, String... exceptions) {
+        MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions, delegateLoader);
         methods.add(builder);
         return builder;
     }

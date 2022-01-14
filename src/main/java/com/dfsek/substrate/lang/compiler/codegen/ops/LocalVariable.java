@@ -7,8 +7,10 @@ public final class LocalVariable {
     private final int width;
     private final int offset;
     private final String name;
+    private final MethodBuilder parent;
 
-    public LocalVariable(Signature type, int width, int offset, String name) {
+    public LocalVariable(MethodBuilder parent, Signature type, int width, int offset, String name) {
+        this.parent = parent;
         this.type = type;
         this.width = width;
         this.offset = offset;
@@ -29,5 +31,9 @@ public final class LocalVariable {
 
     public int getOffset() {
         return offset;
+    }
+
+    public MethodBuilder getParent() {
+        return parent;
     }
 }
