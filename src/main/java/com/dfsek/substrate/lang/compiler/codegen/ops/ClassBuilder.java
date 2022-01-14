@@ -31,9 +31,10 @@ public class ClassBuilder {
 
     public ClassBuilder defaultConstructor() {
         method("<init>", "()V").access(MethodBuilder.Access.PUBLIC)
-        .invokeSpecial("java/lang/Object",
-                "<init>",
-                "()V")
+                .aLoad(0)
+                .invokeSpecial("java/lang/Object",
+                        "<init>",
+                        "()V")
                 .voidReturn();
 
         return this;
@@ -54,7 +55,7 @@ public class ClassBuilder {
     }
 
     public ClassBuilder field(String name, String descriptor, Object value, MethodBuilder.Access... accesses) {
-        return field(name, descriptor, null,  value, accesses);
+        return field(name, descriptor, null, value, accesses);
     }
 
     public ClassBuilder field(String name, String descriptor, String signature, Object value, MethodBuilder.Access... accesses) {
