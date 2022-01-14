@@ -55,7 +55,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .filter(node -> node instanceof ValueReferenceNode)
                 .map(node -> ((ValueReferenceNode) node).getId().getContent())
                 .forEach(id -> {
-                    if(!closureIDs.contains(id) && !paramIDs.contains(id)) {
+                    if(!closureIDs.contains(id) && !paramIDs.contains(id) && !(data.getValue(id) instanceof FunctionValue)) {
                         closureValues.add(Pair.of(reference(delegate), id));
                         closureIDs.add(id);
                     }
