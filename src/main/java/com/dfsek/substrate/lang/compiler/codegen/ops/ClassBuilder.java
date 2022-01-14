@@ -99,4 +99,8 @@ public class ClassBuilder {
         CompilerUtil.dump(clazz, bytes);
         return clazz;
     }
+
+    public String getName() {
+        return name;
+    }
 }

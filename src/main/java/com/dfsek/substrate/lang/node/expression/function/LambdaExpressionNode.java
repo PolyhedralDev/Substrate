@@ -10,11 +10,13 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
+import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
@@ -22,6 +24,9 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final List<Pair<String, Signature>> types;
     private final Position start;
     private final Signature parameters;
+
+    private final Function<BuildData, Signature> closure;
+    private final List<Pair<String, Function<BuildData, Signature>>> closureTypes;
 
     private String self;
 
@@ -35,6 +40,31 @@ public class LambdaExpressionNode extends ExpressionNode {
             signature = signature.and(type.getRight());
         }
         this.parameters = signature;
+
+
+        this.closureTypes = new ArrayList<>();
+        Set<String> closureIDs = new HashSet<>();
+
+        content.streamContents()
+                .filter(node -> node instanceof ValueReferenceNode)
+                .map(node -> (ValueReferenceNode) node)
+                .forEach(valueReferenceNode -> {
+                    System.out.println("Contains value ref: " + valueReferenceNode.getId());
+                    String id = valueReferenceNode.getId().getContent();
+                    if(!closureIDs.contains(id)) {
+                        closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), valueReferenceNode::reference));
+                        closureIDs.add(id);
+                    }
+                });
+
+
+        this.closure = data -> {
+            Signature closure = Signature.empty();
+            for (Pair<String, Function<BuildData, Signature>> type : closureTypes) {
+                closure = closure.and(type.getRight().apply(data));
+            }
+            return closure;
+        };
     }
 
     public void setSelf(String self) {
@@ -43,69 +73,26 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        List<Pair<Signature, String>> closureValues = new ArrayList<>();
-        Set<String> closureIDs = new HashSet<>();
+        Signature closureSignature = closure.apply(data);
+        System.out.println("Closure argument signature:" + closureSignature);
 
-        BuildData delegate = data.sub();
-
-        Set<String> paramIDs = types.stream().map(Pair::getLeft).collect(Collectors.toSet());
-
-        content
-                .streamContents()
-                .filter(node -> node instanceof ValueReferenceNode)
-                .map(node -> ((ValueReferenceNode) node).getId().getContent())
-                .forEach(id -> {
-                    if(!closureIDs.contains(id) && !paramIDs.contains(id) && !(data.getValue(id) instanceof FunctionValue)) {
-                        closureValues.add(Pair.of(reference(delegate), id));
-                        closureIDs.add(id);
-                    }
-                });
-
-        int param = 1;
-        for (Pair<String, Signature> type : types) {
-            Signature signature = type.getRight();
-            delegate.registerValue(type.getLeft(), new PrimitiveValue(signature, param), signature.frames());
-            param+=signature.frames();
-        }
-
-
-        Signature merged = Signature.empty();
-
-
-        for (int i = 0; i < closureValues.size(); i++) {
-            Pair<Signature, String> pair = closureValues.get(i);
-            merged = merged.and(pair.getLeft());
-
-            if(!paramIDs.contains(pair.getRight())) {
-                System.out.println("attempt:" + self + "," + pair.getRight() + "," + pair.getLeft());
-                delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
+        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(data), closureSignature, methodBuilder -> {
+            BuildData delegate = data.sub(methodBuilder.classWriter());
+            for (int i = 0; i < closureTypes.size(); i++) {
+                Pair<String, Function<BuildData, Signature>> pair = closureTypes.get(i);
+                delegate.registerValue(pair.getLeft(), new ShadowValue(pair.getRight().apply(delegate), i));
             }
-        }
-        if (self != null) {
-            delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
-        }
-
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method) -> {
-            content.apply(method, delegate);
-            method.voidReturn();
-        }, (localVariable, method) -> {
-
+            content.apply(methodBuilder, delegate);
         });
 
         builder.newInsn(CompilerUtil.internalName(lambda))
                 .dup();
 
-        for (Pair<Signature, String> pair : closureValues) {
-
-            String internalParameter = pair.getRight();
-            Value internal = data.getValue(internalParameter);
-            System.out.println("Loading " + data.offset(internalParameter));
-            builder.varInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+        for (Pair<String, Function<BuildData, Signature>> pair : closureTypes) {
+            data.getValue(pair.getLeft()).load(builder, data);
         }
 
-        builder.invokeSpecial(CompilerUtil.internalName(lambda),
-                "<init>",
-                "(" + merged.internalDescriptor() + ")V");
+        builder.invokeSpecial(CompilerUtil.internalName(lambda), "<init>", "(" + closureSignature.internalDescriptor() + ")V");
     }
 
     public Signature getParameters() {

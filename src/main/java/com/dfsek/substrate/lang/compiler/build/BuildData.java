@@ -30,17 +30,17 @@ public class BuildData {
     private final ClassBuilder classWriter;
     private final ValueInterceptor interceptor;
 
-    private final Lazy<String> name;
+    private final String name;
     private int offset;
 
     private final int implArgsOffset;
 
-    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, String name) {
+    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
         lambdaFactory = new LambdaFactory(classLoader, tupleFactory);
-        this.name = Lazy.of(() -> name);
+        this.name = classWriter.getName();
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
@@ -59,7 +59,7 @@ public class BuildData {
                       Map<String, Macro> macros, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       ValueInterceptor interceptor,
-                      Function<BuildData, String> name, int offset, int implArgsOffset) {
+                      String name, int offset, int implArgsOffset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         this.tupleFactory = tupleFactory;
@@ -69,8 +69,8 @@ public class BuildData {
         this.valueOffsets = valueOffsets;
         this.parent = parent;
         this.interceptor = interceptor;
-        this.name = Lazy.of(() -> name.apply(this));
         this.offset = offset;
+        this.name = name;
         this.implArgsOffset = implArgsOffset;
     }
 
@@ -95,7 +95,7 @@ public class BuildData {
     }
 
     public String getClassName() {
-        return name.get();
+        return name;
     }
 
     public void registerValue(String id, Value value, int frames) {
@@ -159,7 +159,20 @@ public class BuildData {
                 macros, valueOffsets, // but same JVM scope
                 this,
                 interceptor,
-                ignore -> name.get(), offset, implArgsOffset);
+                name, offset, implArgsOffset);
+    }
+
+    public BuildData sub(ClassBuilder classWriter) {
+        return new BuildData(classLoader,
+                classWriter,
+                tupleFactory,
+                lambdaFactory,
+                new HashMap<>(values), // new scope
+                macros,
+                new HashMap<>(),
+                this,
+                interceptor,
+                classWriter.getName(), offset, implArgsOffset);
     }
 
     public void loadImplementationArguments(MethodBuilder visitor) {

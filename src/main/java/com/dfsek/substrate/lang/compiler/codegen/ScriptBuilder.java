@@ -48,7 +48,7 @@ public class ScriptBuilder {
 
         ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), INTERFACE_CLASS_NAME).defaultConstructor();
 
-        BuildData data = new BuildData(classLoader, builder, implementationClassName);
+        BuildData data = new BuildData(classLoader, builder);
 
         // prepare functions.
 
@@ -74,8 +74,6 @@ public class ScriptBuilder {
                 }
                 function.invoke(method, separate, args);
                 method.voidReturn();
-            }, (a, b) -> {
-                throw new IllegalStateException();
             });
 
             builder.field("fun" + i,

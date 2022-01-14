@@ -75,7 +75,7 @@ public class LambdaFactory {
                 "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret));
     }
 
-    public Class<?> implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer, BiConsumer<LocalVariable, MethodBuilder> delegateLoader) {
+    public Class<?> implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
         generate(args, returnType);
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
@@ -109,7 +109,7 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        consumer.accept(builder.method("apply", "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret, delegateLoader).access(MethodBuilder.Access.PUBLIC));
+        consumer.accept(builder.method("apply", "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret).access(MethodBuilder.Access.PUBLIC));
 
         return builder.build(classLoader);
     }
