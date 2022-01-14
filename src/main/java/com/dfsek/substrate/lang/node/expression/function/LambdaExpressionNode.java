@@ -56,7 +56,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .map(node -> ((ValueReferenceNode) node).getId().getContent())
                 .forEach(id -> {
                     if(!closureIDs.contains(id) && !paramIDs.contains(id)) {
-                        closureValues.add(Pair.of(reference(delegate).getSimpleReturn(), id));
+                        closureValues.add(Pair.of(reference(delegate), id));
                         closureIDs.add(id);
                     }
                 });
@@ -120,7 +120,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
-            data1.registerValue(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()), signature.frames());
+            data1.registerUnchecked(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()));
         });
 
         return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
