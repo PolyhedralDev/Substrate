@@ -172,7 +172,7 @@ public class BuildData {
                 new HashMap<>(),
                 this,
                 interceptor,
-                classWriter.getName(), offset, implArgsOffset);
+                classWriter.getName(), 0, 1);
     }
 
     public void loadImplementationArguments(MethodBuilder visitor) {

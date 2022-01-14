@@ -36,14 +36,17 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.start = start;
         Signature signature = Signature.empty();
 
+        Set<String> closureIDs = new HashSet<>();
         for (Pair<String, Signature> type : types) {
             signature = signature.and(type.getRight());
+            closureIDs.add(type.getLeft());
         }
+
         this.parameters = signature;
 
 
         this.closureTypes = new ArrayList<>();
-        Set<String> closureIDs = new HashSet<>();
+
 
         content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
@@ -73,14 +76,25 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Signature closureSignature = closure.apply(data);
+        BuildData closureFinder = data.sub();
+
+        types.forEach(pair -> {
+            Signature signature = pair.getRight();
+            closureFinder.registerUnchecked(pair.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
+        });
+
+        Signature closureSignature = closure.apply(closureFinder);
         System.out.println("Closure argument signature:" + closureSignature);
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(data), closureSignature, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
             for (int i = 0; i < closureTypes.size(); i++) {
                 Pair<String, Function<BuildData, Signature>> pair = closureTypes.get(i);
-                delegate.registerValue(pair.getLeft(), new ShadowValue(pair.getRight().apply(delegate), i));
+                delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight().apply(delegate), i));
+            }
+            for (Pair<String, Signature> argument : types) {
+                delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
+                delegate.offsetInc(argument.getRight().frames());
             }
             content.apply(methodBuilder, delegate);
         });
