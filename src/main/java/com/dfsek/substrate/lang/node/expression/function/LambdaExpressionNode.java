@@ -64,7 +64,8 @@ public class LambdaExpressionNode extends ExpressionNode {
         int param = 1;
         for (Pair<String, Signature> type : types) {
             Signature signature = type.getRight();
-            delegate.registerValue(type.getLeft(), new PrimitiveValue(signature, param++), signature.frames());
+            delegate.registerValue(type.getLeft(), new PrimitiveValue(signature, param), signature.frames());
+            param+=signature.frames();
         }
 
 
@@ -95,8 +96,10 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .dup();
 
         for (Pair<Signature, String> pair : closureValues) {
+
             String internalParameter = pair.getRight();
             Value internal = data.getValue(internalParameter);
+            System.out.println("Loading " + data.offset(internalParameter));
             builder.varInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
