@@ -252,10 +252,10 @@ public class MethodBuilder implements Opcodes {
         Label caseTrue = new Label();
         Label caseFalse = new Label();
         ifNE(caseFalse);
-        pushInt(1);
+        pushTrue();
         goTo(caseTrue);
         label(caseFalse);
-        pushInt(0);
+        pushFalse();
         label(caseTrue);
         return this;
     }

@@ -15,9 +15,9 @@ public class BooleanNode extends ConstantExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         boolean val = Boolean.parseBoolean(token.getContent());
         if (val) {
-            builder.pushInt(ICONST_1); // true
+            builder.pushTrue(); // true
         } else {
-            builder.pushInt(ICONST_0); // false
+            builder.pushFalse(); // false
         }
     }
 
