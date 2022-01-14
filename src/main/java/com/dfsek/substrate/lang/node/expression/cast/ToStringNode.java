@@ -18,17 +18,13 @@ public class ToStringNode extends TypeCastNode {
                 .reference(data)
                 .getSimpleReturn();
         if (ref.equals(Signature.integer())) {
-            visitor.invokeStatic(
-                    "java/lang/Integer",
+            visitor.invokeStatic("java/lang/Integer",
                     "toString",
-                    "(I)Ljava/lang/String;"
-                    );
+                    "(I)Ljava/lang/String;");
         } else if (ref.equals(Signature.decimal())) {
-            visitor.invokeStatic(
-                    "java/lang/Double",
+            visitor.invokeStatic("java/lang/Double",
                     "toString",
-                    "(D)Ljava/lang/String;"
-                    );
+                    "(D)Ljava/lang/String;");
         }
     }
 

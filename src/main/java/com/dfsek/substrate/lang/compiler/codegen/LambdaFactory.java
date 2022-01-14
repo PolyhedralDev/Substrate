@@ -69,7 +69,7 @@ public class LambdaFactory {
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
         data.loadImplementationArguments(visitor);
-        visitor.invokeInterface(                CompilerUtil.internalName(generate(args, ret)),
+        visitor.invokeInterface(CompilerUtil.internalName(generate(args, ret)),
                 "apply",
                 "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret));
     }

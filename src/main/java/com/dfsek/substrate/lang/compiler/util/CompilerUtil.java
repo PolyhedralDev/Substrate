@@ -120,8 +120,7 @@ public final class CompilerUtil implements Opcodes {
             for (int i = 0; i < tup.size(); i++) {
                 visitor.aLoad(offset);
 
-                visitor.invokeVirtual(
-                        CompilerUtil.internalName(data.tupleFactory().generate(tup)),
+                visitor.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(tup)),
                         "param" + i,
                         "()" + tup.getType(i).descriptor());
             }

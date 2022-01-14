@@ -22,8 +22,7 @@ public class NotEqualsNode extends ComparisonBinaryNode {
 
     @Override
     protected void applyStrComparison(MethodBuilder visitor) {
-        visitor.invokeVirtual(
-                "java/lang/String",
+        visitor.invokeVirtual("java/lang/String",
                 "equals",
                 "(Ljava/lang/Object;)Z");
         visitor.invertBoolean();

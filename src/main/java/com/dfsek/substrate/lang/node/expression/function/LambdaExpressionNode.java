@@ -80,7 +80,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
         builder.newInsn(CompilerUtil.internalName(lambda))
-        .dup();
+                .dup();
 
         for (Pair<Signature, String> pair : internalParameters) {
             String internalParameter = pair.getRight();
@@ -88,11 +88,9 @@ public class LambdaExpressionNode extends ExpressionNode {
             builder.varInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
-        builder.invokeSpecial(
-                CompilerUtil.internalName(lambda),
+        builder.invokeSpecial(CompilerUtil.internalName(lambda),
                 "<init>",
-                "(" + merged.internalDescriptor() + ")V"
-                );
+                "(" + merged.internalDescriptor() + ")V");
     }
 
     public Signature getParameters() {
