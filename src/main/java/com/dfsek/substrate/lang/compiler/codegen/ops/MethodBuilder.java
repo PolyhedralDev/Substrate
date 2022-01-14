@@ -485,7 +485,7 @@ public class MethodBuilder implements Opcodes {
 
         @Override
         public int getCode() {
-            return 0;
+            return code;
         }
     }
 
