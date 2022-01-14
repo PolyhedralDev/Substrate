@@ -80,7 +80,7 @@ public class ScriptBuilder {
 
             builder.field("fun" + i,
                     "L" + CompilerUtil.internalName(delegate) + ";",
-                    MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
+                    MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
             staticInitializer.newInsn(CompilerUtil.internalName(delegate))
                     .dup()
