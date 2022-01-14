@@ -189,7 +189,7 @@ public class MethodBuilder implements Opcodes {
         return a;
     }
 
-    public ClassBuilder done() {
+    public ClassBuilder classWriter() {
         return classBuilder;
     }
 
