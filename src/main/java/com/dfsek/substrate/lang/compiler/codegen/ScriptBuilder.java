@@ -83,15 +83,12 @@ public class ScriptBuilder {
                     "L" + CompilerUtil.internalName(delegate) + ";",
                     MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
-            builder.field("fun" + i, "L" + CompilerUtil.internalName(delegate) + ";", MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL, MethodBuilder.Access.STATIC);
-
             staticInitializer.newInsn(CompilerUtil.internalName(delegate))
                     .dup()
                     .invokeSpecial(CompilerUtil.internalName(delegate), "<init>", "()V")
                     .putStatic(implementationClassName, "fun" + i, "L" + CompilerUtil.internalName(delegate) + ";");
 
-            int finalI = i;
-            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, finalI, delegate));
+            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, i, delegate));
         }
 
         staticInitializer.voidReturn();
