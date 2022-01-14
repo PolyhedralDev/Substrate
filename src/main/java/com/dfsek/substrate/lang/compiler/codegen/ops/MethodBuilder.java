@@ -123,7 +123,7 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder aNewArray(String type) {
-        return typeInsn(NEWARRAY, type);
+        return typeInsn(ANEWARRAY, type);
     }
 
     public MethodBuilder label(Label label) {
