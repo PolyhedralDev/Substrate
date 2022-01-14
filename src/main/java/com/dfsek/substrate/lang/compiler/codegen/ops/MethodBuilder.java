@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
+@SuppressWarnings("UnusedReturnValue")
 public class MethodBuilder implements Opcodes {
     private AtomicInteger localVariableIndex = new AtomicInteger(0);
 
