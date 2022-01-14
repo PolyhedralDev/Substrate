@@ -17,7 +17,8 @@ public class MethodBuilder implements Opcodes {
 
     private final ClassBuilder classBuilder;
 
-    private final String name, descriptor, signature;
+    private final String name, signature;
+    private String descriptor;
     private final String[] exceptions;
 
     public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions) {
@@ -33,6 +34,10 @@ public class MethodBuilder implements Opcodes {
         return this;
     }
 
+    public MethodBuilder descriptor(String descriptor) {
+        this.descriptor = descriptor;
+        return this;
+    }
 
     public MethodBuilder pushInt(int i) {
         opCodes.add(visitor -> {

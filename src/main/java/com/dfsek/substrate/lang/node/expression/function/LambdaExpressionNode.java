@@ -10,14 +10,10 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
@@ -86,7 +82,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         Signature closureSignature = closure.apply(closureFinder);
         System.out.println("Closure argument signature:" + closureSignature);
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(data), closureSignature, methodBuilder -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
             int argWidth = 0;
             for (Pair<String, Signature> argument : types) {
                 argWidth += argument.getRight().frames();

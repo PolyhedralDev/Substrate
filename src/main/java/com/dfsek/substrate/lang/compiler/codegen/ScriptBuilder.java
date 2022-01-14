@@ -15,16 +15,12 @@ import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.pair.Pair;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.objectweb.asm.Opcodes.*;
 
 public class ScriptBuilder {
     private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));

@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.compiler.codegen;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.LocalVariable;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -16,7 +15,6 @@ import org.objectweb.asm.MethodVisitor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static org.objectweb.asm.Opcodes.*;
