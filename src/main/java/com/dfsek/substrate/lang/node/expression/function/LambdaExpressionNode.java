@@ -87,7 +87,12 @@ public class LambdaExpressionNode extends ExpressionNode {
         System.out.println("Closure argument signature:" + closureSignature);
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(data), closureSignature, methodBuilder -> {
-            BuildData delegate = data.sub(methodBuilder.classWriter());
+            int argWidth = 0;
+            for (Pair<String, Signature> argument : types) {
+                argWidth += argument.getRight().frames();
+            }
+            BuildData delegate = data.sub(methodBuilder.classWriter(), argWidth);
+
             for (int i = 0; i < closureTypes.size(); i++) {
                 Pair<String, Function<BuildData, Signature>> pair = closureTypes.get(i);
                 delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight().apply(delegate), i));
