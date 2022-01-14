@@ -41,13 +41,13 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        List<Pair<Signature, String>> internalParameters = new ArrayList<>();
+        List<Pair<Signature, String>> closureValues = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
             if (data.valueExists(id) && !(data.getValue(id) instanceof FunctionValue)) {
                 Signature sig = data.getValue(id).reference();
-                if (!internalParameters.contains(Pair.of(sig, id)) && !id.equals(self)) {
-                    internalParameters.add(Pair.of(sig, id));
+                if (!closureValues.contains(Pair.of(sig, id)) && !id.equals(self)) {
+                    closureValues.add(Pair.of(sig, id));
                 }
             }
         }, d -> data.lambdaFactory().name(parameters, content.reference(d).expandTuple()), parameters.frames());
@@ -58,13 +58,11 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
 
-        content.apply(new MethodBuilder(null, "app", "()V", null, new String[0]), delegate); // TODO: this is really bad and should be changed to append as we go
-
         Signature merged = Signature.empty();
 
 
-        for (int i = 0; i < internalParameters.size(); i++) {
-            Pair<Signature, String> pair = internalParameters.get(i);
+        for (int i = 0; i < closureValues.size(); i++) {
+            Pair<Signature, String> pair = closureValues.get(i);
             merged = merged.and(pair.getLeft());
 
             System.out.println("attempt:" + self + "," + pair.getRight());
@@ -82,7 +80,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         builder.newInsn(CompilerUtil.internalName(lambda))
                 .dup();
 
-        for (Pair<Signature, String> pair : internalParameters) {
+        for (Pair<Signature, String> pair : closureValues) {
             String internalParameter = pair.getRight();
             Value internal = data.getValue(internalParameter);
             builder.varInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
