@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@SuppressWarnings("UnusedReturnValue")
 public class ClassBuilder {
     private final List<MethodBuilder> methods = new ArrayList<>();
     private final List<Consumer<ClassWriter>> fields = new ArrayList<>();
