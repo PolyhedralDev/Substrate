@@ -111,7 +111,9 @@ public class LambdaExpressionNode extends ExpressionNode {
             data.getValue(pair.getLeft()).load(builder, data);
         }
 
-        builder.invokeSpecial(CompilerUtil.internalName(lambda), "<init>", "(" + closureSignature.internalDescriptor() + ")V");
+        builder.invokeSpecial(CompilerUtil.internalName(lambda),
+                "<init>",
+                "(" + closureSignature.internalDescriptor() + ")V");
     }
 
     public Signature getParameters() {

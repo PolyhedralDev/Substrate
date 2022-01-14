@@ -432,7 +432,7 @@ public class MethodBuilder implements Opcodes {
 
     void apply(MethodVisitor visitor) {
         opCodes.forEach(opCode -> opCode.generate(visitor));
-        if (!(opCodes.get(opCodes.size() - 1) instanceof ReturnOpCode)) {
+        if (opCodes.isEmpty() || !(opCodes.get(opCodes.size() - 1) instanceof ReturnOpCode)) {
             visitor.visitInsn(RETURN); // return void if no return
         }
     }
