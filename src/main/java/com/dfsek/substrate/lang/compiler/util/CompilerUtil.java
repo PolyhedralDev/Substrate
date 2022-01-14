@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.compiler.util;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -18,8 +19,12 @@ import java.io.UncheckedIOException;
 import java.util.List;
 
 public final class CompilerUtil implements Opcodes {
+    public static String internalName(String clazz) {
+        return clazz.replace('.', '/');
+    }
+
     public static String internalName(Class<?> clazz) {
-        return clazz.getCanonicalName().replace('.', '/');
+        return internalName(clazz.getCanonicalName());
     }
 
     public static void dump(Class<?> clazz, byte[] bytes) {
@@ -33,42 +38,7 @@ public final class CompilerUtil implements Opcodes {
         }
     }
 
-    public static void invertBoolean(MethodVisitor visitor) {
-        Label caseTrue = new Label();
-        Label caseFalse = new Label();
-        visitor.visitJumpInsn(IFNE, caseFalse);
-        visitor.visitInsn(ICONST_1);
-        visitor.visitJumpInsn(GOTO, caseTrue);
-        visitor.visitLabel(caseFalse);
-        visitor.visitInsn(ICONST_0);
-        visitor.visitLabel(caseTrue);
-    }
-
-    public static void pushInt(int i, MethodVisitor visitor) {
-        if (i == -1) {
-            visitor.visitInsn(ICONST_M1);
-        } else if (i == 0) {
-            visitor.visitInsn(ICONST_0);
-        } else if (i == 1) {
-            visitor.visitInsn(ICONST_1);
-        } else if (i == 2) {
-            visitor.visitInsn(ICONST_2);
-        } else if (i == 3) {
-            visitor.visitInsn(ICONST_3);
-        } else if (i == 4) {
-            visitor.visitInsn(ICONST_4);
-        } else if (i == 5) {
-            visitor.visitInsn(ICONST_5);
-        } else if (i >= -128 && i < 128) {
-            visitor.visitIntInsn(BIPUSH, i); // byte
-        } else if (i >= -32768 && i < 32768) {
-            visitor.visitIntInsn(SIPUSH, i); // short
-        } else {
-            visitor.visitLdcInsn(i); // constant pool
-        }
-    }
-
-    public static void invokeLambda(ExpressionNode lambdaContainer, MethodVisitor visitor, BuildData data) {
+    public static void invokeLambda(ExpressionNode lambdaContainer, MethodBuilder visitor, BuildData data) {
         ParserUtil.checkWeakReferenceType(lambdaContainer, data, Signature.fun());
 
         Signature returnType = lambdaContainer.reference(data).getSimpleReturn();
@@ -138,23 +108,22 @@ public final class CompilerUtil implements Opcodes {
         return argSignature;
     }
 
-    public static void deconstructTuple(ExpressionNode node, BuildData data, MethodVisitor visitor) {
+    public static void deconstructTuple(ExpressionNode node, BuildData data, MethodBuilder visitor) {
         Signature ref = node.reference(data);
         if (ref.weakEquals(Signature.tup())) {
             data.offsetInc(1);
             int offset = data.getOffset();
-            visitor.visitVarInsn(ASTORE, offset);
+            visitor.aStore(offset);
 
             Signature tup = ref.expandTuple();
 
             for (int i = 0; i < tup.size(); i++) {
-                visitor.visitVarInsn(ALOAD, offset);
+                visitor.aLoad(offset);
 
-                visitor.visitMethodInsn(INVOKEVIRTUAL,
+                visitor.invokeVirtual(
                         CompilerUtil.internalName(data.tupleFactory().generate(tup)),
                         "param" + i,
-                        "()" + tup.getType(i).descriptor(),
-                        false);
+                        "()" + tup.getType(i).descriptor());
             }
 
         }

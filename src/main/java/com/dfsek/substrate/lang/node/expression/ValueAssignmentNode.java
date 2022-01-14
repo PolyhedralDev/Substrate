@@ -1,13 +1,13 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
-import org.objectweb.asm.MethodVisitor;
 
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
@@ -19,7 +19,7 @@ public class ValueAssignmentNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         if (data.valueExists(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
@@ -33,27 +33,27 @@ public class ValueAssignmentNode extends ExpressionNode {
             System.out.println("SELF: " + id);
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
-        value.apply(visitor, data);
+        value.apply(builder, data);
 
         if (ref.equals(Signature.decimal())) {
-            visitor.visitInsn(DUP2);
+            builder.dup2();
         } else {
-            visitor.visitInsn(DUP);
+            builder.dup();
         }
 
 
         int offset = data.offset(id.getContent());
         if (ref.isSimple() && ref.getSimpleReturn().isSimple()) {
             if (value instanceof LambdaExpressionNode || ref.weakEquals(Signature.list())) {
-                visitor.visitVarInsn(ASTORE, offset);
+                builder.aStore(offset);
             } else {
-                visitor.visitVarInsn(ref.getSimpleReturn().getType(0).storeInsn(), offset);
+                builder.varInsn(ref.getSimpleReturn().getType(0).storeInsn(), offset);
             }
         } else {
             if (ref.equals(Signature.empty())) { // void non-lambda expression
                 throw new ParseException("Cannot assign VOID expression to value", getPosition());
             }
-            visitor.visitVarInsn(ASTORE, offset);
+            builder.aStore(offset);
         }
     }
 

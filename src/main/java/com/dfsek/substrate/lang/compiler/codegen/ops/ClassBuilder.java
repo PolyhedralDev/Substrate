@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.compiler.codegen.ops;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,16 @@ public class ClassBuilder {
         this.name = name;
     }
 
+    public ClassBuilder defaultConstructor() {
+        method("<init>", "()V").access(MethodBuilder.Access.PUBLIC)
+        .invokeSpecial("java/lang/Object",
+                "<init>",
+                "()V")
+                .voidReturn();
+
+        return this;
+    }
+
     public MethodBuilder method(String name, String descriptor) {
         return method(name, descriptor, null);
     }
@@ -38,7 +49,15 @@ public class ClassBuilder {
         return builder;
     }
 
-    public ClassBuilder field(String name, String descriptor, String signature, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, MethodBuilder.Access... accesses) {
+        return field(name, descriptor, null, null, accesses);
+    }
+
+    public ClassBuilder field(String name, String descriptor, Object value, MethodBuilder.Access... accesses) {
+        return field(name, descriptor, null,  value, accesses);
+    }
+
+    public ClassBuilder field(String name, String descriptor, String signature, Object value, MethodBuilder.Access... accesses) {
         int access = 0;
 
         for (MethodBuilder.Access level : accesses) {
@@ -46,16 +65,23 @@ public class ClassBuilder {
         }
 
         int finalAccess = access;
-        fields.add(classWriter1 -> classWriter1.visitField(finalAccess, name, descriptor, signature, null).visitEnd());
+        fields.add(classWriter1 -> classWriter1.visitField(finalAccess, name, descriptor, signature, value).visitEnd());
         return this;
     }
 
     public Class<?> build() {
-        methods.forEach(methodBuilder -> methodBuilder.apply(classWriter.visitMethod(methodBuilder.access(),
-                methodBuilder.getName(),
-                methodBuilder.getDescriptor(),
-                methodBuilder.getSignature(),
-                methodBuilder.getExceptions())));
+        methods.forEach(methodBuilder -> {
+            MethodVisitor visitor = classWriter.visitMethod(methodBuilder.access(),
+                    methodBuilder.getName(),
+                    methodBuilder.getDescriptor(),
+                    methodBuilder.getSignature(),
+                    methodBuilder.getExceptions());
+            visitor.visitCode();
+            methodBuilder.apply(visitor);
+            visitor.visitMaxs(0, 0);
+        });
+
+        fields.forEach(consumer -> consumer.accept(classWriter));
         DynamicClassLoader dynamicClassLoader = new DynamicClassLoader();
         byte[] bytes = classWriter.toByteArray();
         Class<?> clazz = dynamicClassLoader.defineClass(name, bytes);

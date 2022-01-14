@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.compiler.codegen.ops;
 
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -19,8 +20,8 @@ public class MethodBuilder implements Opcodes {
     private final String name, descriptor, signature;
     private final String[] exceptions;
 
+    private final AtomicInteger maxLocals = new AtomicInteger(0), maxStack = new AtomicInteger(0);
     private final Deque<Signature> locals = new ArrayDeque<>();
-    private final Deque<Signature> stack = new ArrayDeque<>();
 
     public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions) {
         this.classBuilder = classBuilder;
@@ -29,6 +30,12 @@ public class MethodBuilder implements Opcodes {
         this.signature = signature;
         this.exceptions = descriptions;
     }
+
+    public MethodBuilder access(Access access) {
+        this.access.add(access);
+        return this;
+    }
+
 
     public MethodBuilder pushInt(int i) {
         opCodes.add(visitor -> {
@@ -58,9 +65,9 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder pushDouble(double value) {
-        if(value == 0.0) {
+        if (value == 0.0) {
             return insn(DCONST_0);
-        } else if(value == 1.0) {
+        } else if (value == 1.0) {
             return insn(DCONST_1);
         } else {
             return pushConst(value);
@@ -90,6 +97,103 @@ public class MethodBuilder implements Opcodes {
         }
         return this;
     }
+
+    public MethodBuilder iinc(int lv, int inc) {
+        return insn(visitor -> visitor.visitIincInsn(lv, inc));
+    }
+
+    public MethodBuilder dup() {
+        return insn(DUP);
+    }
+
+    public MethodBuilder dup2() {
+        return insn(DUP2);
+    }
+
+    public MethodBuilder arrayLength() {
+        return insn(ARRAYLENGTH);
+    }
+
+    public MethodBuilder intInsn(int instruction, int op) {
+        return insn(visitor -> visitor.visitIntInsn(instruction, op));
+    }
+
+    public MethodBuilder newArray(int type) {
+        return intInsn(NEWARRAY, type);
+    }
+
+    public MethodBuilder aNewArray(String type) {
+        return typeInsn(NEWARRAY, type);
+    }
+
+    public MethodBuilder label(Label label) {
+        return insn(visitor -> visitor.visitLabel(label));
+    }
+
+    public MethodBuilder jump(int insn, Label label) {
+        return insn(visitor -> visitor.visitJumpInsn(insn, label));
+    }
+
+    public MethodBuilder goTo(Label label) {
+        return jump(GOTO, label);
+    }
+
+    public MethodBuilder ifICmpLT(Label label) {
+        return jump(IF_ICMPLT, label);
+    }
+
+    public MethodBuilder ifICmpGT(Label label) {
+        return jump(IF_ICMPGT, label);
+    }
+
+    public MethodBuilder ifICmpLE(Label label) {
+        return jump(IF_ICMPLE, label);
+    }
+
+    public MethodBuilder ifICmpGE(Label label) {
+        return jump(IF_ICMPGE, label);
+    }
+
+    public MethodBuilder ifICmpEQ(Label label) {
+        return jump(IF_ICMPEQ, label);
+    }
+
+    public MethodBuilder ifICmpNE(Label label) {
+        return jump(IF_ICMPNE, label);
+    }
+
+    public MethodBuilder ifNE(Label label) {
+        return jump(IFNE, label);
+    }
+
+    public MethodBuilder ifEQ(Label label) {
+        return jump(IFEQ, label);
+    }
+
+    public MethodBuilder aaload() {
+        return insn(AALOAD);
+    }
+
+    public MethodBuilder iaload() {
+        return insn(IALOAD);
+    }
+
+    public MethodBuilder daload() {
+        return insn(DASTORE);
+    }
+
+    public MethodBuilder aastore() {
+        return insn(AALOAD);
+    }
+
+    public MethodBuilder iastore() {
+        return insn(IASTORE);
+    }
+
+    public MethodBuilder dastore() {
+        return insn(DASTORE);
+    }
+
 
     public MethodBuilder iLoad(int index) {
         return varInsn(ILOAD, index);
@@ -128,6 +232,52 @@ public class MethodBuilder implements Opcodes {
         return this;
     }
 
+    public MethodBuilder i2d() {
+        return insn(I2D);
+    }
+
+    public MethodBuilder d2i() {
+        return insn(D2I);
+    }
+
+    public MethodBuilder invertBoolean() {
+        Label caseTrue = new Label();
+        Label caseFalse = new Label();
+        ifNE(caseFalse);
+        pushInt(1);
+        goTo(caseTrue);
+        label(caseFalse);
+        pushInt(0);
+        label(caseTrue);
+        return this;
+    }
+
+    public MethodBuilder dcmpl() {
+        return insn(DCMPL);
+    }
+
+    public MethodBuilder dcmpg() {
+        return insn(DCMPG);
+    }
+
+    public MethodBuilder pushTrue() {
+        return pushInt(1);
+    }
+
+    public MethodBuilder pushFalse() {
+        return pushInt(0);
+    }
+
+    public MethodBuilder pushBoolean(boolean value) {
+        if(value) pushInt(1);
+        else pushInt(0);
+        return this;
+    }
+
+    public MethodBuilder lineNumber(int number, Label label) {
+        return insn(visitor -> visitor.visitLineNumber(number, label));
+    }
+
     public MethodBuilder invoke(Invoke type, String owner, String name, String descriptor, boolean isInterface) {
         return insn(visitor -> visitor.visitMethodInsn(type.insn, owner, name, descriptor, isInterface));
     }
@@ -138,6 +288,10 @@ public class MethodBuilder implements Opcodes {
 
     public MethodBuilder invokeSpecial(String owner, String name, String descriptor) {
         return invoke(Invoke.SPECIAL, owner, name, descriptor, false);
+    }
+
+    public MethodBuilder invokeStatic(String owner, String name, String descriptor) {
+        return invoke(Invoke.STATIC, owner, name, descriptor, false);
     }
 
     public MethodBuilder invokeInterface(String owner, String name, String descriptor) {
@@ -176,6 +330,62 @@ public class MethodBuilder implements Opcodes {
         return insn(DDIV);
     }
 
+    public MethodBuilder newInsn(String type) {
+        return typeInsn(NEW, type);
+    }
+
+    public MethodBuilder typeInsn(int insn, String type) {
+        return insn(visitor -> visitor.visitTypeInsn(insn, type));
+    }
+
+    public MethodBuilder fieldInsn(Field field,
+                                   java.lang.String owner,
+                                   java.lang.String name,
+                                   java.lang.String descriptor) {
+        return insn(visitor -> visitor.visitFieldInsn(field.op, owner, name, descriptor));
+    }
+
+    public MethodBuilder getField(java.lang.String owner,
+                                  java.lang.String name,
+                                  java.lang.String descriptor) {
+        return fieldInsn(Field.GETFIELD, owner, name, descriptor);
+    }
+
+    public MethodBuilder putField(java.lang.String owner,
+                                  java.lang.String name,
+                                  java.lang.String descriptor) {
+        return fieldInsn(Field.PUTFIELD, owner, name, descriptor);
+    }
+
+    public MethodBuilder getStatic(java.lang.String owner,
+                                  java.lang.String name,
+                                  java.lang.String descriptor) {
+        return fieldInsn(Field.GETSTATIC, owner, name, descriptor);
+    }
+
+    public MethodBuilder putStatic(java.lang.String owner,
+                                  java.lang.String name,
+                                  java.lang.String descriptor) {
+        return fieldInsn(Field.PUTSTATIC, owner, name, descriptor);
+    }
+
+    public MethodBuilder voidReturn() {
+        return insn(RETURN);
+    }
+
+    public MethodBuilder intReturn() {
+        return insn(IRETURN);
+    }
+
+    public MethodBuilder doubleReturn() {
+        return insn(DRETURN);
+    }
+
+    public MethodBuilder refReturn() {
+        return insn(ARETURN);
+    }
+
+
     void apply(MethodVisitor visitor) {
         opCodes.forEach(opCode -> opCode.generate(visitor));
     }
@@ -213,7 +423,7 @@ public class MethodBuilder implements Opcodes {
         int getCode();
     }
 
-    public enum Invoke implements  Bytecode {
+    public enum Invoke implements Bytecode {
         STATIC(INVOKESTATIC),
         INTERFACE(INVOKEINTERFACE),
         SPECIAL(INVOKESPECIAL),
@@ -229,13 +439,32 @@ public class MethodBuilder implements Opcodes {
         }
     }
 
+    public enum Field implements Bytecode {
+        GETFIELD(Opcodes.GETFIELD),
+        PUTFIELD(Opcodes.PUTFIELD),
+        GETSTATIC(Opcodes.GETSTATIC),
+        PUTSTATIC(Opcodes.PUTSTATIC);
+
+        private final int op;
+
+        Field(int op) {
+            this.op = op;
+        }
+
+        @Override
+        public int getCode() {
+            return op;
+        }
+    }
+
     public enum Access implements Bytecode {
         PUBLIC(ACC_PUBLIC),
         PRIVATE(ACC_PRIVATE),
         PROTECTED(ACC_PROTECTED),
         SYNTHETIC(ACC_SYNTHETIC),
         ABSTRACT(ACC_ABSTRACT),
-        FINAL(ACC_FINAL);
+        FINAL(ACC_FINAL),
+        STATIC(ACC_STATIC);
 
         private final int code;
 

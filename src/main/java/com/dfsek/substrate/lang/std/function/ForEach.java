@@ -2,10 +2,9 @@ package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.api.Function;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 
 public class ForEach implements Macro {
     @Override
@@ -22,52 +21,53 @@ public class ForEach implements Macro {
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
+    public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);
         int lambdaLV = data.getOffset();
-        visitor.visitVarInsn(ASTORE, lambdaLV); // store lambda in LV
+        visitor.aStore(lambdaLV) // store lambda in LV
 
-        visitor.visitInsn(DUP); // duplicate array ref
+                .dup(); // duplicate array ref
         data.offsetInc(1);
         int arrayLV = data.getOffset();
-        visitor.visitVarInsn(ASTORE, arrayLV); // store array in LV
+        visitor.aStore(arrayLV) // store array in LV
 
-        visitor.visitInsn(ARRAYLENGTH);
+                .arrayLength();
+
         data.offsetInc(1);
         int arrayLengthLV = data.getOffset();
-        visitor.visitVarInsn(ISTORE, arrayLengthLV); // store array length in LV
+        visitor.iStore(arrayLengthLV) // store array length in LV
 
-        visitor.visitInsn(ICONST_0);
+                .pushInt(0);
         data.offsetInc(1);
         int iLV = data.getOffset();
-        visitor.visitVarInsn(ISTORE, iLV); // store iterator value in LV
+        visitor.iStore(iLV); // store iterator value in LV
 
         Label start = new Label();
         Label end = new Label();
 
-        visitor.visitLabel(start);
+        visitor.label(start)
 
-        visitor.visitVarInsn(ILOAD, iLV);
-        visitor.visitVarInsn(ILOAD, arrayLengthLV);
-        visitor.visitJumpInsn(IF_ICMPGE, end); // jump to end if i >= length
+                .iLoad(iLV)
+                .iLoad(arrayLengthLV)
+                .ifICmpGE(end) // jump to end if i >= length
 
-        visitor.visitVarInsn(ALOAD, lambdaLV); // load lambda
+                .aLoad(lambdaLV) // load lambda
 
-        visitor.visitVarInsn(ALOAD, arrayLV); // get value from array
-        visitor.visitVarInsn(ILOAD, iLV);
-        if(type.isSimple()) {
-            visitor.visitInsn(type.getType(0).arrayLoadInsn());
+                .aLoad(arrayLV) // get value from array
+                .iLoad(iLV);
+        if (type.isSimple()) {
+            visitor.insn(type.getType(0).arrayLoadInsn());
         } else {
-            visitor.visitInsn(AALOAD);
+            visitor.aaload();
         }
 
         data.lambdaFactory().invoke(args.getGenericReturn(0), Signature.empty(), data, visitor);
 
-        visitor.visitIincInsn(iLV, 1);
-        visitor.visitJumpInsn(GOTO, start);
+        visitor.iinc(iLV, 1)
+                .goTo(start)
 
-        visitor.visitLabel(end);
+                .label(end);
     }
 
     @Override

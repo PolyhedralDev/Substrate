@@ -1,8 +1,8 @@
 package com.dfsek.substrate.lang.compiler.value;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import org.objectweb.asm.MethodVisitor;
 
 public class ThisReferenceValue implements Value{
     private final Signature ref;
@@ -17,11 +17,11 @@ public class ThisReferenceValue implements Value{
     }
 
     @Override
-    public void load(MethodVisitor visitor, BuildData data) {
+    public void load(MethodBuilder visitor, BuildData data) {
         if(!ref.isSimple()) {
-            visitor.visitVarInsn(ALOAD, 0);
+            visitor.aLoad(0);
         } else {
-            visitor.visitVarInsn(reference().getType(0).loadInsn(), 0);
+            visitor.varInsn(reference().getType(0).loadInsn(), 0);
         }
     }
 }

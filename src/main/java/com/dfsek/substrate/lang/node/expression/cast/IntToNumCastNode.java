@@ -1,12 +1,11 @@
 package com.dfsek.substrate.lang.node.expression.cast;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
-import org.objectweb.asm.MethodVisitor;
 
 public class IntToNumCastNode extends TypeCastNode {
     public IntToNumCastNode(Token type, ExpressionNode value) {
@@ -14,9 +13,9 @@ public class IntToNumCastNode extends TypeCastNode {
     }
 
     @Override
-    public void applyCast(MethodVisitor visitor, BuildData data) {
+    public void applyCast(MethodBuilder visitor, BuildData data) {
         ParserUtil.checkType(value, data, Signature.integer());
-        visitor.visitInsn(I2D);
+        visitor.i2d();
     }
 
     @Override

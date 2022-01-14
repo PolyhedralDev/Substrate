@@ -1,13 +1,13 @@
 package com.dfsek.substrate.lang.node.expression.list;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
 
@@ -21,18 +21,18 @@ public class ListNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         Signature signature = elements.get(0).reference(data);
         elements.forEach(element -> ParserUtil.checkReferenceType(element, data, signature));
 
-        CompilerUtil.pushInt(elements.size(), visitor);
+        builder.pushInt(elements.size());
         Signature elementSignature = elements.get(0).reference(data);
-        elementSignature.getType(0).applyNewArray(visitor, elementSignature);
+        elementSignature.getType(0).applyNewArray(builder, elementSignature);
         for (int i = 0; i < elements.size(); i++) {
-            visitor.visitInsn(DUP); // duplicate reference for all elements.
-            CompilerUtil.pushInt(i, visitor); // push index
-            elements.get(i).applyReferential(visitor, data); // apply value
-            visitor.visitInsn(elementSignature.getType(0).arrayStoreInsn());
+            builder.dup(); // duplicate reference for all elements.
+            builder.pushInt(i); // push index
+            elements.get(i).applyReferential(builder, data); // apply value
+            builder.insn(elementSignature.getType(0).arrayStoreInsn());
         }
     }
 

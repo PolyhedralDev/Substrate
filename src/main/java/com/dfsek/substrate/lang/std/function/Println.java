@@ -1,9 +1,9 @@
 package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.api.Function;
-import org.objectweb.asm.MethodVisitor;
 
 public class Println implements Function {
     @Override
@@ -12,20 +12,13 @@ public class Println implements Function {
     }
 
     @Override
-    public void prepare(MethodVisitor visitor) {
-        visitor.visitFieldInsn(GETSTATIC,
-                "java/lang/System",
-                "out",
-                "Ljava/io/PrintStream;");
+    public void prepare(MethodBuilder visitor) {
+        visitor.getStatic("java/lang/System", "out", "Ljava/io/PrintStream;");
     }
 
     @Override
-    public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
-        visitor.visitMethodInsn(INVOKEVIRTUAL,
-                "java/io/PrintStream",
-                "println",
-                "(Ljava/lang/String;)V",
-                false);
+    public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+        visitor.invokeVirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
     }
 
     @Override

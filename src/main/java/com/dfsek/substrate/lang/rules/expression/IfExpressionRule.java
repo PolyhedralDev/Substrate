@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.rules.expression;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.*;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
@@ -13,7 +14,6 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.Collections;
 
@@ -54,7 +54,7 @@ public class IfExpressionRule implements Rule {
                 }
 
                 @Override
-                public void apply(MethodVisitor visitor, BuildData buildData) throws ParseException {
+                public void apply(MethodBuilder builder, BuildData buildData) throws ParseException {
 
                 }
 

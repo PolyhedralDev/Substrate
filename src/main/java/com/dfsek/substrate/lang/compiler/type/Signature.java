@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.compiler.type;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.Opcodes;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

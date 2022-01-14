@@ -3,6 +3,8 @@ package com.dfsek.substrate.lang.compiler.build;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.codegen.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.codegen.TupleFactory;
+import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.Lazy;
@@ -25,7 +27,7 @@ public class BuildData {
 
     private final BuildData parent;
     private final DynamicClassLoader classLoader;
-    private final ClassWriter classWriter;
+    private final ClassBuilder classWriter;
     private final ValueInterceptor interceptor;
 
     private final Lazy<String> name;
@@ -33,7 +35,7 @@ public class BuildData {
 
     private final int implArgsOffset;
 
-    public BuildData(DynamicClassLoader classLoader, ClassWriter classWriter, String name) {
+    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, String name) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
@@ -50,7 +52,7 @@ public class BuildData {
     }
 
     private BuildData(DynamicClassLoader classLoader,
-                      ClassWriter classWriter,
+                      ClassBuilder classWriter,
                       TupleFactory tupleFactory,
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
@@ -72,7 +74,7 @@ public class BuildData {
         this.implArgsOffset = implArgsOffset;
     }
 
-    public ClassWriter getClassWriter() {
+    public ClassBuilder getClassWriter() {
         return classWriter;
     }
 
@@ -169,8 +171,8 @@ public class BuildData {
                 ignore -> name.get(), offset, implArgsOffset);
     }
 
-    public void loadImplementationArguments(MethodVisitor visitor) {
-        visitor.visitVarInsn(Opcodes.ALOAD, implArgsOffset);
+    public void loadImplementationArguments(MethodBuilder visitor) {
+        visitor.aLoad(implArgsOffset);
     }
 
     public BuildData detach(ValueInterceptor interceptor, Function<BuildData, String> name, int args) {

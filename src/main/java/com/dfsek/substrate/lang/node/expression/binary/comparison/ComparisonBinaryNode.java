@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression.binary.comparison;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.BinaryOperationNode;
@@ -8,7 +9,6 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 
 public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     public ComparisonBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
@@ -16,7 +16,7 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     }
 
     @Override
-    public void applyOp(MethodVisitor visitor, BuildData data) {
+    public void applyOp(MethodBuilder visitor, BuildData data) {
         Signature leftType = ParserUtil.checkType(left, data, Signature.integer(), Signature.decimal(), Signature.string())
                 .reference(data).getSimpleReturn();
         Signature rightType = ParserUtil.checkType(right, data, Signature.integer(), Signature.decimal(), Signature.string())
@@ -27,24 +27,24 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
         if (leftType.equals(Signature.integer())) {
             Label f = new Label();
             Label t = new Label();
-            visitor.visitJumpInsn(intInsn(), f);
-            visitor.visitInsn(ICONST_1);
-            visitor.visitJumpInsn(GOTO, t);
-            visitor.visitLabel(f);
-            visitor.visitInsn(ICONST_0);
-            visitor.visitLabel(t);
+            visitor.jump(intInsn(), f)
+                    .pushTrue()
+                    .goTo(t)
+                    .label(f)
+                    .pushFalse()
+                    .label(t);
         } else if (leftType.equals(Signature.decimal())) {
             Label f = new Label();
             Label t = new Label();
-            visitor.visitInsn(DCMPL);
-            visitor.visitJumpInsn(doubleInsn(), f);
-            visitor.visitInsn(ICONST_1);
-            visitor.visitJumpInsn(GOTO, t);
-            visitor.visitLabel(f);
-            visitor.visitInsn(ICONST_0);
-            visitor.visitLabel(t);
+            visitor.dcmpl()
+                    .jump(doubleInsn(), f)
+                    .pushTrue()
+                    .goTo(t)
+                    .label(f)
+                    .pushFalse()
+                    .label(t);
         } else if (leftType.equals(Signature.string())) {
-            if(string()) {
+            if (string()) {
                 applyStrComparison(visitor);
             } else {
                 throw new ParseException("Cannot apply operation " + op.getType() + " to type STR", op.getPosition());
@@ -60,7 +60,7 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
 
     protected abstract int doubleInsn();
 
-    protected void applyStrComparison(MethodVisitor visitor) {
+    protected void applyStrComparison(MethodBuilder visitor) {
         throw new UnsupportedOperationException();
     }
 

@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.*;
@@ -39,7 +40,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         List<Pair<Signature, String>> internalParameters = new ArrayList<>();
 
         BuildData delegate = data.detach((id, buildData) -> {
@@ -57,8 +58,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         });
 
 
-        content.apply(new MethodVisitor(Opcodes.ASM5) {
-        }, delegate); // dummy for creating values to pass.
+        content.apply(new MethodBuilder(null, "app", "()V", null, new String[0]), delegate); // TODO: this is really bad and should be changed to append as we go
 
         Signature merged = Signature.empty();
 
@@ -74,25 +74,25 @@ public class LambdaExpressionNode extends ExpressionNode {
             delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
         }
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method, clazz) -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method) -> {
             content.apply(method, delegate);
-            method.visitInsn(RETURN);
+            method.voidReturn();
         });
 
-        visitor.visitTypeInsn(NEW, CompilerUtil.internalName(lambda));
-        visitor.visitInsn(DUP);
+        builder.newInsn(CompilerUtil.internalName(lambda))
+        .dup();
 
         for (Pair<Signature, String> pair : internalParameters) {
             String internalParameter = pair.getRight();
             Value internal = data.getValue(internalParameter);
-            visitor.visitVarInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
+            builder.varInsn(internal.reference().getType(0).loadInsn(), data.offset(internalParameter));
         }
 
-        visitor.visitMethodInsn(INVOKESPECIAL,
+        builder.invokeSpecial(
                 CompilerUtil.internalName(lambda),
                 "<init>",
-                "(" + merged.internalDescriptor() + ")V",
-                false);
+                "(" + merged.internalDescriptor() + ")V"
+                );
     }
 
     public Signature getParameters() {

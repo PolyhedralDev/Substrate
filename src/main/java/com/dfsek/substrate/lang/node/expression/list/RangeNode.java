@@ -1,12 +1,12 @@
 package com.dfsek.substrate.lang.node.expression.list;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 
 public class RangeNode extends ExpressionNode {
     private final ExpressionNode lower;
@@ -21,53 +21,50 @@ public class RangeNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        upper.apply(visitor, data);
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+        upper.apply(builder, data);
 
-        lower.apply(visitor, data);
-        visitor.visitInsn(DUP);
+        lower.apply(builder, data);
+        builder.dup();
 
         int lowerRef = data.getOffset();
         data.offsetInc(1);
-        visitor.visitVarInsn(ISTORE, lowerRef);
-
-        visitor.visitInsn(ISUB);
-
-        visitor.visitInsn(DUP);
+        builder.iStore(lowerRef)
+                .iSub()
+                .dup();
         int totalRef = data.getOffset();
         data.offsetInc(1);
-        visitor.visitVarInsn(ISTORE, totalRef);
 
+        builder.iStore(totalRef);
 
-        visitor.visitIntInsn(NEWARRAY, T_INT); // [ARef]
-
-        visitor.visitInsn(ICONST_0); // [ARef, i]
+        builder.newArray(T_INT) // [ARef]
+                .pushInt(0); // [ARef, i]
 
         Label start = new Label();
         Label end = new Label();
 
-        visitor.visitLabel(start);
+        builder.label(start)
 
-        visitor.visitInsn(DUP); // [ARef, i, i]
-        visitor.visitVarInsn(ILOAD, totalRef);
-        visitor.visitJumpInsn(IF_ICMPGE, end); // [ARef, i]
+                .dup() // [ARef, i, i]
+                .iLoad(totalRef)
+                .ifICmpGE(end) // [ARef, i]
 
-        visitor.visitInsn(DUP2); // [ARef, i, ARef, i]
-        visitor.visitInsn(DUP); // [ARef, i, ARef, i, i]
+                .dup2() // [ARef, i, ARef, i]
+                .dup() // [ARef, i, ARef, i, i]
 
-        visitor.visitVarInsn(ILOAD, lowerRef); // [ARef, i, ARef, i, i, size]
-        visitor.visitInsn(IADD); // [ARef, i, ARef, i, n]
+                .iLoad(lowerRef) // [ARef, i, ARef, i, i, size]
+                .iAdd() // [ARef, i, ARef, i, n]
 
-        visitor.visitInsn(IASTORE); // [ARef, i]
+                .iastore() // [ARef, i]
 
-        visitor.visitInsn(ICONST_1); // [ARef, i, 1]
-        visitor.visitInsn(IADD); // [ARef, i]
+                .pushInt(1) // [ARef, i, 1]
+                .iAdd() // [ARef, i]
 
 
-        visitor.visitJumpInsn(GOTO, start);
+                .goTo(start)
 
-        visitor.visitLabel(end);
-        visitor.visitInsn(POP); // [ARef]
+                .label(end)
+                .pop(); // [ARef]
     }
 
     @Override

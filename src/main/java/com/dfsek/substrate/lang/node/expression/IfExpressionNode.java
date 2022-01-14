@@ -1,12 +1,12 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 
 public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode predicate;
@@ -20,25 +20,24 @@ public class IfExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkType(predicate, data, Signature.bool());
         ParserUtil.checkType(caseTrue, data, caseFalse.reference(data).getSimpleReturn());
 
         Label equal = new Label();
         Label end = new Label();
-        predicate.apply(visitor, data);
+        predicate.apply(builder, data);
 
-        visitor.visitJumpInsn(IFEQ, equal);
+        builder.ifEQ(equal);
 
-        caseTrue.apply(visitor, data);
+        caseTrue.apply(builder, data);
 
-        visitor.visitJumpInsn(GOTO, end);
+        builder.goTo(end)
+                .label(equal);
 
-        visitor.visitLabel(equal);
+        caseFalse.apply(builder, data);
 
-        caseFalse.apply(visitor, data);
-
-        visitor.visitLabel(end);
+        builder.label(end);
     }
 
     @Override

@@ -1,4 +1,5 @@
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
@@ -9,7 +10,6 @@ import com.dfsek.substrate.tokenizer.exceptions.TokenizerException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
-import org.objectweb.asm.MethodVisitor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,12 +35,11 @@ public class SubstrateTests {
             }
 
             @Override
-            public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
-                visitor.visitMethodInsn(INVOKESTATIC,
+            public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+                visitor.invokeStatic(
                         CompilerUtil.internalName(Assertions.class),
                         "fail",
-                        "()V",
-                        false);
+                        "()V");
             }
 
             @Override
@@ -55,12 +54,11 @@ public class SubstrateTests {
             }
 
             @Override
-            public void invoke(MethodVisitor visitor, BuildData data, Signature args) {
-                visitor.visitMethodInsn(INVOKESTATIC,
+            public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+                visitor.invokeStatic(
                         CompilerUtil.internalName(Assertions.class),
                         "assertTrue",
-                        "(Z)V",
-                        false);
+                        "(Z)V");
             }
 
             @Override
@@ -142,9 +140,9 @@ public class SubstrateTests {
         try {
             Files.walk(parent, 1)
                     .forEach(path -> {
-                        if(path.equals(parent)) return;
+                        if (path.equals(parent)) return;
                         String testName = parent.relativize(path).toString();
-                        if(path.toFile().isDirectory()) {
+                        if (path.toFile().isDirectory()) {
                             nodes.add(register(testName, parent.resolve(testName), executable));
                         } else {
                             nodes.add(DynamicTest.dynamicTest(testName, executable.apply(path)));

@@ -2,12 +2,12 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
 
@@ -23,17 +23,17 @@ public class MacroNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         Signature argSignature = CompilerUtil.expandArguments(data, args);
         if(!macro.argsMatch(argSignature)) {
             throw new ParseException("Macro expects " + macro.arguments() + ", got " + argSignature, position);
         }
 
-        macro.prepare(visitor);
+        macro.prepare(builder);
 
-        args.forEach(arg -> arg.apply(visitor, data));
+        args.forEach(arg -> arg.apply(builder, data));
 
-        macro.invoke(visitor, data, argSignature);
+        macro.invoke(builder, data, argSignature);
     }
 
     @Override

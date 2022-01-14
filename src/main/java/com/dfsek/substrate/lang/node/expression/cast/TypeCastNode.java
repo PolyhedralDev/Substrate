@@ -1,11 +1,11 @@
 package com.dfsek.substrate.lang.node.expression.cast;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
-import org.objectweb.asm.MethodVisitor;
 
 public abstract class TypeCastNode extends ExpressionNode {
     protected final Token type;
@@ -17,12 +17,12 @@ public abstract class TypeCastNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
-        value.apply(visitor, data);
-        applyCast(visitor, data);
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+        value.apply(builder, data);
+        applyCast(builder, data);
     }
 
-    public abstract void applyCast(MethodVisitor visitor, BuildData data);
+    public abstract void applyCast(MethodBuilder visitor, BuildData data);
 
 
     @Override

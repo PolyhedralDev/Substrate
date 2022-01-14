@@ -1,12 +1,12 @@
 package com.dfsek.substrate.lang.node.expression.list;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import org.objectweb.asm.MethodVisitor;
 
 public class ListIndexNode extends ExpressionNode {
     private final ExpressionNode listReference;
@@ -18,19 +18,19 @@ public class ListIndexNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkWeakReferenceType(listReference, data, Signature.list())
-                .apply(visitor, data);
+                .apply(builder, data);
 
         ParserUtil.checkType(index, data, Signature.integer())
-                .apply(visitor, data);
+                .apply(builder, data);
 
         Signature ref = reference(data);
 
         if(ref.isSimple()) {
-            visitor.visitInsn(ref.getType(0).arrayLoadInsn());
+            builder.insn(ref.getType(0).arrayLoadInsn());
         } else {
-            visitor.visitInsn(AALOAD);
+            builder.aaload();
         }
     }
 

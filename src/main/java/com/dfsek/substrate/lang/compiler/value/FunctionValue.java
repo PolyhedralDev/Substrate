@@ -2,9 +2,9 @@ package com.dfsek.substrate.lang.compiler.value;
 
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import org.objectweb.asm.MethodVisitor;
 
 public class FunctionValue implements Value {
     private final Function function;
@@ -27,9 +27,8 @@ public class FunctionValue implements Value {
     }
 
     @Override
-    public void load(MethodVisitor visitor, BuildData data) {
-        visitor.visitFieldInsn(GETSTATIC,
-                implementationClassName,
+    public void load(MethodBuilder visitor, BuildData data) {
+        visitor.getStatic(implementationClassName,
                 "fun" + finalI,
                 "L" + CompilerUtil.internalName(delegate) + ";");
     }

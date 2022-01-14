@@ -2,6 +2,8 @@ package com.dfsek.substrate.lang.compiler.codegen;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -61,58 +64,42 @@ public class LambdaFactory {
 
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
-        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get()-1);
+        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
     }
 
-    public void invoke(Signature args, Signature ret, BuildData data, MethodVisitor visitor) {
+    public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
         data.loadImplementationArguments(visitor);
-        visitor.visitMethodInsn(INVOKEINTERFACE,
-                CompilerUtil.internalName(generate(args, ret)),
+        visitor.invokeInterface(                CompilerUtil.internalName(generate(args, ret)),
                 "apply",
-                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret),
-                true);
+                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret));
     }
 
-    public Class<?> implement(Signature args, Signature returnType, Signature scope, BiConsumer<MethodVisitor, ClassWriter> consumer) {
+    public Class<?> implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
         generate(args, returnType);
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
         String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
-        ClassWriter writer = CompilerUtil.generateClass(name, false, false, CompilerUtil.internalName(pair.getLeft()));
+        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(pair.getLeft()));
 
-        MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
-                "<init>", // Constructor method name is <init>
-                "(" + scope.internalDescriptor() + ")V",
-                null,
-                null);
+        MethodBuilder constructor = builder.method("<init>",
+                        "(" + scope.internalDescriptor() + ")V")
+                .access(MethodBuilder.Access.PUBLIC);
 
-        constructor.visitCode();
-        constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
-        constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
-                "java/lang/Object",
-                "<init>",
-                "()V",
-                false);
+
+        constructor.aLoad(0)
+                .invokeSpecial("java/lang/Object", "<init>", "()V");
 
         for (int i = 0; i < scope.size(); i++) {
-            writer.visitField(ACC_PRIVATE | ACC_FINAL,
-                    "scope" + i,
-                    scope.getType(i).descriptor(),
-                    null,
-                    null);
-            constructor.visitVarInsn(ALOAD, 0);
-            constructor.visitVarInsn(scope.getType(i).loadInsn(), i + 1);
-            constructor.visitFieldInsn(PUTFIELD,
-                    name,
-                    "scope" + i,
-                    scope.getType(i).descriptor());
+            builder.field("scope" + i, scope.getType(i).descriptor(), MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL);
+
+            constructor.aLoad(0)
+                    .varInsn(scope.getType(i).loadInsn(), i + 1)
+                    .putField(name, "scope" + i, scope.getType(i).descriptor());
         }
 
-        constructor.visitInsn(RETURN); // Void return
-        constructor.visitMaxs(0, 0);
-
+        constructor.voidReturn(); // Void return
 
         String ret = returnType.internalDescriptor();
 
@@ -121,20 +108,8 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        MethodVisitor apply = writer.visitMethod(ACC_PUBLIC,
-                "apply",
-                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret,
-                null,
-                null);
+        consumer.accept(builder.method("apply", "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret).access(MethodBuilder.Access.PUBLIC));
 
-        consumer.accept(apply, writer);
-        apply.visitMaxs(0, 0);
-
-
-        byte[] bytes = writer.toByteArray();
-
-        Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
-        CompilerUtil.dump(clazz, bytes);
-        return clazz;
+        return builder.build();
     }
 }

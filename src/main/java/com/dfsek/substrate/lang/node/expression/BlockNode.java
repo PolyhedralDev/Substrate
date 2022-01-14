@@ -2,11 +2,11 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import org.objectweb.asm.MethodVisitor;
 
 import java.util.List;
 
@@ -23,9 +23,9 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         BuildData scope = data.sub();
-        contents.forEach(node -> node.apply(visitor, scope));
+        contents.forEach(node -> node.apply(builder, scope));
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -45,86 +47,65 @@ public class ScriptBuilder {
 
         String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
 
-        ClassWriter writer = CompilerUtil.generateClass(implementationClassName, false, true, INTERFACE_CLASS_NAME);
+        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), INTERFACE_CLASS_NAME).defaultConstructor();
 
-
-        BuildData data = new BuildData(classLoader, writer, implementationClassName);
+        BuildData data = new BuildData(classLoader, builder, implementationClassName);
 
         // prepare functions.
 
-        MethodVisitor clinit = writer.visitMethod(ACC_PUBLIC | ACC_STATIC,
-                "<clinit>",
-                "()V",
-                null,
-                null);
-        clinit.visitCode();
+        MethodBuilder staticInitializer = builder.method("<clinit>", "()V")
+                .access(MethodBuilder.Access.PUBLIC)
+                .access(MethodBuilder.Access.STATIC);
+
+
         for (int i = 0; i < functions.size(); i++) {
             Function function = functions.get(i).getRight();
 
-            BuildData separate = data.detach((id, d) -> {},
+            BuildData separate = data.detach((id, d) -> {
+                    },
                     d -> data.lambdaFactory().name(function.arguments(), function.reference(d).getSimpleReturn()), function.arguments().frames());
             Signature ref = function.reference(separate);
 
 
-            Class<?> delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method, clazz) -> {
+            Class<?> delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
                 function.prepare(method);
                 Signature args = function.arguments();
                 int frame = 1;
                 for (int arg = 0; arg < args.size(); arg++) {
-                    method.visitVarInsn(args.getType(arg).loadInsn(), frame);
+                    method.varInsn(args.getType(arg).loadInsn(), frame);
                     frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
                 }
                 function.invoke(method, separate, args);
-                method.visitInsn(RETURN);
+                method.voidReturn();
             });
 
-            writer.visitField(ACC_PUBLIC | ACC_FINAL | ACC_STATIC,
-                    "fun" + i,
+            builder.field("fun" + i,
                     "L" + CompilerUtil.internalName(delegate) + ";",
-                    null,
-                    null);
-            clinit.visitTypeInsn(NEW, CompilerUtil.internalName(delegate));
-            clinit.visitInsn(DUP);
-            clinit.visitMethodInsn(INVOKESPECIAL,
-                    CompilerUtil.internalName(delegate),
-                    "<init>",
-                    "()V",
-                    false);
-            clinit.visitFieldInsn(PUTSTATIC,
-                    implementationClassName,
-                    "fun" + i,
-                    "L" + CompilerUtil.internalName(delegate) + ";");
+                    MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
+
+            builder.field("fun" + i, "L" + CompilerUtil.internalName(delegate) + ";", MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL, MethodBuilder.Access.STATIC);
+
+            staticInitializer.newInsn(CompilerUtil.internalName(delegate))
+                    .dup()
+                    .invokeSpecial(CompilerUtil.internalName(delegate), "<init>", "()V")
+                    .putStatic(implementationClassName, "fun" + i, "L" + CompilerUtil.internalName(delegate) + ";");
 
             int finalI = i;
             data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, finalI, delegate));
         }
-        clinit.visitInsn(RETURN);
-        clinit.visitMaxs(0, 0); // bogus
-        clinit.visitEnd();
+
+        staticInitializer.voidReturn();
 
 
-        MethodVisitor absMethod = writer.visitMethod(ACC_PUBLIC,
-                "execute", // Method name
-                "(L" + IMPL_ARG_CLASS_NAME + ";)V", // Method descriptor (no args, return double)
-                null,
-                null);
-        absMethod.visitCode();
+        MethodBuilder absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V").access(MethodBuilder.Access.PUBLIC);
 
         macros.forEach(data::registerMacro);
 
         ops.forEach(op -> op.apply(absMethod, data));
 
-        absMethod.visitInsn(RETURN);
 
-        absMethod.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
+        Class<?> clazz = builder.build();
 
-        absMethod.visitEnd();
-
-        byte[] bytes = writer.toByteArray();
-
-        Class<?> clazz = classLoader.defineClass(implementationClassName.replace('/', '.'), bytes);
-
-        CompilerUtil.dump(clazz, bytes);
         builds++;
         try {
             Object instance = clazz.getDeclaredConstructor().newInstance();

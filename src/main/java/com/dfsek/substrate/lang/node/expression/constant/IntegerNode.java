@@ -1,11 +1,11 @@
 package com.dfsek.substrate.lang.node.expression.constant;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
-import org.objectweb.asm.MethodVisitor;
 
 public class IntegerNode extends ConstantExpressionNode {
     public IntegerNode(Token token) {
@@ -13,9 +13,9 @@ public class IntegerNode extends ConstantExpressionNode {
     }
 
     @Override
-    public void apply(MethodVisitor visitor, BuildData data) throws ParseException {
+    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         int i = Integer.parseInt(token.getContent());
-        CompilerUtil.pushInt(i, visitor);
+        builder.pushInt(i);
     }
 
     @Override
