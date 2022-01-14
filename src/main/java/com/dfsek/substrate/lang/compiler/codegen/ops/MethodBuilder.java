@@ -11,30 +11,21 @@ import java.util.function.BiConsumer;
 
 @SuppressWarnings("UnusedReturnValue")
 public class MethodBuilder implements Opcodes {
-    private AtomicInteger localVariableIndex = new AtomicInteger(0);
 
     private final List<OpCode> opCodes = new ArrayList<>();
     private final List<Access> access = new ArrayList<>();
 
-    private final Map<String, LocalVariable> localVariableMap = new HashMap<>();
     private final ClassBuilder classBuilder;
 
     private final String name, descriptor, signature;
     private final String[] exceptions;
-    private final BiConsumer<LocalVariable, MethodBuilder> delegateLoader;
 
-    private final AtomicInteger maxLocals = new AtomicInteger(0), maxStack = new AtomicInteger(0);
-    private final Deque<Signature> locals = new ArrayDeque<>();
-
-
-
-    public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions, BiConsumer<LocalVariable, MethodBuilder> delegateLoader) {
+    public MethodBuilder(ClassBuilder classBuilder, String name, String descriptor, String signature, String[] descriptions) {
         this.classBuilder = classBuilder;
         this.name = name;
         this.descriptor = descriptor;
         this.signature = signature;
         this.exceptions = descriptions;
-        this.delegateLoader = delegateLoader;
     }
 
     public MethodBuilder access(Access access) {
@@ -130,37 +121,6 @@ public class MethodBuilder implements Opcodes {
 
     public MethodBuilder aNewArray(String type) {
         return typeInsn(ANEWARRAY, type);
-    }
-
-    public LocalVariable createLocalVariable(String name, Signature type) {
-        if (localVariableMap.containsKey(name)) {
-            throw new IllegalArgumentException("Duplicate Local Variable name: " + name);
-        }
-        int width = type.frames();
-        LocalVariable variable = new LocalVariable(this, type, width, localVariableIndex.addAndGet(width), name);
-        localVariableMap.put(name, variable);
-        return variable;
-    }
-
-    public MethodBuilder storeLocalVariable(LocalVariable variable) {
-        return varInsn(variable.getType().getType(0).storeInsn(), variable.getOffset());
-    }
-
-    public boolean hasLocalVariable(String variable) {
-        return localVariableMap.containsKey(variable);
-    }
-
-    public Optional<LocalVariable> getLocalVariable(String name) {
-        return Optional.ofNullable(localVariableMap.get(name));
-    }
-
-    public MethodBuilder loadLocal(LocalVariable variable) {
-        if(variable.getParent() == this) {
-            varInsn(variable.getType().getType(0).loadInsn(), variable.getOffset());
-        } else {
-            delegateLoader.accept(variable, this);
-        }
-        return this;
     }
 
     public MethodBuilder label(Label label) {
@@ -526,7 +486,7 @@ public class MethodBuilder implements Opcodes {
         }
     }
 
-    private class ReturnOpCode implements OpCode {
+    private static class ReturnOpCode implements OpCode {
         private final int opCode;
 
         private ReturnOpCode(int opCode) {
