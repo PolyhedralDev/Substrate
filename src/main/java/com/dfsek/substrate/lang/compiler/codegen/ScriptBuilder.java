@@ -60,9 +60,7 @@ public class ScriptBuilder {
         for (int i = 0; i < functions.size(); i++) {
             Function function = functions.get(i).getRight();
 
-            BuildData separate = data.detach((id, d) -> {
-                    },
-                    d -> data.lambdaFactory().name(function.arguments(), function.reference(d).getSimpleReturn()), function.arguments().frames());
+            BuildData separate = data.sub();
             Signature ref = function.reference(separate);
 
 

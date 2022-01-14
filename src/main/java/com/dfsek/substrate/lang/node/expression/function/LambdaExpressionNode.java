@@ -7,16 +7,15 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.*;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
@@ -45,15 +44,28 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         List<Pair<Signature, String>> closureValues = new ArrayList<>();
-
-
+        Set<String> closureIDs = new HashSet<>();
 
         BuildData delegate = data.sub();
 
-        types.forEach(pair -> {
-            Signature signature = pair.getRight();
-            delegate.registerValue(pair.getLeft(), new PrimitiveValue(signature, delegate.getOffset()), signature.frames());
-        });
+        Set<String> paramIDs = types.stream().map(Pair::getLeft).collect(Collectors.toSet());
+
+        content
+                .streamContents()
+                .filter(node -> node instanceof ValueReferenceNode)
+                .map(node -> ((ValueReferenceNode) node).getId().getContent())
+                .forEach(id -> {
+                    if(!closureIDs.contains(id) && !paramIDs.contains(id)) {
+                        closureValues.add(Pair.of(reference(delegate).getSimpleReturn(), id));
+                        closureIDs.add(id);
+                    }
+                });
+
+        int param = 1;
+        for (Pair<String, Signature> type : types) {
+            Signature signature = type.getRight();
+            delegate.registerValue(type.getLeft(), new PrimitiveValue(signature, param++), signature.frames());
+        }
 
 
         Signature merged = Signature.empty();
@@ -63,8 +75,10 @@ public class LambdaExpressionNode extends ExpressionNode {
             Pair<Signature, String> pair = closureValues.get(i);
             merged = merged.and(pair.getLeft());
 
-            System.out.println("attempt:" + self + "," + pair.getRight());
-            delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
+            if(!paramIDs.contains(pair.getRight())) {
+                System.out.println("attempt:" + self + "," + pair.getRight() + "," + pair.getLeft());
+                delegate.registerUnchecked(pair.getRight(), new ShadowValue(pair.getLeft(), i));
+            }
         }
         if (self != null) {
             delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
@@ -102,13 +116,13 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public Signature reference(BuildData data) {
-        BuildData data1 = data.detach((id, buildData) -> {
-        }, d -> data.lambdaFactory().name(parameters, content.reference(d).expandTuple()), parameters.frames());
+        BuildData data1 = data.sub();
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
             data1.registerValue(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()), signature.frames());
         });
+
         return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
     }
 

@@ -55,4 +55,8 @@ public class ValueReferenceNode extends ExpressionNode {
         }
         return data.getValue(id.getContent()).reference();
     }
+
+    public Token getId() {
+        return id;
+    }
 }

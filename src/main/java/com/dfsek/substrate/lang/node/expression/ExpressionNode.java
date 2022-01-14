@@ -9,6 +9,8 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public abstract class ExpressionNode implements Node, Typed {
     public void applyReferential(MethodBuilder visitor, BuildData data) {
@@ -16,4 +18,16 @@ public abstract class ExpressionNode implements Node, Typed {
     }
 
     public abstract Collection<? extends Node> contents();
+
+    public Stream<? extends Node> streamContents() {
+        return streamContents(this);
+    }
+
+    private Stream<? extends Node> streamContents(Node start) {
+        if (start instanceof ExpressionNode) {
+            return ((ExpressionNode) start).contents().stream().flatMap(node -> Stream.concat(Stream.of(node), streamContents(node)));
+        } else {
+            return Stream.empty();
+        }
+    }
 }
