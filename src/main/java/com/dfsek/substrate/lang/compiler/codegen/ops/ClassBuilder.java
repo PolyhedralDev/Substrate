@@ -6,9 +6,11 @@ import org.objectweb.asm.ClassWriter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ClassBuilder {
     private final List<MethodBuilder> methods = new ArrayList<>();
+    private final List<Consumer<ClassWriter>> fields = new ArrayList<>();
     private final ClassWriter classWriter;
     private static final String[] EMPTY = new String[0];
     private final String name;
@@ -34,6 +36,18 @@ public class ClassBuilder {
         MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions);
         methods.add(builder);
         return builder;
+    }
+
+    public ClassBuilder field(String name, String descriptor, String signature, MethodBuilder.Access... accesses) {
+        int access = 0;
+
+        for (MethodBuilder.Access level : accesses) {
+            access |= level.getCode();
+        }
+
+        int finalAccess = access;
+        fields.add(classWriter1 -> classWriter1.visitField(finalAccess, name, descriptor, signature, null).visitEnd());
+        return this;
     }
 
     public Class<?> build() {
