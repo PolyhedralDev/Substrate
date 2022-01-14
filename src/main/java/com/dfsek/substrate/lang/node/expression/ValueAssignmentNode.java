@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -8,6 +9,9 @@ import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
@@ -65,5 +69,10 @@ public class ValueAssignmentNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         return value.reference(data);
+    }
+
+    @Override
+    public Collection<Node> contents() {
+        return Collections.singleton(value);
     }
 }

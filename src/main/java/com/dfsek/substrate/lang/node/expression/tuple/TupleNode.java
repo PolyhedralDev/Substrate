@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.tuple;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -8,6 +9,7 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
+import java.util.Collection;
 import java.util.List;
 
 public class TupleNode extends ExpressionNode {
@@ -45,5 +47,10 @@ public class TupleNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         return Signature.tup().applyGenericReturn(0, CompilerUtil.expandArguments(data, args));
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return args;
     }
 }

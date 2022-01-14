@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -13,6 +14,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class LambdaExpressionNode extends ExpressionNode {
@@ -43,14 +46,9 @@ public class LambdaExpressionNode extends ExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         List<Pair<Signature, String>> closureValues = new ArrayList<>();
 
-        BuildData delegate = data.detach((id, buildData) -> {
-            if (data.valueExists(id) && !(data.getValue(id) instanceof FunctionValue)) {
-                Signature sig = data.getValue(id).reference();
-                if (!closureValues.contains(Pair.of(sig, id)) && !id.equals(self)) {
-                    closureValues.add(Pair.of(sig, id));
-                }
-            }
-        }, d -> data.lambdaFactory().name(parameters, content.reference(d).expandTuple()), parameters.frames());
+
+
+        BuildData delegate = data.sub();
 
         types.forEach(pair -> {
             Signature signature = pair.getRight();
@@ -75,6 +73,8 @@ public class LambdaExpressionNode extends ExpressionNode {
         Class<?> lambda = data.lambdaFactory().implement(parameters, content.reference(delegate).expandTuple(), merged, (method) -> {
             content.apply(method, delegate);
             method.voidReturn();
+        }, (localVariable, method) -> {
+
         });
 
         builder.newInsn(CompilerUtil.internalName(lambda))
@@ -110,5 +110,10 @@ public class LambdaExpressionNode extends ExpressionNode {
             data1.registerValue(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()), signature.frames());
         });
         return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return Collections.singleton(content);
     }
 }

@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.list;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -9,6 +10,8 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class ListNode extends ExpressionNode {
@@ -44,5 +47,10 @@ public class ListNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         return Signature.list().applyGenericReturn(0, elements.get(0).reference(data));
+    }
+
+    @Override
+    public List<ExpressionNode> contents() {
+        return elements;
     }
 }

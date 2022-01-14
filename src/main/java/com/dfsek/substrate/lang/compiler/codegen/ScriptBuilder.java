@@ -76,6 +76,8 @@ public class ScriptBuilder {
                 }
                 function.invoke(method, separate, args);
                 method.voidReturn();
+            }, (a, b) -> {
+                throw new IllegalStateException();
             });
 
             builder.field("fun" + i,

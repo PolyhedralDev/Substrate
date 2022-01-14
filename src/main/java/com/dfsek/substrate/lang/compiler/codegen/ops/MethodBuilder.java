@@ -145,6 +145,14 @@ public class MethodBuilder implements Opcodes {
         return varInsn(variable.getType().getType(0).storeInsn(), variable.getOffset());
     }
 
+    public boolean hasLocalVariable(String variable) {
+        return localVariableMap.containsKey(variable);
+    }
+
+    public Optional<LocalVariable> getLocalVariable(String name) {
+        return Optional.ofNullable(localVariableMap.get(name));
+    }
+
     public MethodBuilder loadLocal(LocalVariable variable) {
         if(variable.getParent() == this) {
             varInsn(variable.getType().getType(0).loadInsn(), variable.getOffset());

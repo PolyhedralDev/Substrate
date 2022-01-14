@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -9,6 +10,8 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FunctionInvocationNode extends ExpressionNode {
@@ -50,5 +53,12 @@ public class FunctionInvocationNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         return function.reference(data).getSimpleReturn();
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        List<Node> nodes = new ArrayList<>(arguments);
+        nodes.add(function);
+        return nodes;
     }
 }

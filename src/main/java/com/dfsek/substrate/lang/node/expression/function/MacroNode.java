@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.function;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
@@ -9,6 +10,7 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
+import java.util.Collection;
 import java.util.List;
 
 public class MacroNode extends ExpressionNode {
@@ -44,5 +46,10 @@ public class MacroNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return position;
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return args;
     }
 }

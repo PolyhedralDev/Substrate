@@ -45,10 +45,14 @@ public class ClassBuilder {
         return method(name, descriptor, null);
     }
 
+    public MethodBuilder method(String name, String descriptor, BiConsumer<LocalVariable, MethodBuilder> delegateLoader) {
+        return method(name, descriptor, null, delegateLoader, EMPTY);
+    }
+
     public MethodBuilder method(String name, String descriptor, String signature, String... exceptions) {
-        MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions, (a, b) -> {});
-        methods.add(builder);
-        return builder;
+        return method(name, descriptor, signature,  (a, b) -> {
+            throw new IllegalStateException();
+        }, exceptions);
     }
 
     public MethodBuilder method(String name, String descriptor, String signature, BiConsumer<LocalVariable, MethodBuilder> delegateLoader, String... exceptions) {

@@ -1,10 +1,14 @@
 package com.dfsek.substrate.lang.node.expression;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class ReturnNode extends ExpressionNode {
     private final Position position;
@@ -35,5 +39,10 @@ public class ReturnNode extends ExpressionNode {
     public Signature reference(BuildData data) {
         if (value == null) return Signature.empty();
         return value.reference(data);
+    }
+
+    @Override
+    public Collection<Node> contents() {
+        return Collections.singleton(value);
     }
 }

@@ -74,10 +74,6 @@ public class BuildData {
         this.implArgsOffset = implArgsOffset;
     }
 
-    public ClassBuilder getClassWriter() {
-        return classWriter;
-    }
-
     public LambdaFactory lambdaFactory() {
         return lambdaFactory;
     }
@@ -154,11 +150,6 @@ public class BuildData {
         return values.containsKey(id) || macros.containsKey(id);
     }
 
-    public boolean valueExistsParent(String id) {
-        if(parent == null) return false;
-        return parent.valueExists(id);
-    }
-
     public BuildData sub() {
         return new BuildData(classLoader,
                 classWriter,
@@ -173,18 +164,5 @@ public class BuildData {
 
     public void loadImplementationArguments(MethodBuilder visitor) {
         visitor.aLoad(implArgsOffset);
-    }
-
-    public BuildData detach(ValueInterceptor interceptor, Function<BuildData, String> name, int args) {
-        return new BuildData(classLoader,
-                classWriter,
-                tupleFactory,
-                lambdaFactory,
-                new HashMap<>(values), // new scope
-                macros, new HashMap<>(), // *and* different JVM scope
-                this,
-                interceptor,
-                name,
-                1, args + 1);
     }
 }

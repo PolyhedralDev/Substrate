@@ -8,6 +8,7 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
+import java.util.Collection;
 import java.util.List;
 
 public class BlockNode extends ExpressionNode {
@@ -39,5 +40,10 @@ public class BlockNode extends ExpressionNode {
         Signature test = returnType.get(0).reference(data);
         returnType.forEach(type -> ParserUtil.checkReferenceType(type, data, test));
         return test;
+    }
+
+    @Override
+    public Collection<Node> contents() {
+        return contents;
     }
 }

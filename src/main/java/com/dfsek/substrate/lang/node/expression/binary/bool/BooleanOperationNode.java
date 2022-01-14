@@ -1,10 +1,14 @@
 package com.dfsek.substrate.lang.node.expression.binary.bool;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public abstract class BooleanOperationNode extends ExpressionNode {
     protected ExpressionNode left;
@@ -25,5 +29,10 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return op.getPosition();
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return Arrays.asList(left, right);
     }
 }

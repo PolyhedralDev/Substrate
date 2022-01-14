@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -7,6 +8,9 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.Label;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode predicate;
@@ -48,5 +52,10 @@ public class IfExpressionNode extends ExpressionNode {
     @Override
     public Signature reference(BuildData data) {
         return caseTrue.reference(data).getSimpleReturn();
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return Arrays.asList(predicate, caseFalse, caseTrue);
     }
 }

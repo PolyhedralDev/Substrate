@@ -1,11 +1,15 @@
 package com.dfsek.substrate.lang.node.expression.cast;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public abstract class TypeCastNode extends ExpressionNode {
     protected final Token type;
@@ -28,5 +32,10 @@ public abstract class TypeCastNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return type.getPosition();
+    }
+
+    @Override
+    public Collection<? extends Node> contents() {
+        return Collections.singleton(value);
     }
 }
