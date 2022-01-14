@@ -84,7 +84,7 @@ public class ClassBuilder {
         fields.forEach(consumer -> consumer.accept(classWriter));
         DynamicClassLoader dynamicClassLoader = new DynamicClassLoader();
         byte[] bytes = classWriter.toByteArray();
-        Class<?> clazz = dynamicClassLoader.defineClass(name, bytes);
+        Class<?> clazz = dynamicClassLoader.defineClass(name.replace('/', '.'), bytes);
         CompilerUtil.dump(clazz, bytes);
         return clazz;
     }
