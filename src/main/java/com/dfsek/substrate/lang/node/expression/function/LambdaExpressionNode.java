@@ -119,6 +119,8 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .dup();
 
         for (Pair<String, Function<BuildData, Signature>> pair : closureTypes) {
+            System.out.println("Loading closure type..." + pair.getLeft());
+            if(pair.getLeft().equals(self)) continue; // dont load self into closure.
             data.getValue(pair.getLeft()).load(builder, data);
         }
 
