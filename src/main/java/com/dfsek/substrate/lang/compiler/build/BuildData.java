@@ -74,6 +74,10 @@ public class BuildData {
         this.implArgsOffset = implArgsOffset;
     }
 
+    public Map<String, Value> getValues() {
+        return values;
+    }
+
     public LambdaFactory lambdaFactory() {
         return lambdaFactory;
     }

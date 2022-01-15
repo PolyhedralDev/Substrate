@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.util.Lazy;
 
 import java.util.Collection;
@@ -15,8 +16,23 @@ public abstract class NodeHolder implements Node {
         return streamContents(this);
     }
 
+    public Stream<? extends Node> streamScopedContents() {
+        return streamScopedContents(this);
+    }
+
     private Stream<? extends Node> streamContents(Node start) {
         if (start instanceof NodeHolder) {
+            return ((NodeHolder) start)
+                    .cachedContents.get()
+                    .stream()
+                    .flatMap(node -> Stream.concat(Stream.of(node), streamContents(node)));
+        } else {
+            return Stream.empty();
+        }
+    }
+
+    private Stream<? extends Node> streamScopedContents(Node start) {
+        if (start instanceof NodeHolder && !(start instanceof LambdaExpressionNode)) {
             return ((NodeHolder) start)
                     .cachedContents.get()
                     .stream()

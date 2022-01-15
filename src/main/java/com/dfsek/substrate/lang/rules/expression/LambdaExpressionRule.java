@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -13,7 +14,9 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 import com.dfsek.substrate.util.pair.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class LambdaExpressionRule implements Rule {
     private static final LambdaExpressionRule INSTANCE = new LambdaExpressionRule();
@@ -27,11 +30,13 @@ public class LambdaExpressionRule implements Rule {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
+        Set<String> args = new HashSet<>();
 
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
             Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
             types.add(Pair.of(id.getContent(), ParserUtil.parseSignatureNotation(tokenizer)));
+            args.add(id.getContent());
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume();
             }
@@ -47,6 +52,10 @@ public class LambdaExpressionRule implements Rule {
             expression = ExpressionRule.getInstance().assemble(tokenizer, data);
         }
 
+        expression.streamScopedContents()
+                .filter(node -> node instanceof ValueReferenceNode)
+                .filter(node -> args.contains(((ValueReferenceNode) node).getId().getContent()))
+                .forEach(node -> ((ValueReferenceNode) node).setLambdaArgument(true));
 
         return new LambdaExpressionNode(expression, types, begin.getPosition());
     }

@@ -15,6 +15,16 @@ import java.util.Collections;
 public class ValueReferenceNode extends ExpressionNode {
     private final Token id;
 
+    private boolean isLambdaArgument = false;
+
+    public void setLambdaArgument(boolean lambdaArgument) {
+        isLambdaArgument = lambdaArgument;
+    }
+
+    public boolean isLambdaArgument() {
+        return isLambdaArgument;
+    }
+
     public ValueReferenceNode(Token id) {
         this.id = id;
     }

@@ -46,6 +46,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
+                .filter(node -> !((ValueReferenceNode) node).isLambdaArgument())
                 .map(node -> (ValueReferenceNode) node)
                 .forEach(valueReferenceNode -> {
                     System.out.println("Contains value ref: " + valueReferenceNode.getId());
@@ -70,16 +71,19 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.self = self;
     }
 
+
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         BuildData closureFinder = data.sub();
 
         System.out.println("CONTENT:");
         content.streamContents().forEach(System.out::println);
-        types.forEach(pair -> {
-            Signature signature = pair.getRight();
-            closureFinder.registerUnchecked(pair.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
-        });
+
+        for (Pair<String, Signature> type : types) {
+            Signature signature = type.getRight();
+            System.out.println("REGISTER: " + type.getLeft());
+            closureFinder.registerUnchecked(type.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
+        }
 
         Signature closureSignature = closure.apply(closureFinder);
         System.out.println("Closure argument signature:" + closureSignature);
