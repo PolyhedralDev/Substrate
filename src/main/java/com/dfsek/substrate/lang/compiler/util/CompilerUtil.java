@@ -28,7 +28,7 @@ public final class CompilerUtil implements Opcodes {
     }
 
     public static void dump(Class<?> clazz, byte[] bytes) {
-        File dump = new File("./.substrate/dumps/" + internalName(clazz) + ".class");
+        File dump = new File("./.substrate/dumps/" + clazz.getClassLoader().hashCode() + "/" + internalName(clazz) + ".class");
         dump.getParentFile().mkdirs();
         System.out.println("Dumping to " + dump.getAbsolutePath());
         try {
