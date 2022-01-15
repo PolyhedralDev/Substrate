@@ -13,6 +13,7 @@ public class ThisReferenceValue implements Value{
 
     @Override
     public Signature reference() {
+        System.out.println("THIS REF: " + ref);
         return ref;
     }
 

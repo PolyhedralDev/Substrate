@@ -52,8 +52,14 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .forEach(valueReferenceNode -> {
                     System.out.println("Contains value ref: " + valueReferenceNode.getId());
                     String id = valueReferenceNode.getId().getContent();
-                    if(!closureIDs.contains(id)) {
-                        closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), valueReferenceNode::reference));
+                    if(!closureIDs.contains(id) && !id.equals(self)) {
+                        closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), data -> {
+                            System.out.println("self: " + self);
+                            if(!valueReferenceNode.getId().getContent().equals(self)) {
+                                return valueReferenceNode.reference(data);
+                            }
+                            return Signature.empty();
+                        }));
                         closureIDs.add(id);
                     }
                 });
@@ -103,6 +109,11 @@ public class LambdaExpressionNode extends ExpressionNode {
             for (Pair<String, Signature> argument : types) {
                 delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
                 delegate.offsetInc(argument.getRight().frames());
+            }
+
+            if (self != null) {
+                System.out.println("SELF: " + self);
+                delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
             }
             content.apply(methodBuilder, delegate);
         });
