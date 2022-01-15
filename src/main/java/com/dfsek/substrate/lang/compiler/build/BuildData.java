@@ -28,7 +28,6 @@ public class BuildData {
     private final BuildData parent;
     private final DynamicClassLoader classLoader;
     private final ClassBuilder classWriter;
-    private final ValueInterceptor interceptor;
 
     private final String name;
     private int offset;
@@ -44,8 +43,6 @@ public class BuildData {
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
-        interceptor = (a, b) -> {
-        };
         this.offset = 2;
         this.implArgsOffset = 1;
         this.macros = new HashMap<>();
@@ -58,7 +55,6 @@ public class BuildData {
                       Map<String, Value> values,
                       Map<String, Macro> macros, Map<Pair<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
-                      ValueInterceptor interceptor,
                       String name, int offset, int implArgsOffset) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
@@ -68,7 +64,6 @@ public class BuildData {
         this.macros = macros;
         this.valueOffsets = valueOffsets;
         this.parent = parent;
-        this.interceptor = interceptor;
         this.offset = offset;
         this.name = name;
         this.implArgsOffset = implArgsOffset;
@@ -128,7 +123,6 @@ public class BuildData {
     }
 
     public Value getValue(String id) {
-        interceptor.fetch(id, this);
         if (!values.containsKey(id)) {
             throw new IllegalArgumentException("No such value \"" + id + "\": " + values);
         }
@@ -140,7 +134,6 @@ public class BuildData {
     }
 
     public int offset(String id) {
-        interceptor.fetch(id, this);
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
 
         BuildData test = this;
@@ -150,7 +143,6 @@ public class BuildData {
     }
 
     public boolean valueExists(String id) {
-        interceptor.fetch(id, this);
         return values.containsKey(id) || macros.containsKey(id);
     }
 
@@ -162,7 +154,6 @@ public class BuildData {
                 new HashMap<>(values), // new scope
                 macros, valueOffsets, // but same JVM scope
                 this,
-                interceptor,
                 name, offset, implArgsOffset);
     }
 
@@ -175,7 +166,6 @@ public class BuildData {
                 macros,
                 new HashMap<>(),
                 this,
-                interceptor,
                 classWriter.getName(), 1, argWidth + 1);
     }
 
