@@ -1,0 +1,7 @@
+test = () -> {
+    a = 3;
+    println(str(a));
+};
+
+
+test();
