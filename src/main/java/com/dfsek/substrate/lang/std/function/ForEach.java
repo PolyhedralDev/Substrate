@@ -22,7 +22,7 @@ public class ForEach implements Macro {
 
     @Override
     public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
-        data.loadImplementationArguments(visitor);
+
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);
         int lambdaLV = data.getOffset();
@@ -32,7 +32,6 @@ public class ForEach implements Macro {
         data.offsetInc(1);
         int arrayLV = data.getOffset();
         visitor.aStore(arrayLV) // store array in LV
-
                 .arrayLength();
 
         data.offsetInc(1);
@@ -53,8 +52,9 @@ public class ForEach implements Macro {
                 .iLoad(arrayLengthLV)
                 .ifICmpGE(end) // jump to end if i >= length
 
-                .aLoad(lambdaLV) // load lambda
-
+                .aLoad(lambdaLV); // load lambda
+        data.loadImplementationArguments(visitor);
+        visitor
                 .aLoad(arrayLV) // get value from array
                 .iLoad(iLV);
         if (type.isSimple()) {
