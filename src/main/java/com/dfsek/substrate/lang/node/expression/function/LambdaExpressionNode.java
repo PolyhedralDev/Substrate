@@ -47,6 +47,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLambdaArgument())
+                .filter(node -> !((ValueReferenceNode) node).isLocal())
                 .map(node -> (ValueReferenceNode) node)
                 .forEach(valueReferenceNode -> {
                     System.out.println("Contains value ref: " + valueReferenceNode.getId());

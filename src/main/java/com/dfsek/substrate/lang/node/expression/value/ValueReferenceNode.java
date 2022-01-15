@@ -17,6 +17,15 @@ public class ValueReferenceNode extends ExpressionNode {
     private final Token id;
 
     private boolean isLambdaArgument = false;
+    private boolean isLocal = false;
+
+    public void setLocal(boolean local) {
+        isLocal = local;
+    }
+
+    public boolean isLocal() {
+        return isLocal;
+    }
 
     public void setLambdaArgument(boolean lambdaArgument) {
         isLambdaArgument = lambdaArgument;

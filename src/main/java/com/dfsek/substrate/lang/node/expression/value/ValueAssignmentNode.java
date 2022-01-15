@@ -23,6 +23,10 @@ public class ValueAssignmentNode extends ExpressionNode {
         this.value = value;
     }
 
+    public Token getId() {
+        return id;
+    }
+
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         if (data.valueExists(id.getContent())) {
