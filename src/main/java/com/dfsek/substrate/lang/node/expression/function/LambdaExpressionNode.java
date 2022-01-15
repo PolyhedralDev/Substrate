@@ -74,6 +74,8 @@ public class LambdaExpressionNode extends ExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         BuildData closureFinder = data.sub();
 
+        System.out.println("CONTENT:");
+        content.streamContents().forEach(System.out::println);
         types.forEach(pair -> {
             Signature signature = pair.getRight();
             closureFinder.registerUnchecked(pair.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));

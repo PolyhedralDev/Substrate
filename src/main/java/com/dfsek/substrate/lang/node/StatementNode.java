@@ -6,11 +6,15 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.NodeHolder;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import org.objectweb.asm.Label;
 
-public class StatementNode implements Node {
+import java.util.Collection;
+import java.util.Collections;
+
+public class StatementNode extends NodeHolder {
     private final Position position;
     private final ExpressionNode content;
 
@@ -40,5 +44,10 @@ public class StatementNode implements Node {
     @Override
     public Position getPosition() {
         return position;
+    }
+
+    @Override
+    protected Collection<? extends Node> contents() {
+        return Collections.singleton(content);
     }
 }

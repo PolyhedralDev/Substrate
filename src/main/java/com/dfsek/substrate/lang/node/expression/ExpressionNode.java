@@ -13,27 +13,8 @@ import java.util.Collections;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class ExpressionNode implements Node, Typed {
+public abstract class ExpressionNode extends NodeHolder implements Typed {
     public void applyReferential(MethodBuilder visitor, BuildData data) {
         apply(visitor, data);
-    }
-
-    public abstract Collection<? extends Node> contents();
-
-    private final Lazy<Collection<? extends Node>> cachedContents = Lazy.of(this::contents);
-
-    public Stream<? extends Node> streamContents() {
-        return streamContents(this);
-    }
-
-    private Stream<? extends Node> streamContents(Node start) {
-        if (start instanceof ExpressionNode) {
-            return ((ExpressionNode) start)
-                    .cachedContents.get()
-                    .stream()
-                    .flatMap(node -> Stream.concat(Stream.of(node), streamContents(node)));
-        } else {
-            return Stream.empty();
-        }
     }
 }
