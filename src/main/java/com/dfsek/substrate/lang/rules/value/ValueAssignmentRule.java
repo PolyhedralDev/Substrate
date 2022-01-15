@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang.rules.value;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.node.expression.ValueAssignmentNode;
+import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.parser.ParserUtil;
