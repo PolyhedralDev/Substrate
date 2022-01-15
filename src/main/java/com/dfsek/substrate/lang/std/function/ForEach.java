@@ -22,6 +22,7 @@ public class ForEach implements Macro {
 
     @Override
     public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+        data.loadImplementationArguments(visitor);
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);
         int lambdaLV = data.getOffset();

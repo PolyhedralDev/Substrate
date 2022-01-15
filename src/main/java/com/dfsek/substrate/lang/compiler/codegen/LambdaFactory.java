@@ -48,7 +48,7 @@ public class LambdaFactory {
 
             MethodVisitor apply = writer.visitMethod(ACC_PUBLIC | ACC_ABSTRACT,
                     "apply",
-                    "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret,
+                    "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret,
                     null,
                     null);
             apply.visitEnd();
@@ -67,10 +67,10 @@ public class LambdaFactory {
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
-        data.loadImplementationArguments(visitor);
+
         visitor.invokeInterface(CompilerUtil.internalName(generate(args, ret)),
                 "apply",
-                "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + CompilerUtil.buildReturnType(data, ret));
+                "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret));
     }
 
     public Class<?> implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
@@ -107,7 +107,7 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        consumer.accept(builder.method("apply", "(" + args.internalDescriptor() + "L" + IMPL_ARG_CLASS_NAME + ";)" + ret).access(MethodBuilder.Access.PUBLIC));
+        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() +")" + ret).access(MethodBuilder.Access.PUBLIC));
 
         return builder.build(classLoader);
     }

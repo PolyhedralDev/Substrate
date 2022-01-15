@@ -63,7 +63,7 @@ public class ScriptBuilder {
             Class<?> delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
                 function.prepare(method);
                 Signature args = function.arguments();
-                int frame = 1;
+                int frame = 2;
                 for (int arg = 0; arg < args.size(); arg++) {
                     method.varInsn(args.getType(arg).loadInsn(), frame);
                     frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;

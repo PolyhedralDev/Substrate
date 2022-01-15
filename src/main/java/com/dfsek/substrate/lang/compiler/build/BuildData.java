@@ -157,7 +157,7 @@ public class BuildData {
                 name, offset, implArgsOffset);
     }
 
-    public BuildData sub(ClassBuilder classWriter, int argWidth) {
+    public BuildData sub(ClassBuilder classWriter) {
         return new BuildData(classLoader,
                 classWriter,
                 tupleFactory,
@@ -166,7 +166,7 @@ public class BuildData {
                 macros,
                 new HashMap<>(),
                 this,
-                classWriter.getName(), 1, argWidth + 1);
+                classWriter.getName(), 2, 1);
     }
 
     public void loadImplementationArguments(MethodBuilder visitor) {

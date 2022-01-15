@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
@@ -26,7 +27,15 @@ public class LambdaInvocationNode extends ExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         lambda.apply(builder, data);
 
-        CompilerUtil.invokeLambda(lambda, builder, data);
+        data.loadImplementationArguments(builder);
+
+        ParserUtil.checkWeakReferenceType(lambda, data, Signature.fun());
+
+        Signature returnType = lambda.reference(data).getSimpleReturn();
+
+        Signature args = lambda.reference(data).getGenericArguments(0);
+
+        data.lambdaFactory().invoke(args, returnType, data, builder);
     }
 
     @Override

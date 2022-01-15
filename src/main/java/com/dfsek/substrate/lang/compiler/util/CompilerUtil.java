@@ -38,16 +38,6 @@ public final class CompilerUtil implements Opcodes {
         }
     }
 
-    public static void invokeLambda(ExpressionNode lambdaContainer, MethodBuilder visitor, BuildData data) {
-        ParserUtil.checkWeakReferenceType(lambdaContainer, data, Signature.fun());
-
-        Signature returnType = lambdaContainer.reference(data).getSimpleReturn();
-
-        Signature args = lambdaContainer.reference(data).getGenericArguments(0);
-
-        data.lambdaFactory().invoke(args, returnType, data, visitor);
-    }
-
     public static ClassWriter generateClass(String name, boolean iface, boolean defaultConstructor, String... ifaces) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
 
