@@ -19,8 +19,6 @@ public class Signature implements Opcodes {
 
     private static final Signature FUN = new Signature(DataType.FUN);
 
-    private static final Signature TUP = new Signature(DataType.TUP);
-
     private static final Signature LIST = new Signature(DataType.LIST);
     private final List<DataType> types;
     private final List<Pair<Signature, Signature>> generic;
@@ -62,10 +60,6 @@ public class Signature implements Opcodes {
 
     public static Signature fun() {
         return FUN;
-    }
-
-    public static Signature tup() {
-        return TUP;
     }
 
     public static Signature list() {
@@ -157,13 +151,6 @@ public class Signature implements Opcodes {
         }
         if (this.weakEquals(fun())) return getGenericReturn(0);
         if (!getGenericReturn(0).equals(empty())) return getGenericReturn(0);
-        return this;
-    }
-
-    public Signature expandTuple() {
-        if (this.weakEquals(tup())) {
-            return getGenericReturn(0);
-        }
         return this;
     }
 

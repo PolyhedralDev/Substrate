@@ -159,21 +159,6 @@ public enum DataType implements Opcodes{
             visitor.aNewArray(CompilerUtil.internalName(Lambda.class));
         }
     },
-    TUP {
-        @Override
-        public String descriptor() {
-            return "L" + CompilerUtil.internalName(Tuple.class) + ";";
-        }
-
-        @Override
-        public char descriptorChar() {
-            return 'T';
-        }
-        @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.aNewArray(CompilerUtil.internalName(Tuple.class));
-        }
-    },
     LIST {
         @Override
         public String descriptor() {
@@ -203,8 +188,6 @@ public enum DataType implements Opcodes{
                     arr.append("Ljava/lang/String;");
                 } else if(generic.getType(0).equals(FUN)) {
                     arr.append('L').append(CompilerUtil.internalName(Lambda.class)).append(';');
-                } else if(generic.getType(0).equals(TUP)) {
-                    arr.append('L').append(CompilerUtil.internalName(Tuple.class)).append(';');
                 } else if(generic.getType(0).equals(LIST)) {
                     Signature nested = generic.getGenericReturn(0);
                     nestArray(arr, nested);

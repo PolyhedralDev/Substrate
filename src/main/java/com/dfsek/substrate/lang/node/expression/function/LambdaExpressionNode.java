@@ -99,7 +99,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         Signature closureSignature = closure.apply(closureFinder);
         System.out.println("Closure argument signature:" + closureSignature);
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn().expandTuple(), closureSignature, methodBuilder -> {
+        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
 
             for (int i = 0; i < closureTypes.size(); i++) {

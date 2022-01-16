@@ -44,7 +44,7 @@ public class FunctionInvocationNode extends ExpressionNode {
 
 
         Signature ref = reference(data);
-        data.lambdaFactory().invoke(argSignature, ref.expandTuple(), data, builder);
+        data.lambdaFactory().invoke(argSignature, ref, data, builder);
     }
 
     @Override

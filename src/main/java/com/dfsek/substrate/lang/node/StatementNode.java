@@ -30,12 +30,9 @@ public class StatementNode extends NodeHolder {
         content.apply(builder, data);
 
         Signature ref = content.reference(data);
-        for (int i = 0; i < ref.size(); i++) {
-            if(ref.getType(0) == DataType.NUM) {
-                builder.pop2();
-            } else {
-                builder.pop();
-            }
+        if(!ref.equals(Signature.empty())) {
+            if(ref.equals(Signature.decimal())) builder.pop2();
+            else builder.pop();
         }
 
         builder.lineNumber(getPosition().getLine(), statement);

@@ -88,11 +88,11 @@ public final class CompilerUtil implements Opcodes {
         if (arguments.isEmpty()) {
             argSignature = Signature.empty();
         } else if (arguments.size() == 1) {
-            argSignature = arguments.get(0).reference(data).expandTuple();
+            argSignature = arguments.get(0).reference(data);
         } else {
-            argSignature = arguments.get(0).reference(data).expandTuple();
+            argSignature = arguments.get(0).reference(data);
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).reference(data).expandTuple());
+                argSignature = argSignature.and(arguments.get(i).reference(data));
             }
         }
         return argSignature;
@@ -100,21 +100,18 @@ public final class CompilerUtil implements Opcodes {
 
     public static void deconstructTuple(ExpressionNode node, BuildData data, MethodBuilder visitor) {
         Signature ref = node.reference(data);
-        if (ref.weakEquals(Signature.tup()) || !ref.isSimple()) {
+        if (!ref.isSimple()) {
             data.offsetInc(1);
             int offset = data.getOffset();
             visitor.aStore(offset);
 
-            Signature tup = ref.expandTuple();
-
-            for (int i = 0; i < tup.size(); i++) {
+            for (int i = 0; i < ref.size(); i++) {
                 visitor.aLoad(offset);
 
-                visitor.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(tup)),
+                visitor.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(ref)),
                         "param" + i,
-                        "()" + tup.getType(i).descriptor());
+                        "()" + ref.getType(i).descriptor());
             }
-
         }
     }
 }
