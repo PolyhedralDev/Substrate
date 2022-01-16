@@ -1,0 +1,5 @@
+test = (a: fun<fun<num -> int>>) -> {
+    a((b: num): int -> {
+        return int(b + 4.4);
+    });
+};
