@@ -1,0 +1,3 @@
+test = (a: int, b: bool): int -> if(b) a else 0;
+
+curry(test);

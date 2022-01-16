@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.api.Function;
+import com.dfsek.substrate.lang.std.function.Curry;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -22,6 +23,7 @@ public class Parser {
         tokenizer = new Tokenizer(data);
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
+        registerMacro("curry", new Curry());
 
         this.base = base;
     }
