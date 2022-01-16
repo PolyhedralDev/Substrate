@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
@@ -40,7 +41,7 @@ public class MacroNode extends ExpressionNode {
 
     @Override
     public Signature reference(BuildData data) {
-        return macro.reference(data).getSimpleReturn();
+        return macro.reference(CompilerUtil.expandArguments(data, args), data).getSimpleReturn();
     }
 
     @Override

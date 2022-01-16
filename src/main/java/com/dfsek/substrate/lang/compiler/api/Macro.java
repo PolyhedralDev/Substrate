@@ -3,14 +3,15 @@ package com.dfsek.substrate.lang.compiler.api;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.type.Typed;
 import org.objectweb.asm.Opcodes;
 
 /**
  * a function-like construct which emits implementation specific bytecode.
  */
-public interface Macro extends Opcodes, Typed {
+public interface Macro extends Opcodes {
     Signature arguments();
+
+    Signature reference(Signature arguments, BuildData data);
 
     default void prepare(MethodBuilder visitor) {
     }
