@@ -38,9 +38,6 @@ public class Curry implements Macro {
                     .applyGenericReturn(0, fun == null ? argumentFunctionReturn : fun);
         }
 
-        System.out.println(arguments);
-        System.out.println(fun);
-
-        return null;
+        return fun;
     }
 }
