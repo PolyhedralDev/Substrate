@@ -185,7 +185,7 @@ public class MethodBuilder implements Opcodes {
     }
 
     public MethodBuilder aastore() {
-        return insn(AALOAD);
+        return insn(AASTORE);
     }
 
     public MethodBuilder iastore() {
