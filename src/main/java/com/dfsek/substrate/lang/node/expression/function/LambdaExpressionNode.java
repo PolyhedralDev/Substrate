@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.*;
+import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -118,6 +119,13 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
 
             ParserUtil.checkReferenceType(content, delegate, returnType).apply(methodBuilder, delegate);
+            if(!(content instanceof BlockNode)) {
+                if(returnType.isSimple()) {
+                    methodBuilder.insn(returnType.getType(0).returnInsn());
+                } else if(returnType.size() > 1) {
+                    methodBuilder.refReturn();
+                }
+            }
         });
 
         builder.newInsn(CompilerUtil.internalName(lambda))
