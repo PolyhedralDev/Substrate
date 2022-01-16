@@ -1,0 +1,3 @@
+test = (a: int): num -> {
+    return if(true) 4.6 else "hello";
+};
