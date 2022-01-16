@@ -1,10 +1,10 @@
 // test making a tuple from a function return value
 
-test = (a: num, b: str) -> {
+test = (a: num, b: str): num -> {
     return a;
 };
 
-test2 = (a: num, b: str) -> {
+test2 = (a: num, b: str): str -> {
     return b;
 };
 

@@ -8,6 +8,7 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.*;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.util.pair.Pair;
@@ -24,12 +25,15 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Function<BuildData, Signature> closure;
     private final List<Pair<String, Function<BuildData, Signature>>> closureTypes;
 
+    private final Signature returnType;
+
     private String self;
 
-    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start) {
+    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start, Signature returnType) {
         this.content = content;
         this.types = types;
         this.start = start;
+        this.returnType = returnType;
         Signature signature = Signature.empty();
 
         Set<String> closureIDs = new HashSet<>();
@@ -112,7 +116,8 @@ public class LambdaExpressionNode extends ExpressionNode {
                 System.out.println("SELF: " + self);
                 delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
             }
-            content.apply(methodBuilder, delegate);
+
+            ParserUtil.checkReferenceType(content, delegate, returnType).apply(methodBuilder, delegate);
         });
 
         builder.newInsn(CompilerUtil.internalName(lambda))
@@ -140,14 +145,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public Signature reference(BuildData data) {
-        BuildData data1 = data.sub();
-
-        types.forEach(pair -> {
-            Signature signature = pair.getRight();
-            data1.registerUnchecked(pair.getLeft(), new PrimitiveValue(signature, data1.getOffset()));
-        });
-
-        return Signature.fun().applyGenericReturn(0, content.reference(data1)).applyGenericArgument(0, getParameters());
+        return Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, getParameters());
     }
 
     @Override

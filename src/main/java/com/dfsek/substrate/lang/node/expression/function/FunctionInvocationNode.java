@@ -37,10 +37,10 @@ public class FunctionInvocationNode extends ExpressionNode {
 
         data.loadImplementationArguments(builder);
 
-        arguments.forEach(arg -> {
+        for (ExpressionNode arg : arguments) {
             arg.apply(builder, data);
             CompilerUtil.deconstructTuple(arg, data, builder);
-        });
+        }
 
 
         Signature ref = reference(data);

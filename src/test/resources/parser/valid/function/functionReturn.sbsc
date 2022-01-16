@@ -1,6 +1,6 @@
 // test a simple function that returns a value
 
-test = (a: str) -> {
+test = (a: str): str -> {
     return a;
 };
 

@@ -69,7 +69,8 @@ public class ExpressionRule implements Rule {
             node = ListRule.getInstance().assemble(tokenizer, data);
             possibleFunctionSite = false;
         } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
-                || tokenizer.peek(2).getType() == Token.Type.ARROW) { // lambda or function
+                || tokenizer.peek(2).getType() == Token.Type.ARROW
+                || tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer, data);
         } else if(test.getType() == Token.Type.GROUP_BEGIN) {
             node = TupleRule.getInstance().assemble(tokenizer, data);

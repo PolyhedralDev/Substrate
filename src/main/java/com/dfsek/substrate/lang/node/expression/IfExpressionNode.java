@@ -11,21 +11,29 @@ import org.objectweb.asm.Label;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Function;
 
 public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode predicate;
-    private final ExpressionNode caseTrue;
-    private final ExpressionNode caseFalse;
+    private final Function<BuildData, ExpressionNode> caseTrue;
+    private final Function<BuildData, ExpressionNode> caseFalse;
 
-    public IfExpressionNode(ExpressionNode predicate, ExpressionNode caseTrue, ExpressionNode caseFalse) {
+    private final ExpressionNode caseTrueNode;
+    private final ExpressionNode caseFalseNode;
+
+    public IfExpressionNode(ExpressionNode predicate, Function<BuildData, ExpressionNode> caseTrue, Function<BuildData, ExpressionNode> caseFalse, ExpressionNode caseTrueNode, ExpressionNode caseFalseNode) {
         this.predicate = predicate;
         this.caseTrue = caseTrue;
         this.caseFalse = caseFalse;
+        this.caseTrueNode = caseTrueNode;
+        this.caseFalseNode = caseFalseNode;
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkType(predicate, data, Signature.bool());
+        ExpressionNode caseFalse = this.caseFalse.apply(data);
+        ExpressionNode caseTrue = this.caseTrue.apply(data);
         ParserUtil.checkType(caseTrue, data, caseFalse.reference(data).getSimpleReturn());
 
         Label equal = new Label();
@@ -51,11 +59,11 @@ public class IfExpressionNode extends ExpressionNode {
 
     @Override
     public Signature reference(BuildData data) {
-        return caseTrue.reference(data).getSimpleReturn();
+        return caseTrue.apply(data).reference(data).getSimpleReturn();
     }
 
     @Override
     public Collection<? extends Node> contents() {
-        return Arrays.asList(predicate, caseFalse, caseTrue);
+        return Arrays.asList(predicate, caseTrueNode, caseFalseNode);
     }
 }

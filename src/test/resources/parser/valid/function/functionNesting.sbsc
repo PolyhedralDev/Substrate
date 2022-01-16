@@ -1,11 +1,11 @@
 // test a complex hierarchy of nested functions
 
-test1 = (a: str) -> {
+test1 = (a: str): str -> {
     println(a);
     return a;
 };
 
-test2 = (a: str, b: num) -> {
+test2 = (a: str, b: num): str, num -> {
     return (test1(a), b);
 };
 

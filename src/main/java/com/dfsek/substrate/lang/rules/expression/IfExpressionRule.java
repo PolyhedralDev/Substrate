@@ -18,6 +18,7 @@ import com.dfsek.substrate.tokenizer.Tokenizer;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Function;
 
 public class IfExpressionRule implements Rule {
     private static final IfExpressionRule INSTANCE = new IfExpressionRule();
@@ -27,28 +28,30 @@ public class IfExpressionRule implements Rule {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
         ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer, data);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
-        ExpressionNode caseTrue;
 
+        ExpressionNode caseTrueNode;
+        Function<BuildData, ExpressionNode> caseTrue;
         if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            ExpressionNode block = BlockRule.getInstance().assemble(tokenizer, data);
-            LambdaExpressionNode lambda = new LambdaExpressionNode(block, Collections.emptyList(), block.getPosition());
-            caseTrue = new LambdaInvocationNode(lambda);
+            caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data);
+            caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference(buildData)));
         } else {
-            caseTrue = ExpressionRule.getInstance().assemble(tokenizer, data);
+            caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data);
+            caseTrue = buildData -> caseTrueNode;
         }
 
-        ExpressionNode caseFalse;
+        ExpressionNode caseFalseNode;
+        Function<BuildData, ExpressionNode> caseFalse;
         if(tokenizer.peek().getType() == Token.Type.ELSE) {
             tokenizer.consume();
             if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-                ExpressionNode block = BlockRule.getInstance().assemble(tokenizer, data);
-                LambdaExpressionNode lambda = new LambdaExpressionNode(block, Collections.emptyList(), block.getPosition());
-                caseFalse = new LambdaInvocationNode(lambda);
+                caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data);
+                caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference(buildData)));
             } else {
-                caseFalse = ExpressionRule.getInstance().assemble(tokenizer, data);
+                caseFalseNode = ExpressionRule.getInstance().assemble(tokenizer, data);
+                caseFalse = buildData -> caseFalseNode;
             }
         } else {
-            caseFalse = new ExpressionNode() {
+            caseFalseNode = new ExpressionNode() {
 
                 @Override
                 public Collection<? extends Node> contents() {
@@ -67,12 +70,13 @@ public class IfExpressionRule implements Rule {
 
                 @Override
                 public Position getPosition() {
-                    return caseTrue.getPosition();
+                    return predicate.getPosition();
                 }
             };
+            caseFalse = buildData -> caseFalseNode;
         }
 
-        return new IfExpressionNode(predicate, caseTrue, caseFalse);
+        return new IfExpressionNode(predicate, caseTrue, caseFalse, caseTrueNode, caseFalseNode);
     }
 
     public static IfExpressionRule getInstance() {

@@ -6,6 +6,6 @@ test = (a: fun<int, int -> num>) -> {
 
 c = 3;
 
-test((a: int, b: int) -> {
+test((a: int, b: int): num -> {
     return num(a + b + c);
 });

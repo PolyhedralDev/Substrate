@@ -8,7 +8,7 @@ c = 4;
 
 d = (int(a), int(b), num(c));
 
-test = (e: int, f: int, g: num) -> {
+test = (e: int, f: int, g: num): int -> {
     return e + f + int(g);
 };
 

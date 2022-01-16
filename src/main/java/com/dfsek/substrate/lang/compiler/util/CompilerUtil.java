@@ -100,7 +100,7 @@ public final class CompilerUtil implements Opcodes {
 
     public static void deconstructTuple(ExpressionNode node, BuildData data, MethodBuilder visitor) {
         Signature ref = node.reference(data);
-        if (ref.weakEquals(Signature.tup())) {
+        if (ref.weakEquals(Signature.tup()) || !ref.isSimple()) {
             data.offsetInc(1);
             int offset = data.getOffset();
             visitor.aStore(offset);

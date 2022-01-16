@@ -1,6 +1,6 @@
 // Fibonacci sequence
 
-fib = (i: int) -> {
+fib = (i: int): int -> {
     return if(i <= 1) i else fib(i-1) + fib(i-2);
 };
 

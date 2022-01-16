@@ -44,6 +44,17 @@ public class LambdaExpressionRule implements Rule {
         }
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+
+        Signature returnType;
+
+        if(tokenizer.peek().getType() == Token.Type.TYPE) { // parse type
+            ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
+            returnType = ParserUtil.parseSignatureNotation(tokenizer);
+        } else {
+            returnType = Signature.empty(); // void
+        }
+
+
         ParserUtil.checkType(tokenizer.consume(), Token.Type.ARROW);
 
         ExpressionNode expression;
@@ -70,6 +81,6 @@ public class LambdaExpressionRule implements Rule {
                 .forEach(node -> ((ValueReferenceNode) node).setLocal(true));
 
 
-        return new LambdaExpressionNode(expression, types, begin.getPosition());
+        return new LambdaExpressionNode(expression, types, begin.getPosition(), returnType);
     }
 }

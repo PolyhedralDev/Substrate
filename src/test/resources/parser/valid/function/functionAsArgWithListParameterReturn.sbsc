@@ -6,7 +6,7 @@ test = (a: fun<list<int>, int -> num>) -> {
 
 c = 3;
 
-test((a: list<int>, b: int) -> {
+test((a: list<int>, b: int): num -> {
     forEach(a, (i: int) -> println(str(i)));
     return num(b + c);
 });

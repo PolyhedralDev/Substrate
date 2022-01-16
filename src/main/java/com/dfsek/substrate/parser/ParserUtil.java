@@ -82,9 +82,6 @@ public final class ParserUtil {
                     if(tokenizer.peek().getType() == Token.Type.ARROW) {
                         tokenizer.consume();
                         Signature ret = parseSignatureNotation(tokenizer);
-                        if(!ret.isSimple()) {
-                            ret = Signature.tup().applyGenericReturn(0, ret);
-                        }
                         other = other.applyGenericReturn(0, ret);
                     }
                 }

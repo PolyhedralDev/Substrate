@@ -1,10 +1,10 @@
-a = (f: fun<int -> int>) -> {
-    return (b: num) -> {
+a = (f: fun<int -> int>): fun<num -> num> -> {
+    return (b: num): num -> {
         return num(f(int(b)));
     };
 };
 
-result = a((b: int) -> {
+result = a((b: int): int -> {
              return b + 5;
          })(0.5);
 
