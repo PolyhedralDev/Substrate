@@ -98,6 +98,10 @@ public class Signature implements Opcodes {
         return arg == null ? empty() : arg;
     }
 
+    public Signature get(int index) {
+        return new Signature(types.get(index)).applyGenericReturn(0, getGenericReturn(index)).applyGenericArgument(0, getGenericArguments(index));
+    }
+
     public Signature applyGenericReturn(int index, Signature generic) {
         Objects.requireNonNull(generic);
         List<DataType> otherTypes = new ArrayList<>(types);
