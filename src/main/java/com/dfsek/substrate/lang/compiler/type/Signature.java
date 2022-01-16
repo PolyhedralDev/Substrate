@@ -156,21 +156,20 @@ public class Signature implements Opcodes {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("(");
+        if(this.equals(empty())) return "()";
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
             builder.append(types.get(i));
             if (!getGenericArguments(i).equals(empty()) || !getGenericReturn(i).equals(empty())) {
                 builder.append('<');
-                if (!getGenericArguments(i).equals(empty())) {
-                    builder.append(getGenericArguments(i).toString());
-                    builder.append("->");
-                }
+                builder.append(getGenericArguments(i).toString());
+                builder.append("->");
                 builder.append(getGenericReturn(i).toString());
                 builder.append('>');
             }
             if (i != types.size() - 1) builder.append(',');
         }
-        return builder.append(')').toString();
+        return builder.toString();
     }
 
     public Signature and(Signature other) {
