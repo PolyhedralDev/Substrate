@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -30,12 +31,21 @@ public class ListNode extends ExpressionNode {
 
         builder.pushInt(elements.size());
         Signature elementSignature = elements.get(0).reference(data);
-        elementSignature.getType(0).applyNewArray(builder, elementSignature);
+        if(elementSignature.isSimple()) {
+            elementSignature.getType(0).applyNewArray(builder, elementSignature);
+        } else {
+            builder.aNewArray(CompilerUtil.internalName(Tuple.class));
+        }
+
         for (int i = 0; i < elements.size(); i++) {
             builder.dup(); // duplicate reference for all elements.
             builder.pushInt(i); // push index
             elements.get(i).applyReferential(builder, data); // apply value
-            builder.insn(elementSignature.getType(0).arrayStoreInsn());
+            if(elementSignature.isSimple()) {
+                builder.insn(elementSignature.getType(0).arrayStoreInsn());
+            } else {
+                builder.aastore();
+            }
         }
     }
 
