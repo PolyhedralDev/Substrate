@@ -1,2 +1,3 @@
-function = (a: int): fun<int -> int> -> (in: int): int -> {return in;};
+add = (left: int): fun<int -> int> -> (right: int): int -> left + right;
 
+println(str(add(3)(4)));
