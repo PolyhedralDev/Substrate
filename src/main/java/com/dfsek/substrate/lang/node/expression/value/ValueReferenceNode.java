@@ -39,6 +39,10 @@ public class ValueReferenceNode extends ExpressionNode {
         this.id = id;
     }
 
+    public ValueReferenceNode(String id) {
+        this.id = new Token(id, Token.Type.IDENTIFIER, Position.getNull());
+    }
+
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         if (!data.valueExists(id.getContent())) {

@@ -55,11 +55,9 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
                 .map(node -> (ValueReferenceNode) node)
                 .forEach(valueReferenceNode -> {
-                    System.out.println("Contains value ref: " + valueReferenceNode.getId());
                     String id = valueReferenceNode.getId().getContent();
                     if(!closureIDs.contains(id) && !id.equals(self)) {
                         closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), data -> {
-                            System.out.println("self: " + self);
                             if(!valueReferenceNode.getId().getContent().equals(self)) {
                                 return valueReferenceNode.reference(data);
                             }
@@ -77,6 +75,9 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
             return closure;
         };
+
+        System.out.println("Return type " + returnType);
+        System.out.println("args " + parameters);
     }
 
     public void setSelf(String self) {
@@ -93,12 +94,10 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         for (Pair<String, Signature> type : types) {
             Signature signature = type.getRight();
-            System.out.println("REGISTER: " + type.getLeft());
             closureFinder.registerUnchecked(type.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
         }
 
         Signature closureSignature = closure.apply(closureFinder);
-        System.out.println("Closure argument signature:" + closureSignature);
 
         Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
@@ -108,16 +107,15 @@ public class LambdaExpressionNode extends ExpressionNode {
                 delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight().apply(delegate), i));
             }
             for (Pair<String, Signature> argument : types) {
-                System.out.println("REGISTERING " + argument.getLeft() + " at offset " + delegate.getOffset());
                 delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
                 delegate.offsetInc(argument.getRight().frames());
             }
 
             if (self != null) {
-                System.out.println("SELF: " + self);
                 delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
             }
 
+            System.out.println("CONTENT REF: " + content.reference(delegate));
             ParserUtil.checkReferenceType(content, delegate, returnType).apply(methodBuilder, delegate);
             if(!(content instanceof BlockNode)) {
                 if(returnType.isSimple()) {
@@ -132,7 +130,6 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .dup();
 
         for (Pair<String, Function<BuildData, Signature>> pair : closureTypes) {
-            System.out.println("Loading closure type..." + pair.getLeft());
             if(pair.getLeft().equals(self)) continue; // dont load self into closure.
             data.getValue(pair.getLeft()).load(builder, data);
         }

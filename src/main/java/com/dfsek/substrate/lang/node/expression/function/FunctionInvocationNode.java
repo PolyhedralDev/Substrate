@@ -25,6 +25,9 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+        System.out.println("INVOKING: " + function.reference(data));
+        System.out.println("INVOKING: " + function);
+        System.out.println("INVOKING: " + function.getPosition());
         ParserUtil.checkWeakReferenceType(function, data, Signature.fun());
 
         Signature argSignature = CompilerUtil.expandArguments(data, arguments);

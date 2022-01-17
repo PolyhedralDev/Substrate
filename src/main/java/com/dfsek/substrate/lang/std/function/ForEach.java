@@ -4,7 +4,10 @@ import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Label;
+
+import java.util.List;
 
 public class ForEach implements Macro {
     @Override
@@ -21,7 +24,8 @@ public class ForEach implements Macro {
     }
 
     @Override
-    public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+    public void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes) {
+        argNodes.forEach(arg -> arg.apply(visitor, data));
 
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);

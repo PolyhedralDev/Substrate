@@ -1,3 +1,5 @@
 test = (a: int, b: bool): int -> if(b) a else 0;
 
-curry(test);
+c = curry(test);
+
+println(str(c(56)(true)));

@@ -3,7 +3,10 @@ package com.dfsek.substrate.lang.compiler.api;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import org.objectweb.asm.Opcodes;
+
+import java.util.List;
 
 /**
  * a function-like construct which emits implementation specific bytecode.
@@ -20,5 +23,5 @@ public interface Macro extends Opcodes {
         return arguments().equals(attempt);
     }
 
-    void invoke(MethodBuilder visitor, BuildData data, Signature args);
+    void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes);
 }

@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
 
@@ -34,9 +33,7 @@ public class MacroNode extends ExpressionNode {
 
         macro.prepare(builder);
 
-        args.forEach(arg -> arg.apply(builder, data));
-
-        macro.invoke(builder, data, argSignature);
+        macro.invoke(builder, data, argSignature, args);
     }
 
     @Override
