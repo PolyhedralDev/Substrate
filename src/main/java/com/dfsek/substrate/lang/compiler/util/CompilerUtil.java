@@ -17,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public final class CompilerUtil implements Opcodes {
     public static String internalName(String clazz) {
@@ -27,12 +29,12 @@ public final class CompilerUtil implements Opcodes {
         return internalName(clazz.getCanonicalName());
     }
 
-    public static void dump(Class<?> clazz, byte[] bytes) {
-        File dump = new File("./.substrate/dumps/" + clazz.getClassLoader().hashCode() + "/" + internalName(clazz) + ".class");
-        dump.getParentFile().mkdirs();
-        System.out.println("Dumping to " + dump.getAbsolutePath());
+    public static void dump(Class<?> clazz, byte[] bytes, ZipOutputStream zipOutputStream) {
+        if(zipOutputStream == null) return;
         try {
-            IOUtils.write(bytes, new FileOutputStream(dump));
+            zipOutputStream.putNextEntry(new ZipEntry(internalName(clazz) + ".class"));
+            IOUtils.write(bytes, zipOutputStream);
+            zipOutputStream.closeEntry();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -11,6 +11,7 @@ import com.dfsek.substrate.util.pair.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 public class BuildData {
     private final TupleFactory tupleFactory;
@@ -29,11 +30,11 @@ public class BuildData {
 
     private final int implArgsOffset;
 
-    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter) {
+    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
-        tupleFactory = new TupleFactory(classLoader, classWriter.getName());
-        lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter.getName());
+        tupleFactory = new TupleFactory(classLoader, classWriter.getName(), zipOutputStream);
+        lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter.getName(), zipOutputStream);
         this.name = classWriter.getName();
         values = new HashMap<>();
         valueOffsets = new HashMap<>();

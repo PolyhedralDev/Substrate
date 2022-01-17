@@ -8,6 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.zip.ZipOutputStream;
 
 @SuppressWarnings("UnusedReturnValue")
 public class ClassBuilder {
@@ -72,7 +73,7 @@ public class ClassBuilder {
         return this;
     }
 
-    public Class<?> build(DynamicClassLoader loader) {
+    public Class<?> build(DynamicClassLoader loader, final ZipOutputStream zipOutputStream) {
         methods.forEach(methodBuilder -> {
             MethodVisitor visitor = classWriter.visitMethod(methodBuilder.access(),
                     methodBuilder.getName(),
@@ -87,7 +88,7 @@ public class ClassBuilder {
         fields.forEach(consumer -> consumer.accept(classWriter));
         byte[] bytes = classWriter.toByteArray();
         Class<?> clazz = loader.defineClass(name.replace('/', '.'), bytes);
-        CompilerUtil.dump(clazz, bytes);
+        CompilerUtil.dump(clazz, bytes, zipOutputStream);
         return clazz;
     }
 

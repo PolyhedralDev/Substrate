@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.zip.ZipOutputStream;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -31,10 +32,13 @@ public class LambdaFactory {
 
     private final String baseName;
 
-    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory, String baseName) {
+    private final ZipOutputStream zipOutputStream;
+
+    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory, String baseName, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
         this.tupleFactory = tupleFactory;
         this.baseName = baseName;
+        this.zipOutputStream = zipOutputStream;
     }
 
     public Class<?> generate(Signature args, Signature returnType) {
@@ -58,7 +62,7 @@ public class LambdaFactory {
 
             byte[] bytes = writer.toByteArray();
             Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
-            CompilerUtil.dump(clazz, bytes);
+            CompilerUtil.dump(clazz, bytes, zipOutputStream);
 
             return Pair.of(clazz, new AtomicInteger(0));
         }).getLeft();
@@ -112,6 +116,6 @@ public class LambdaFactory {
 
         consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() +")" + ret).access(MethodBuilder.Access.PUBLIC));
 
-        return builder.build(classLoader);
+        return builder.build(classLoader, zipOutputStream);
     }
 }

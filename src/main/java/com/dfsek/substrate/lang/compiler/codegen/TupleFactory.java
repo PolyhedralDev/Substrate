@@ -10,6 +10,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -21,10 +22,12 @@ public class TupleFactory {
     private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
 
     private final String baseName;
+    private final ZipOutputStream zipOutputStream;
 
-    public TupleFactory(DynamicClassLoader classLoader, String baseName) {
+    public TupleFactory(DynamicClassLoader classLoader, String baseName, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
         this.baseName = baseName;
+        this.zipOutputStream = zipOutputStream;
     }
 
     public Class<?> generate(Signature args) {
@@ -88,7 +91,7 @@ public class TupleFactory {
 
             byte[] bytes = writer.toByteArray();
             Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
-            CompilerUtil.dump(clazz, bytes);
+            CompilerUtil.dump(clazz, bytes, zipOutputStream);
             return clazz;
         });
     }

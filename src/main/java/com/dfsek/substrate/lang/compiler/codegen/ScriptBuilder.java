@@ -16,14 +16,16 @@ import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.pair.Pair;
 
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder {
-    private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));
+    private static final boolean DUMP = true;//"true".equals(System.getProperty("terrascript.asm.dump"));
     public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
     private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
@@ -39,12 +41,25 @@ public class ScriptBuilder {
 
     public Script build() throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
-
+        ZipOutputStream zipOutputStream;
+        if (DUMP) {
+            try {
+                File out = new File(".substrate/dumps/" + builds + ".jar");
+                if(out.exists()) out.delete();
+                out.getParentFile().mkdirs();
+                out.createNewFile();
+                zipOutputStream = new ZipOutputStream(new FileOutputStream(out));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } else {
+            zipOutputStream = null;
+        }
         String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
 
         ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), INTERFACE_CLASS_NAME).defaultConstructor();
 
-        BuildData data = new BuildData(classLoader, builder);
+        BuildData data = new BuildData(classLoader, builder, zipOutputStream);
 
         // prepare functions.
 
@@ -94,7 +109,15 @@ public class ScriptBuilder {
         ops.forEach(op -> op.apply(absMethod, data));
 
 
-        Class<?> clazz = builder.build(classLoader);
+        Class<?> clazz = builder.build(classLoader, zipOutputStream);
+
+        if(zipOutputStream != null) {
+            try {
+                zipOutputStream.close();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
 
         builds++;
         try {
