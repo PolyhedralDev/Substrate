@@ -42,6 +42,16 @@ public class ClassBuilder {
         return this;
     }
 
+    public ClassBuilder inner(String name, String outerName, String innerName, MethodBuilder.Access... accesses) {
+        int access = 0;
+
+        for (MethodBuilder.Access level : accesses) {
+            access |= level.getCode();
+        }
+        classWriter.visitInnerClass(name, outerName, innerName, access);
+        return this;
+    }
+
     public MethodBuilder method(String name, String descriptor) {
         return method(name, descriptor, null, EMPTY);
     }
