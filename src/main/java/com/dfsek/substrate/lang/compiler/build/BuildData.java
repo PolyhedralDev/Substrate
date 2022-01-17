@@ -32,7 +32,7 @@ public class BuildData {
     public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
-        tupleFactory = new TupleFactory(classLoader);
+        tupleFactory = new TupleFactory(classLoader, classWriter.getName());
         lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter.getName());
         this.name = classWriter.getName();
         values = new HashMap<>();

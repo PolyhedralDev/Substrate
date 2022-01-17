@@ -20,14 +20,17 @@ public class TupleFactory {
 
     private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
 
-    public TupleFactory(DynamicClassLoader classLoader) {
+    private final String baseName;
+
+    public TupleFactory(DynamicClassLoader classLoader, String baseName) {
         this.classLoader = classLoader;
+        this.baseName = baseName;
     }
 
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
 
-            String name = CompilerUtil.internalName(Tuple.class) + "IMPL_" + args.classDescriptor();
+            String name = baseName + "$Tuple$IM_" + args.classDescriptor();
 
             ClassWriter writer = CompilerUtil.generateClass(name, false, false, TUPLE_NAME);
 
