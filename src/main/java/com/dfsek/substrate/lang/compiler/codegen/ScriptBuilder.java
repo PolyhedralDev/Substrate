@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class ScriptBuilder {
     private static final boolean DUMP = "true".equals(System.getProperty("terrascript.asm.dump"));
-    private static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
+    public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
     private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
     private final List<Node> ops = new ArrayList<>();

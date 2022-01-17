@@ -29,14 +29,17 @@ public class LambdaFactory {
 
     private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
 
-    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory) {
+    private final String baseName;
+
+    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory, String baseName) {
         this.classLoader = classLoader;
         this.tupleFactory = tupleFactory;
+        this.baseName = baseName;
     }
 
     public Class<?> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
-            String name = LAMBDA_NAME + "$" + args.classDescriptor() + "$R" + returnType.classDescriptor();
+            String name = baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor();
             ClassWriter writer = CompilerUtil.generateClass(name, true, false, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
@@ -63,7 +66,7 @@ public class LambdaFactory {
 
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
-        return LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
+        return baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
@@ -78,7 +81,7 @@ public class LambdaFactory {
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
-        String name = LAMBDA_NAME + "IMPL_" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
+        String name = baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft()));
 

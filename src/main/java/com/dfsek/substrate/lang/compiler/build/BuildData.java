@@ -7,15 +7,10 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.Lazy;
 import com.dfsek.substrate.util.pair.Pair;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class BuildData {
     private final TupleFactory tupleFactory;
@@ -38,7 +33,7 @@ public class BuildData {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
         tupleFactory = new TupleFactory(classLoader);
-        lambdaFactory = new LambdaFactory(classLoader, tupleFactory);
+        lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter.getName());
         this.name = classWriter.getName();
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
