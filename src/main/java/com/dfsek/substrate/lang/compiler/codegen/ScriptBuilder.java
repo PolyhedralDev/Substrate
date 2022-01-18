@@ -69,13 +69,12 @@ public class ScriptBuilder {
                 .access(MethodBuilder.Access.STATIC);
 
 
-        for (int i = 0; i < functions.size(); i++) {
-            Function function = functions.get(i).getRight();
-            String functionName = "wrap$" + functions.get(i).getLeft();
+        for (Pair<String, Function> stringFunctionPair : functions) {
+            Function function = stringFunctionPair.getRight();
+            String functionName = "wrap$" + stringFunctionPair.getLeft();
 
             BuildData separate = data.sub();
             Signature ref = function.reference(separate);
-
 
             String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
                 function.prepare(method);
@@ -89,19 +88,18 @@ public class ScriptBuilder {
                 method.voidReturn();
             }).getName();
 
-            builder.field(functionName,
-                    "L" + delegate + ";",
-                    MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
-            staticInitializer.newInsn(delegate)
-                    .dup()
-                    .invokeSpecial(delegate, "<init>", "()V")
-                    .putStatic(implementationClassName, functionName, "L" + delegate + ";");
+            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, data, implementationClassName, delegate, functionName, () -> {
+                builder.field(functionName,
+                        "L" + delegate + ";",
+                        MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
-            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, delegate, functionName));
+                staticInitializer.newInsn(delegate)
+                        .dup()
+                        .invokeSpecial(delegate, "<init>", "()V")
+                        .putStatic(implementationClassName, functionName, "L" + delegate + ";");
+            }));
         }
-
-        staticInitializer.voidReturn();
 
 
         MethodBuilder absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V").access(MethodBuilder.Access.PUBLIC);
