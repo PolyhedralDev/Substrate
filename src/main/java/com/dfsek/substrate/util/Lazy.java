@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 public final class Lazy<T> {
     private final Supplier<T> value;
     private T result;
-    private boolean calc = false;
+    private volatile boolean calc = false;
 
     public static <T> Lazy<T> of(Supplier<T> value) {
         return new Lazy<>(value);
