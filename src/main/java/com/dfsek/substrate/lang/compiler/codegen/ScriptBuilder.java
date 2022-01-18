@@ -73,23 +73,22 @@ public class ScriptBuilder {
             Function function = stringFunctionPair.getRight();
             String functionName = "wrap$" + stringFunctionPair.getLeft();
 
-            BuildData separate = data.sub();
-            Signature ref = function.reference(separate);
+            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, data, implementationClassName, functionName, () -> {
+                BuildData separate = data.sub();
+                Signature ref = function.reference(separate);
 
-            String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
-                function.prepare(method);
-                Signature args = function.arguments();
-                int frame = 2;
-                for (int arg = 0; arg < args.size(); arg++) {
-                    method.varInsn(args.getType(arg).loadInsn(), frame);
-                    frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
-                }
-                function.invoke(method, separate, args);
-                method.voidReturn();
-            }).getName();
+                String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
+                    function.prepare(method);
+                    Signature args = function.arguments();
+                    int frame = 2;
+                    for (int arg = 0; arg < args.size(); arg++) {
+                        method.varInsn(args.getType(arg).loadInsn(), frame);
+                        frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
+                    }
+                    function.invoke(method, separate, args);
+                    method.voidReturn();
+                }).getName();
 
-
-            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, data, implementationClassName, delegate, functionName, () -> {
                 builder.field(functionName,
                         "L" + delegate + ";",
                         MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
@@ -98,6 +97,8 @@ public class ScriptBuilder {
                         .dup()
                         .invokeSpecial(delegate, "<init>", "()V")
                         .putStatic(implementationClassName, functionName, "L" + delegate + ";");
+
+                return delegate;
             }));
         }
 
