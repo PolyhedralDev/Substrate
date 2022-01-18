@@ -98,7 +98,7 @@ public class ClassBuilder {
         fields.forEach(consumer -> consumer.accept(classWriter));
         byte[] bytes = classWriter.toByteArray();
         Class<?> clazz = loader.defineClass(name.replace('/', '.'), bytes);
-        CompilerUtil.dump(clazz, bytes, zipOutputStream);
+        CompilerUtil.dump(name, bytes, zipOutputStream);
         return clazz;
     }
 

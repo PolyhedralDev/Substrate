@@ -42,7 +42,8 @@ public class LambdaFactory {
 
     public Pair<ClassBuilder, AtomicInteger> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
-            String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor();
+            String endName = "Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor();
+            String name = classBuilder.getName() + "$" + endName;
             ClassBuilder builder = new ClassBuilder(name, true, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
@@ -56,14 +57,10 @@ public class LambdaFactory {
                     .access(MethodBuilder.Access.PUBLIC)
                     .access(MethodBuilder.Access.ABSTRACT);
 
+            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
             return Pair.of(builder, new AtomicInteger(0));
         });
-    }
-
-    public String name(Signature args, Signature returnType) {
-        generate(args, returnType);
-        return classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
@@ -76,7 +73,10 @@ public class LambdaFactory {
     public ClassBuilder implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
         Pair<ClassBuilder, AtomicInteger> pair = generate(args, returnType);
 
-        String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
+        String endName = "IM" + pair.getRight().getAndIncrement();
+        String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor() + "$" + endName;
+
+        pair.getLeft().inner(name, pair.getLeft().getName(), endName, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
 

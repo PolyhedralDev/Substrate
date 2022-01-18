@@ -95,7 +95,7 @@ public class TupleFactory {
 
             byte[] bytes = writer.toByteArray();
             Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
-            CompilerUtil.dump(clazz, bytes, zipOutputStream);
+            CompilerUtil.dump(name, bytes, zipOutputStream);
             return clazz;
         });
     }

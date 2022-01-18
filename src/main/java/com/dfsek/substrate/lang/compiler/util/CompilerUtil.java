@@ -29,7 +29,7 @@ public final class CompilerUtil implements Opcodes {
         return internalName(clazz.getCanonicalName());
     }
 
-    public static void dump(Class<?> clazz, byte[] bytes, ZipOutputStream zipOutputStream) {
+    public static void dump(String clazz, byte[] bytes, ZipOutputStream zipOutputStream) {
         if(zipOutputStream == null) return;
         try {
             zipOutputStream.putNextEntry(new ZipEntry(internalName(clazz) + ".class"));
