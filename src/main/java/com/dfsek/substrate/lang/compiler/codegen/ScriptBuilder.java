@@ -76,7 +76,7 @@ public class ScriptBuilder {
             Signature ref = function.reference(separate);
 
 
-            Class<?> delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
+            String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
                 function.prepare(method);
                 Signature args = function.arguments();
                 int frame = 2;
@@ -86,16 +86,16 @@ public class ScriptBuilder {
                 }
                 function.invoke(method, separate, args);
                 method.voidReturn();
-            });
+            }).getName();
 
             builder.field("fun" + i,
-                    "L" + CompilerUtil.internalName(delegate) + ";",
+                    "L" + delegate + ";",
                     MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
-            staticInitializer.newInsn(CompilerUtil.internalName(delegate))
+            staticInitializer.newInsn(delegate)
                     .dup()
-                    .invokeSpecial(CompilerUtil.internalName(delegate), "<init>", "()V")
-                    .putStatic(implementationClassName, "fun" + i, "L" + CompilerUtil.internalName(delegate) + ";");
+                    .invokeSpecial(delegate, "<init>", "()V")
+                    .putStatic(implementationClassName, "fun" + i, "L" + delegate + ";");
 
             data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, i, delegate));
         }
@@ -110,6 +110,7 @@ public class ScriptBuilder {
         ops.forEach(op -> op.apply(absMethod, data));
 
 
+        data.lambdaFactory().buildAll();
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
 
         if(zipOutputStream != null) {

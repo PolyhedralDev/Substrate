@@ -99,7 +99,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         Signature closureSignature = closure.apply(closureFinder);
 
-        Class<?> lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
+        String lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
 
             for (int i = 0; i < closureTypes.size(); i++) {
@@ -124,9 +124,9 @@ public class LambdaExpressionNode extends ExpressionNode {
                     methodBuilder.refReturn();
                 }
             }
-        });
+        }).getName();
 
-        builder.newInsn(CompilerUtil.internalName(lambda))
+        builder.newInsn(lambda)
                 .dup();
 
         for (Pair<String, Function<BuildData, Signature>> pair : closureTypes) {

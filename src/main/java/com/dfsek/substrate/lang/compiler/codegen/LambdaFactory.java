@@ -9,19 +9,18 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.pair.Pair;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.zip.ZipOutputStream;
 
-import static org.objectweb.asm.Opcodes.*;
-
 public class LambdaFactory {
-    private final Map<Signature, Map<Signature, Pair<Class<?>, AtomicInteger>>> generated = new HashMap<>();
+    private final Map<Signature, Map<Signature, Pair<ClassBuilder, AtomicInteger>>> generated = new HashMap<>();
+    private final List<ClassBuilder> implementations = new ArrayList<>();
 
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
@@ -41,10 +40,10 @@ public class LambdaFactory {
         this.zipOutputStream = zipOutputStream;
     }
 
-    public Class<?> generate(Signature args, Signature returnType) {
+    public Pair<ClassBuilder, AtomicInteger> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
             String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor();
-            ClassWriter writer = CompilerUtil.generateClass(name, true, false, LAMBDA_NAME);
+            ClassBuilder builder = new ClassBuilder(name, true, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
 
@@ -53,19 +52,13 @@ public class LambdaFactory {
                 else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
-            MethodVisitor apply = writer.visitMethod(ACC_PUBLIC | ACC_ABSTRACT,
-                    "apply",
-                    "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret,
-                    null,
-                    null);
-            apply.visitEnd();
+            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret)
+                    .access(MethodBuilder.Access.PUBLIC)
+                    .access(MethodBuilder.Access.ABSTRACT);
 
-            byte[] bytes = writer.toByteArray();
-            Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
-            CompilerUtil.dump(clazz, bytes, zipOutputStream);
 
-            return Pair.of(clazz, new AtomicInteger(0));
-        }).getLeft();
+            return Pair.of(builder, new AtomicInteger(0));
+        });
     }
 
     public String name(Signature args, Signature returnType) {
@@ -75,19 +68,17 @@ public class LambdaFactory {
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
 
-        visitor.invokeInterface(CompilerUtil.internalName(generate(args, ret)),
+        visitor.invokeInterface(generate(args, ret).getLeft().getName(),
                 "apply",
                 "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret));
     }
 
-    public Class<?> implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
-        generate(args, returnType);
-
-        Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
+    public ClassBuilder implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
+        Pair<ClassBuilder, AtomicInteger> pair = generate(args, returnType);
 
         String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
-        ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft()));
+        ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
 
         MethodBuilder constructor = builder.method("<init>",
                         "(" + scope.internalDescriptor() + ")V")
@@ -114,8 +105,14 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() +")" + ret).access(MethodBuilder.Access.PUBLIC));
+        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret).access(MethodBuilder.Access.PUBLIC));
 
-        return builder.build(classLoader, zipOutputStream);
+        implementations.add(builder);
+        return builder;
+    }
+
+    void buildAll() {
+        generated.forEach((sig, map) -> map.forEach((sig2, pair) -> pair.getLeft().build(classLoader, zipOutputStream)));
+        implementations.forEach(impl -> impl.build(classLoader, zipOutputStream));
     }
 }

@@ -397,6 +397,7 @@ public class MethodBuilder implements Opcodes {
 
 
     void apply(MethodVisitor visitor) {
+        if(access.contains(Access.ABSTRACT)) return; // no code in abstract methods
         opCodes.forEach(opCode -> opCode.generate(visitor));
         if (opCodes.isEmpty() || !(opCodes.get(opCodes.size() - 1) instanceof ReturnOpCode)) {
             visitor.visitInsn(RETURN); // return void if no return

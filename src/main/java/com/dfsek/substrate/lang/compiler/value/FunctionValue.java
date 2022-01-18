@@ -11,9 +11,9 @@ public class FunctionValue implements Value {
     private final BuildData data;
     private final String implementationClassName;
     private final int finalI;
-    private final Class<?> delegate;
+    private final String delegate;
 
-    public FunctionValue(Function function, BuildData data, String implementationClassName, int finalI, Class<?> delegate) {
+    public FunctionValue(Function function, BuildData data, String implementationClassName, int finalI, String delegate) {
         this.function = function;
         this.data = data;
         this.implementationClassName = implementationClassName;
@@ -30,6 +30,6 @@ public class FunctionValue implements Value {
     public void load(MethodBuilder visitor, BuildData data) {
         visitor.getStatic(implementationClassName,
                 "fun" + finalI,
-                "L" + CompilerUtil.internalName(delegate) + ";");
+                "L" + delegate + ";");
     }
 }
