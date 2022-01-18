@@ -30,20 +30,20 @@ public class LambdaFactory {
 
     private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
 
-    private final String baseName;
+    private final ClassBuilder classBuilder;
 
     private final ZipOutputStream zipOutputStream;
 
-    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory, String baseName, ZipOutputStream zipOutputStream) {
+    public LambdaFactory(DynamicClassLoader classLoader, TupleFactory tupleFactory, ClassBuilder classBuilder, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
         this.tupleFactory = tupleFactory;
-        this.baseName = baseName;
+        this.classBuilder = classBuilder;
         this.zipOutputStream = zipOutputStream;
     }
 
     public Class<?> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
-            String name = baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor();
+            String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor();
             ClassWriter writer = CompilerUtil.generateClass(name, true, false, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
@@ -70,7 +70,7 @@ public class LambdaFactory {
 
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
-        return baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
+        return classBuilder + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
@@ -85,7 +85,7 @@ public class LambdaFactory {
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
-        String name = baseName + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
+        String name = classBuilder + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft()));
 

@@ -33,8 +33,8 @@ public class BuildData {
     public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
-        tupleFactory = new TupleFactory(classLoader, classWriter.getName(), zipOutputStream);
-        lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter.getName(), zipOutputStream);
+        tupleFactory = new TupleFactory(classLoader, classWriter, zipOutputStream);
+        lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter, zipOutputStream);
         this.name = classWriter.getName();
         values = new HashMap<>();
         valueOffsets = new HashMap<>();

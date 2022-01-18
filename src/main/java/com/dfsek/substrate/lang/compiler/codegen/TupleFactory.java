@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
+import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -21,19 +22,19 @@ public class TupleFactory {
 
     private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
 
-    private final String baseName;
+    private final ClassBuilder classBuilder;
     private final ZipOutputStream zipOutputStream;
 
-    public TupleFactory(DynamicClassLoader classLoader, String baseName, ZipOutputStream zipOutputStream) {
+    public TupleFactory(DynamicClassLoader classLoader, ClassBuilder classBuilder, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;
-        this.baseName = baseName;
+        this.classBuilder = classBuilder;
         this.zipOutputStream = zipOutputStream;
     }
 
     public Class<?> generate(Signature args) {
         return generated.computeIfAbsent(args, ignore -> {
 
-            String name = baseName + "$Tuple$IM_" + args.classDescriptor();
+            String name = classBuilder.getName() + "$Tuple$IM_" + args.classDescriptor();
 
             ClassWriter writer = CompilerUtil.generateClass(name, false, false, TUPLE_NAME);
 
