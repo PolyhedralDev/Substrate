@@ -71,6 +71,7 @@ public class ScriptBuilder {
 
         for (int i = 0; i < functions.size(); i++) {
             Function function = functions.get(i).getRight();
+            String functionName = "wrap$" + functions.get(i).getLeft();
 
             BuildData separate = data.sub();
             Signature ref = function.reference(separate);
@@ -88,16 +89,16 @@ public class ScriptBuilder {
                 method.voidReturn();
             }).getName();
 
-            builder.field("fun" + i,
+            builder.field(functionName,
                     "L" + delegate + ";",
                     MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
 
             staticInitializer.newInsn(delegate)
                     .dup()
                     .invokeSpecial(delegate, "<init>", "()V")
-                    .putStatic(implementationClassName, "fun" + i, "L" + delegate + ";");
+                    .putStatic(implementationClassName, functionName, "L" + delegate + ";");
 
-            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, i, delegate));
+            data.registerValue(functions.get(i).getLeft(), new FunctionValue(function, data, implementationClassName, delegate, functionName));
         }
 
         staticInitializer.voidReturn();

@@ -4,21 +4,20 @@ import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 
 public class FunctionValue implements Value {
     private final Function function;
     private final BuildData data;
     private final String implementationClassName;
-    private final int finalI;
     private final String delegate;
+    private final String name;
 
-    public FunctionValue(Function function, BuildData data, String implementationClassName, int finalI, String delegate) {
+    public FunctionValue(Function function, BuildData data, String implementationClassName, String delegate, String name) {
         this.function = function;
         this.data = data;
         this.implementationClassName = implementationClassName;
-        this.finalI = finalI;
         this.delegate = delegate;
+        this.name = name;
     }
 
     @Override
@@ -29,7 +28,7 @@ public class FunctionValue implements Value {
     @Override
     public void load(MethodBuilder visitor, BuildData data) {
         visitor.getStatic(implementationClassName,
-                "fun" + finalI,
+                name,
                 "L" + delegate + ";");
     }
 }
