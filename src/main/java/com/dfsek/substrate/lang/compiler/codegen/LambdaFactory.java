@@ -70,7 +70,7 @@ public class LambdaFactory {
 
     public String name(Signature args, Signature returnType) {
         generate(args, returnType);
-        return classBuilder + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
+        return classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + (generated.get(args).get(returnType).getRight().get() - 1);
     }
 
     public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
@@ -85,7 +85,7 @@ public class LambdaFactory {
 
         Pair<Class<?>, AtomicInteger> pair = generated.get(args).get(returnType);
 
-        String name = classBuilder + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
+        String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "$R" + returnType.classDescriptor() + "$IM" + pair.getRight().getAndIncrement();
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft()));
 

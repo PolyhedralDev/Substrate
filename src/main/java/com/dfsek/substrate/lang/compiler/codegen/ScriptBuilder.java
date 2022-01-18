@@ -45,6 +45,7 @@ public class ScriptBuilder {
         if (DUMP) {
             try {
                 File out = new File(".substrate/dumps/" + builds + ".jar");
+                System.out.println("Dumping to " + out.getAbsolutePath());
                 if(out.exists()) out.delete();
                 out.getParentFile().mkdirs();
                 out.createNewFile();
