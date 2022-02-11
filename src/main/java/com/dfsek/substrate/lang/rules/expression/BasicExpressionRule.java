@@ -25,13 +25,17 @@ public class BasicExpressionRule implements Rule {
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER, Token.Type.STRING, Token.Type.BOOLEAN, Token.Type.NUMBER, Token.Type.INT);
         if (tokenizer.peek().getType() == Token.Type.STRING) {
-            return new StringNode(tokenizer.consume());
+            Token token = tokenizer.consume();
+            return new StringNode(token.getContent(), token.getPosition());
         } else if (tokenizer.peek().getType() == Token.Type.BOOLEAN) {
-            return new BooleanNode(tokenizer.consume());
+            Token token = tokenizer.consume();
+            return new BooleanNode(Boolean.parseBoolean(token.getContent()), token.getPosition());
         } else if (tokenizer.peek().getType() == Token.Type.NUMBER) {
-            return new DecimalNode(tokenizer.consume());
+            Token token = tokenizer.consume();
+            return new DecimalNode(Double.parseDouble(token.getContent()), token.getPosition());
         } else if (tokenizer.peek().getType() == Token.Type.INT) {
-            return new IntegerNode(tokenizer.consume());
+            Token token = tokenizer.consume();
+            return new IntegerNode(Integer.parseInt(token.getContent()), token.getPosition());
         } else {
             ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
             if(tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {

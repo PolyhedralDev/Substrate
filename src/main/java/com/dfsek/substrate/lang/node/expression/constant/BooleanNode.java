@@ -4,17 +4,17 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 
-public class BooleanNode extends ConstantExpressionNode {
-    public BooleanNode(Token token) {
-        super(token);
+public class BooleanNode extends ConstantExpressionNode<Boolean> {
+    public BooleanNode(boolean value, Position position) {
+        super(value, position);
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        boolean val = Boolean.parseBoolean(token.getContent());
-        if (val) {
+        if (value) {
             builder.pushTrue(); // true
         } else {
             builder.pushFalse(); // false

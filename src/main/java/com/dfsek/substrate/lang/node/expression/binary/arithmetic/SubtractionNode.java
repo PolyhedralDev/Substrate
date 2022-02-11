@@ -18,4 +18,14 @@ public class SubtractionNode extends NumericBinaryNode {
     protected int doubleOp() {
         return DSUB;
     }
+
+    @Override
+    public double apply(double left, double right) {
+        return left - right;
+    }
+
+    @Override
+    public int apply(int left, int right) {
+        return left - right;
+    }
 }

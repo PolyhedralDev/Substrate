@@ -3,25 +3,30 @@ package com.dfsek.substrate.lang.node.expression.constant;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public abstract class ConstantExpressionNode extends ExpressionNode {
-    protected final Token token;
+public abstract class ConstantExpressionNode<T> extends ExpressionNode {
+    protected final T value;
+    private final Position position;
 
-    public ConstantExpressionNode(Token token) {
-        this.token = token;
+    public ConstantExpressionNode(T value, Position position) {
+        this.value = value;
+        this.position = position;
     }
 
     @Override
     public Position getPosition() {
-        return token.getPosition();
+        return position;
     }
 
     @Override
     public Collection<Node> contents() {
         return Collections.emptyList();
+    }
+
+    public T getValue() {
+        return value;
     }
 }

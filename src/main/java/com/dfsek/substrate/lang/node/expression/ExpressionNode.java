@@ -17,4 +17,9 @@ public abstract class ExpressionNode extends NodeHolder implements Typed {
     public void applyReferential(MethodBuilder visitor, BuildData data) {
         simplify().apply(visitor, data);
     }
+
+    @Override
+    public ExpressionNode simplify() {
+        return this;
+    }
 }

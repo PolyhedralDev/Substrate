@@ -3,19 +3,20 @@ package com.dfsek.substrate.lang.node.expression.constant;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 
-public class IntegerNode extends ConstantExpressionNode {
-    public IntegerNode(Token token) {
-        super(token);
+import java.awt.*;
+
+public class IntegerNode extends ConstantExpressionNode<Integer> {
+    public IntegerNode(int value, Position position) {
+        super(value, position);
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        int i = Integer.parseInt(token.getContent());
-        builder.pushInt(i);
+        builder.pushInt(value);
     }
 
     @Override

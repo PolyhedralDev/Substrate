@@ -4,6 +4,8 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
+import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.tokenizer.Token;
 
@@ -36,5 +38,24 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
             return ref.getGenericReturn(0);
         }
         return ref;
+    }
+
+    public abstract double apply(double left, double right);
+
+    public abstract int apply(int left, int right);
+
+    @Override
+    public ExpressionNode simplify() {
+        if (left instanceof DecimalNode && right instanceof DecimalNode) {
+            return new DecimalNode(
+                    apply(((DecimalNode) left).getValue(), ((DecimalNode) right).getValue()),
+                    left.getPosition());
+        }
+        if (left instanceof IntegerNode && right instanceof IntegerNode) {
+            return new IntegerNode(
+                    apply(((IntegerNode) left).getValue(), ((IntegerNode) right).getValue()),
+                    left.getPosition());
+        }
+        return this;
     }
 }

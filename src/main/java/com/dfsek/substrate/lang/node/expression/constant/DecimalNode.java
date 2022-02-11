@@ -4,16 +4,17 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 
-public class DecimalNode extends ConstantExpressionNode {
-    public DecimalNode(Token token) {
-        super(token);
+public class DecimalNode extends ConstantExpressionNode<Double> {
+    public DecimalNode(double value, Position position) {
+        super(value, position);
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        builder.pushDouble(Double.parseDouble(token.getContent()));
+        builder.pushDouble(value);
     }
 
     @Override

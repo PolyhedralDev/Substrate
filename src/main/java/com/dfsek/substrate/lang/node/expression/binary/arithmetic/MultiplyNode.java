@@ -18,4 +18,14 @@ public class MultiplyNode extends NumericBinaryNode {
     protected int doubleOp() {
         return DMUL;
     }
+
+    @Override
+    public double apply(double left, double right) {
+        return left * right;
+    }
+
+    @Override
+    public int apply(int left, int right) {
+        return left * right;
+    }
 }

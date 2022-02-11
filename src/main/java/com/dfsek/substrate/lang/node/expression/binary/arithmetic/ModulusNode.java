@@ -18,4 +18,14 @@ public class ModulusNode extends NumericBinaryNode {
     protected int doubleOp() {
         return DREM;
     }
+
+    @Override
+    public double apply(double left, double right) {
+        return left % right;
+    }
+
+    @Override
+    public int apply(int left, int right) {
+        return left % right;
+    }
 }

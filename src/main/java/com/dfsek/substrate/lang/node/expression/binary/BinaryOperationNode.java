@@ -19,15 +19,15 @@ public abstract class BinaryOperationNode extends ExpressionNode {
     protected final Token op;
 
     public BinaryOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
-        this.left = left;
-        this.right = right;
+        this.left = left.simplify();
+        this.right = right.simplify();
         this.op = op;
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        left.simplify().apply(builder, data);
-        right.simplify().apply(builder, data);
+        left.apply(builder, data);
+        right.apply(builder, data);
         applyOp(builder, data);
     }
 
