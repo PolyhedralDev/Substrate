@@ -37,7 +37,7 @@ public class TupleFactory {
 
             String endName = "TupleIM_" + args.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
-            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
             ClassWriter writer = CompilerUtil.generateClass(name, false, false, TUPLE_NAME);
 
