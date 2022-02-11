@@ -105,7 +105,9 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret).access(MethodBuilder.Access.PUBLIC));
+        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret)
+                .access(MethodBuilder.Access.PUBLIC)
+                .annotate("java/lang/Override"));
 
         implementations.add(builder);
         return builder;
