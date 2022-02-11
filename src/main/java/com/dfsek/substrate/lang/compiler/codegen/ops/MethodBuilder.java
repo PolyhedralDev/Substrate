@@ -1,19 +1,20 @@
 package com.dfsek.substrate.lang.compiler.codegen.ops;
 
-import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("UnusedReturnValue")
 public class MethodBuilder implements Opcodes {
 
     private final List<OpCode> opCodes = new ArrayList<>();
     private final List<Access> access = new ArrayList<>();
+
+    private final List<Pair<String, Boolean>> annotations = new ArrayList<>();
 
     private final ClassBuilder classBuilder;
 
@@ -32,6 +33,15 @@ public class MethodBuilder implements Opcodes {
     public MethodBuilder access(Access access) {
         this.access.add(access);
         return this;
+    }
+
+    public MethodBuilder annotate(String annotation, boolean visible) {
+        annotations.add(Pair.of(annotation, visible));
+        return this;
+    }
+
+    public MethodBuilder annotate(String annotation) {
+        return annotate(annotation, true);
     }
 
     public MethodBuilder descriptor(String descriptor) {
@@ -397,7 +407,8 @@ public class MethodBuilder implements Opcodes {
 
 
     void apply(MethodVisitor visitor) {
-        if(access.contains(Access.ABSTRACT)) return; // no code in abstract methods
+        annotations.forEach(pair -> visitor.visitAnnotation(pair.getLeft(), pair.getRight()));
+        if (access.contains(Access.ABSTRACT)) return; // no code in abstract methods
         opCodes.forEach(opCode -> opCode.generate(visitor));
         if (opCodes.isEmpty() || !(opCodes.get(opCodes.size() - 1) instanceof ReturnOpCode)) {
             visitor.visitInsn(RETURN); // return void if no return
