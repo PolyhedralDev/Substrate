@@ -107,7 +107,7 @@ public class ScriptBuilder {
 
         macros.forEach(data::registerMacro);
 
-        ops.forEach(op -> op.apply(absMethod, data));
+        ops.forEach(op -> op.simplify().apply(absMethod, data));
 
 
         data.lambdaFactory().buildAll();

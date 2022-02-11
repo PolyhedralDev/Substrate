@@ -24,10 +24,10 @@ public class ListIndexNode extends ExpressionNode {
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkWeakReferenceType(listReference, data, Signature.list())
-                .apply(builder, data);
+                .simplify().apply(builder, data);
 
         ParserUtil.checkType(index, data, Signature.integer())
-                .apply(builder, data);
+                .simplify().apply(builder, data);
 
         Signature ref = reference(data);
 

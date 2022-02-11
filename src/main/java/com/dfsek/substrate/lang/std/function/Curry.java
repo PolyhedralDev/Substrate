@@ -32,7 +32,7 @@ public class Curry implements Macro {
     public void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes) {
         Signature functionArgs = args.getGenericArguments(0);
         generateClosure(0, functionArgs, reference(args, data).getSimpleReturn(), argNodes.get(0))
-                .apply(visitor, data);
+                .simplify().apply(visitor, data);
     }
 
     private ExpressionNode generateClosure(int captureTo, Signature args, Signature ret, ExpressionNode function) {

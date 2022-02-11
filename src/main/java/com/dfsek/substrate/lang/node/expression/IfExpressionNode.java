@@ -38,16 +38,16 @@ public class IfExpressionNode extends ExpressionNode {
 
         Label equal = new Label();
         Label end = new Label();
-        predicate.apply(builder, data);
+        predicate.simplify().apply(builder, data);
 
         builder.ifEQ(equal);
 
-        caseTrue.apply(builder, data);
+        caseTrue.simplify().apply(builder, data);
 
         builder.goTo(end)
                 .label(equal);
 
-        caseFalse.apply(builder, data);
+        caseFalse.simplify().apply(builder, data);
 
         builder.label(end);
     }

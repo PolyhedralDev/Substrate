@@ -116,7 +116,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
 
             System.out.println("CONTENT REF: " + content.reference(delegate));
-            ParserUtil.checkReferenceType(content, delegate, returnType).apply(methodBuilder, delegate);
+            ParserUtil.checkReferenceType(content, delegate, returnType).simplify().apply(methodBuilder, delegate);
             if(!(content instanceof BlockNode)) {
                 if(returnType.isSimple()) {
                     methodBuilder.insn(returnType.getType(0).returnInsn());

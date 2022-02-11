@@ -26,8 +26,8 @@ public abstract class BinaryOperationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        left.apply(builder, data);
-        right.apply(builder, data);
+        left.simplify().apply(builder, data);
+        right.simplify().apply(builder, data);
         applyOp(builder, data);
     }
 

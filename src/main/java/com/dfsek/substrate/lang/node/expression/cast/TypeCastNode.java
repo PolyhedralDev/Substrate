@@ -22,7 +22,7 @@ public abstract class TypeCastNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        value.apply(builder, data);
+        value.simplify().apply(builder, data);
         applyCast(builder, data);
     }
 

@@ -24,7 +24,7 @@ public class ReturnNode extends ExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         if (value == null) builder.voidReturn();
         else {
-            value.apply(builder, data);
+            value.simplify().apply(builder, data);
             Signature ret = value.reference(data);
             if (ret.size() == 1) builder.insn(ret.getType(0).returnInsn());
             else builder.refReturn();

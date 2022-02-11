@@ -15,6 +15,6 @@ import java.util.stream.StreamSupport;
 
 public abstract class ExpressionNode extends NodeHolder implements Typed {
     public void applyReferential(MethodBuilder visitor, BuildData data) {
-        apply(visitor, data);
+        simplify().apply(visitor, data);
     }
 }

@@ -26,9 +26,9 @@ public class RangeNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        upper.apply(builder, data);
+        upper.simplify().apply(builder, data);
 
-        lower.apply(builder, data);
+        lower.simplify().apply(builder, data);
         builder.dup();
 
         int lowerRef = data.getOffset();

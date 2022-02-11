@@ -23,7 +23,7 @@ public class BooleanNotNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(node, data, Signature.bool()).apply(builder, data);
+        ParserUtil.checkType(node, data, Signature.bool()).simplify().apply(builder, data);
         builder.invertBoolean();
     }
 

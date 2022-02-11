@@ -32,7 +32,7 @@ public class TupleNode extends ExpressionNode {
                 .dup();
 
         args.forEach(arg -> {
-            arg.apply(builder, data);
+            arg.simplify().apply(builder, data);
             CompilerUtil.deconstructTuple(arg, data, builder);
         });
 

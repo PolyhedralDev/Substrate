@@ -25,7 +25,7 @@ public class LambdaInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        lambda.apply(builder, data);
+        lambda.simplify().apply(builder, data);
 
         data.loadImplementationArguments(builder);
 

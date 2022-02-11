@@ -27,7 +27,7 @@ public class StatementNode extends NodeHolder {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         Label statement = new Label();
         builder.label(statement);
-        content.apply(builder, data);
+        content.simplify().apply(builder, data);
 
         Signature ref = content.reference(data);
         if(!ref.equals(Signature.empty())) {

@@ -41,7 +41,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         data.loadImplementationArguments(builder);
 
         for (ExpressionNode arg : arguments) {
-            arg.apply(builder, data);
+            arg.simplify().apply(builder, data);
             CompilerUtil.deconstructTuple(arg, data, builder);
         }
 

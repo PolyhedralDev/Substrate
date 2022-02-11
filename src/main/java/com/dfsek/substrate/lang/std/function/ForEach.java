@@ -25,7 +25,7 @@ public class ForEach implements Macro {
 
     @Override
     public void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes) {
-        argNodes.forEach(arg -> arg.apply(visitor, data));
+        argNodes.forEach(arg -> arg.simplify().apply(visitor, data));
 
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);

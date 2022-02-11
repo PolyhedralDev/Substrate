@@ -16,13 +16,13 @@ public class BooleanAndNode extends BooleanOperationNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(left, data, Signature.bool()).apply(builder, data);
+        ParserUtil.checkType(left, data, Signature.bool()).simplify().apply(builder, data);
         Label shortFalse = new Label();
         Label end = new Label();
 
         builder.ifEQ(shortFalse);
 
-        ParserUtil.checkType(right, data, Signature.bool()).apply(builder, data);
+        ParserUtil.checkType(right, data, Signature.bool()).simplify().apply(builder, data);
 
         builder.ifEQ(shortFalse)
                 .pushInt(1)

@@ -26,7 +26,7 @@ public class BlockNode extends ExpressionNode {
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         BuildData scope = data.sub();
-        contents.forEach(node -> node.apply(builder, scope));
+        contents.forEach(node -> node.simplify().apply(builder, scope));
     }
 
     @Override

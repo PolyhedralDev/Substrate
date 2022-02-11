@@ -42,7 +42,7 @@ public class ValueAssignmentNode extends ExpressionNode {
             System.out.println("SELF: " + id);
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
-        value.apply(builder, data);
+        value.simplify().apply(builder, data);
 
         if (ref.equals(Signature.decimal())) {
             builder.dup2();
