@@ -57,7 +57,7 @@ public class LambdaFactory {
                     .access(MethodBuilder.Access.PUBLIC)
                     .access(MethodBuilder.Access.ABSTRACT);
 
-            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
             return Pair.of(builder, new AtomicInteger(0));
         });
