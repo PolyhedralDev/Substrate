@@ -11,4 +11,8 @@ import org.objectweb.asm.Opcodes;
 
 public interface Node extends Opcodes, Positioned {
     void apply(MethodBuilder builder, BuildData data) throws ParseException;
+
+    default Node simplify() {
+        return this;
+    }
 }
