@@ -76,7 +76,7 @@ public class LambdaFactory {
         String endName = "IM" + pair.getRight().getAndIncrement();
         String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor() + "$" + endName;
 
-        pair.getLeft().inner(name, pair.getLeft().getName(), endName, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+        pair.getLeft().inner(name, pair.getLeft().getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
 
