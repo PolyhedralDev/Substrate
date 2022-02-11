@@ -18,7 +18,7 @@ public class StringNode extends ConstantExpressionNode<String> {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.string();
     }
 }

@@ -40,7 +40,7 @@ public class ListNode extends ExpressionNode {
         for (int i = 0; i < elements.size(); i++) {
             builder.dup(); // duplicate reference for all elements.
             builder.pushInt(i); // push index
-            elements.get(i).applyReferential(builder, data); // apply value
+            elements.get(i).apply(builder, data); // apply value
             if(elementSignature.isSimple()) {
                 builder.insn(elementSignature.getType(0).arrayStoreInsn());
             } else {

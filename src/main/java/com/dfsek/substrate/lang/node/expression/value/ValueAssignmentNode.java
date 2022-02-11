@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -20,7 +21,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
     public ValueAssignmentNode(Token id, ExpressionNode value) {
         this.id = id;
-        this.value = value;
+        this.value = value.simplify();
     }
 
     public Token getId() {
@@ -42,7 +43,7 @@ public class ValueAssignmentNode extends ExpressionNode {
             System.out.println("SELF: " + id);
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
-        value.simplify().apply(builder, data);
+        value.apply(builder, data);
 
         if (ref.equals(Signature.decimal())) {
             builder.dup2();
@@ -64,6 +65,14 @@ public class ValueAssignmentNode extends ExpressionNode {
             }
             builder.aStore(offset);
         }
+    }
+
+    @Override
+    public ExpressionNode simplify() {
+        if(value instanceof ConstantExpressionNode) {
+            return new ConstantValueNode(id, (ConstantExpressionNode<?>) value);
+        }
+        return this;
     }
 
     @Override

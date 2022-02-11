@@ -49,16 +49,7 @@ public class ValueReferenceNode extends ExpressionNode {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
 
-        Value value = data.getValue(id.getContent());
-        value.load(builder, data);
-    }
-
-    @Override
-    public void applyReferential(MethodBuilder visitor, BuildData data) {
-        if (!data.valueExists(id.getContent())) {
-            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-        }
-        data.getValue(id.getContent()).load(visitor, data);
+        data.getValue(id.getContent()).load(builder, data);
     }
 
     @Override
