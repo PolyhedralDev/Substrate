@@ -4,10 +4,12 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
+import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.tokenizer.Token;
 
-public class NumToIntCastNode extends TypeCastNode {
+public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
     public NumToIntCastNode(Token type, ExpressionNode value) {
         super(type, value);
     }
@@ -16,6 +18,14 @@ public class NumToIntCastNode extends TypeCastNode {
     public void applyCast(MethodBuilder visitor, BuildData data) {
         ParserUtil.checkType(value, data, Signature.decimal());
         visitor.d2i();
+    }
+
+    @Override
+    public ExpressionNode simplify() {
+        if(value instanceof DecimalNode) {
+            return new IntegerNode(((DecimalNode) value).getValue().intValue(), value.getPosition());
+        }
+        return super.simplify();
     }
 
     @Override

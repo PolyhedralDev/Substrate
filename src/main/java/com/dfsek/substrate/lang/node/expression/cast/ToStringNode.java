@@ -4,10 +4,14 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
+import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
+import com.dfsek.substrate.lang.node.expression.constant.StringNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.tokenizer.Token;
 
-public class ToStringNode extends TypeCastNode {
+public class ToStringNode extends TypeCastNode<Object, String> {
     public ToStringNode(Token type, ExpressionNode value) {
         super(type, value);
     }
@@ -26,6 +30,14 @@ public class ToStringNode extends TypeCastNode {
                     "toString",
                     "(D)Ljava/lang/String;");
         }
+    }
+
+    @Override
+    public ExpressionNode simplify() {
+        if(value instanceof DecimalNode || value instanceof IntegerNode) {
+            return new StringNode(((ConstantExpressionNode<?>) value).getValue().toString(), value.getPosition());
+        }
+        return super.simplify();
     }
 
     @Override
