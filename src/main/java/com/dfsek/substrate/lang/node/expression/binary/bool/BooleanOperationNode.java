@@ -17,8 +17,8 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     private final Token op;
 
     public BooleanOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
-        this.left = left;
-        this.right = right;
+        this.left = left.simplify();
+        this.right = right.simplify();
         this.op = op;
     }
 

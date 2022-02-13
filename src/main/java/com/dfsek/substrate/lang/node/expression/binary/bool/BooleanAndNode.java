@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -20,14 +21,33 @@ public class BooleanAndNode extends BooleanOperationNode {
     }
 
     @Override
+    public ExpressionNode simplify() {
+        if(left instanceof BooleanNode) {
+            if(((BooleanNode) left).getValue()) {
+                return right; // left does not matter.
+            } else {
+                return left; // short-circuit
+            }
+        }
+        if(right instanceof BooleanNode) {
+            if(((BooleanNode) right).getValue()) {
+                return left; // right does not matter.
+            } else {
+                return right; // short-circuit
+            }
+        }
+        return super.simplify();
+    }
+
+    @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(left, data, Signature.bool()).simplify().apply(builder, data);
+        ParserUtil.checkType(left, data, Signature.bool()).apply(builder, data);
         Label shortFalse = new Label();
         Label end = new Label();
 
         builder.ifEQ(shortFalse);
 
-        ParserUtil.checkType(right, data, Signature.bool()).simplify().apply(builder, data);
+        ParserUtil.checkType(right, data, Signature.bool()).apply(builder, data);
 
         builder.ifEQ(shortFalse)
                 .pushInt(1)
