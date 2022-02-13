@@ -138,32 +138,68 @@ public class ExpressionRule implements Rule {
         if (op.getType() == Token.Type.ADDITION_OPERATOR) {
             return new AdditionNode(
                     data.checkType(left, Signature.integer(), Signature.string(), Signature.decimal()),
-                    data.checkType(right, Signature.integer(), Signature.string(), Signature.decimal()),
+                    data.assertEqual(right, left),
                     op);
         } else if (op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
-            return new SubtractionNode(left, right, op);
+            return new SubtractionNode(
+                    data.checkType(left, Signature.integer(), Signature.decimal()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
-            return new MultiplyNode(left, right, op);
+            return new MultiplyNode(
+                    data.checkType(left, Signature.integer(), Signature.decimal()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.DIVISION_OPERATOR) {
-            return new DivisionNode(left, right, op);
+            return new DivisionNode(
+                    data.checkType(left, Signature.integer(), Signature.decimal()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.MODULO_OPERATOR) {
-            return new ModulusNode(left, right, op);
+            return new ModulusNode(
+                    data.checkType(left, Signature.integer(), Signature.decimal()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.EQUALS_OPERATOR) {
-            return new EqualsNode(left, right, op);
+            return new EqualsNode(
+                    left,
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.NOT_EQUALS_OPERATOR) {
-            return new NotEqualsNode(left, right, op);
+            return new NotEqualsNode(
+                    left,
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.GREATER_THAN_OPERATOR) {
-            return new GreaterThanNode(left, right, op);
+            return new GreaterThanNode(
+                    data.checkType(left, Signature.decimal(), Signature.integer()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.LESS_THAN_OPERATOR) {
-            return new LessThanNode(left, right, op);
+            return new LessThanNode(
+                    data.checkType(left, Signature.decimal(), Signature.integer()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR) {
-            return new GreaterThanOrEqualsNode(left, right, op);
+            return new GreaterThanOrEqualsNode(
+                    data.checkType(left, Signature.decimal(), Signature.integer()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.LESS_THAN_OR_EQUALS_OPERATOR) {
-            return new LessThanOrEqualsNode(left, right, op);
+            return new LessThanOrEqualsNode(
+                    data.checkType(left, Signature.decimal(), Signature.integer()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.BOOLEAN_AND) {
-            return new BooleanAndNode(left, right, op);
+            return new BooleanAndNode(
+                    data.checkType(left, Signature.bool()),
+                    data.assertEqual(right, left),
+                    op);
         } else if (op.getType() == Token.Type.BOOLEAN_OR) {
-            return new BooleanOrNode(left, right, op);
+            return new BooleanOrNode(
+                    data.checkType(left, Signature.bool()),
+                    data.assertEqual(right, left),
+                    op);
         } else {
             throw new ParseException("Unexpected token: " + op, op.getPosition());
         }
