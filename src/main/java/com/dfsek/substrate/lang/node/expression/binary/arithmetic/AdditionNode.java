@@ -5,6 +5,8 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
+import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
+import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.tokenizer.Token;
 import org.objectweb.asm.Opcodes;
@@ -58,5 +60,23 @@ public class AdditionNode extends NumericBinaryNode {
             return ref.getGenericReturn(0);
         }
         return ref;
+    }
+
+    @Override
+    public ExpressionNode simplify() {
+        if(left instanceof IntegerNode && ((IntegerNode) left).getValue() == 0) {
+            return right; // 0 + a == a
+        }
+        if(left instanceof DecimalNode && ((DecimalNode) left).getValue() == 0) {
+            return right; // 0 + a == a
+        }
+
+        if(right instanceof IntegerNode && ((IntegerNode) right).getValue() == 0) {
+            return left; // a + 0 == a
+        }
+        if(right instanceof DecimalNode && ((DecimalNode) right).getValue() == 0) {
+            return left; // a + 0 == a
+        }
+        return super.simplify();
     }
 }
