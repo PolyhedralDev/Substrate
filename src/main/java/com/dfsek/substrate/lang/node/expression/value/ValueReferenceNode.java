@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -17,6 +18,8 @@ public class ValueReferenceNode extends ExpressionNode {
 
     private boolean isLambdaArgument = false;
     private boolean isLocal = false;
+
+    private volatile Signature signature;
 
     public void setLocal(boolean local) {
         isLocal = local;
@@ -47,8 +50,9 @@ public class ValueReferenceNode extends ExpressionNode {
         if (!data.valueExists(id.getContent())) {
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
         }
-
-        data.getValue(id.getContent()).load(builder, data);
+        Value value = data.getValue(id.getContent());
+        this.signature = value.reference();
+        value.load(builder, data);
     }
 
     @Override
@@ -64,6 +68,7 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public Signature reference(BuildData data) {
+        if(signature != null) return signature;
         if (!data.valueExists(id.getContent())) {
             System.out.println(data.getValues());
             throw new ParseException("No such value: " + id.getContent(), id.getPosition());
