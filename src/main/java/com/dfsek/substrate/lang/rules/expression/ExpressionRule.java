@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
@@ -124,18 +125,21 @@ public class ExpressionRule implements Rule {
         Token next = tokenizer.peek();
         if (next.isBinaryOperator()) {
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                return join(left, op, assembleBinaryOperator(right, tokenizer, data));
+                return join(left, op, assembleBinaryOperator(right, tokenizer, data), data);
             } else {
-                return assembleBinaryOperator(join(left, op, right), tokenizer, data);
+                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data);
             }
         }
 
-        return join(left, op, right);
+        return join(left, op, right, data);
     }
 
-    private ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right) {
+    private ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right, ParseData data) {
         if (op.getType() == Token.Type.ADDITION_OPERATOR) {
-            return new AdditionNode(left, right, op);
+            return new AdditionNode(
+                    data.checkType(left, Signature.integer(), Signature.string(), Signature.decimal()),
+                    data.checkType(right, Signature.integer(), Signature.string(), Signature.decimal()),
+                    op);
         } else if (op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
             return new SubtractionNode(left, right, op);
         } else if (op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
