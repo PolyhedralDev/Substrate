@@ -5,10 +5,9 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.tokenizer.Token;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public enum DataType implements Opcodes{
+public enum DataType implements Opcodes {
     INT {
         @Override
         public String descriptor() {
@@ -83,6 +82,7 @@ public enum DataType implements Opcodes{
         public int arrayLoadInsn() {
             return DALOAD;
         }
+
         @Override
         public void applyNewArray(MethodBuilder visitor, Signature generic) {
             visitor.newArray(T_DOUBLE);
@@ -154,6 +154,7 @@ public enum DataType implements Opcodes{
         public char descriptorChar() {
             return 'F';
         }
+
         @Override
         public void applyNewArray(MethodBuilder visitor, Signature generic) {
             visitor.aNewArray(CompilerUtil.internalName(Lambda.class));
@@ -169,6 +170,7 @@ public enum DataType implements Opcodes{
         public char descriptorChar() {
             return 'A';
         }
+
         @Override
         public void applyNewArray(MethodBuilder visitor, Signature generic) {
             StringBuilder arr = new StringBuilder("[");
@@ -177,23 +179,23 @@ public enum DataType implements Opcodes{
         }
 
         private void nestArray(StringBuilder arr, Signature generic) {
-            if(generic.isSimple()) {
-                if(generic.getType(0).equals(INT)) {
+            if (generic.isSimple()) {
+                if (generic.getType(0).equals(INT)) {
                     arr.append('I');
-                } else if(generic.getType(0).equals(NUM)) {
+                } else if (generic.getType(0).equals(NUM)) {
                     arr.append('D');
-                } else if(generic.getType(0).equals(BOOL)) {
+                } else if (generic.getType(0).equals(BOOL)) {
                     arr.append('Z');
-                } else if(generic.getType(0).equals(STR)) {
+                } else if (generic.getType(0).equals(STR)) {
                     arr.append("Ljava/lang/String;");
-                } else if(generic.getType(0).equals(FUN)) {
+                } else if (generic.getType(0).equals(FUN)) {
                     arr.append('L').append(CompilerUtil.internalName(Lambda.class)).append(';');
-                } else if(generic.getType(0).equals(LIST)) {
+                } else if (generic.getType(0).equals(LIST)) {
                     Signature nested = generic.getGenericReturn(0);
                     nestArray(arr, nested);
                 }
             } else {
-                if(generic.equals(Signature.empty())) {
+                if (generic.equals(Signature.empty())) {
                     throw new IllegalArgumentException("Cannot construct array of VOID");
                 }
                 arr.append("L").append(CompilerUtil.internalName(Tuple.class)).append(";"); // It's a tuple.

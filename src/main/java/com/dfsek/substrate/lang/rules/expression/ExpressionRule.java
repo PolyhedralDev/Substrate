@@ -54,7 +54,7 @@ public class ExpressionRule implements Rule {
         boolean possibleFunctionSite = true;
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
-            if(test.isIdentifier() && data.hasMacro(test.getContent())) {
+            if (test.isIdentifier() && data.hasMacro(test.getContent())) {
                 tokenizer.consume();
                 node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(tokenizer, data));
             } else {
@@ -72,7 +72,7 @@ public class ExpressionRule implements Rule {
                 || tokenizer.peek(2).getType() == Token.Type.ARROW
                 || tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
             node = LambdaExpressionRule.getInstance().assemble(tokenizer, data);
-        } else if(test.getType() == Token.Type.GROUP_BEGIN) {
+        } else if (test.getType() == Token.Type.GROUP_BEGIN) {
             node = TupleRule.getInstance().assemble(tokenizer, data);
             possibleFunctionSite = false;
         } else {

@@ -4,9 +4,9 @@ import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
-import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -47,7 +47,7 @@ public class LambdaExpressionRule implements Rule {
 
         Signature returnType;
 
-        if(tokenizer.peek().getType() == Token.Type.TYPE) { // parse type
+        if (tokenizer.peek().getType() == Token.Type.TYPE) { // parse type
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
             returnType = ParserUtil.parseSignatureNotation(tokenizer);
         } else {

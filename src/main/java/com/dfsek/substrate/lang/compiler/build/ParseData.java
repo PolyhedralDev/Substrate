@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.compiler.build;
 
 import com.dfsek.substrate.lang.compiler.api.Macro;
-import com.dfsek.substrate.util.pair.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +9,7 @@ public class ParseData {
     private final Map<String, Macro> macros = new HashMap<>();
 
     public Macro getMacro(String id) {
-        if(!macros.containsKey(id)) {
+        if (!macros.containsKey(id)) {
             throw new IllegalArgumentException("No such macro \"" + id + "\": " + macros);
         }
         return macros.get(id);

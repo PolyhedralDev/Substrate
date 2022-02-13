@@ -22,7 +22,7 @@ public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
 
     @Override
     public ExpressionNode simplify() {
-        if(value instanceof IntegerNode) {
+        if (value instanceof IntegerNode) {
             return new DecimalNode(((IntegerNode) value).getValue(), value.getPosition());
         }
         return super.simplify();

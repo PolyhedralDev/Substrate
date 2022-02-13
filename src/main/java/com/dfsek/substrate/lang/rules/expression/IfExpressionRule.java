@@ -6,7 +6,8 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.node.expression.*;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.IfExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaInvocationNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 
 public class IfExpressionRule implements Rule {
     private static final IfExpressionRule INSTANCE = new IfExpressionRule();
+
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.IF);
@@ -31,7 +33,7 @@ public class IfExpressionRule implements Rule {
 
         ExpressionNode caseTrueNode;
         Function<BuildData, ExpressionNode> caseTrue;
-        if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
+        if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
             caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data);
             caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference(buildData)));
         } else {
@@ -41,9 +43,9 @@ public class IfExpressionRule implements Rule {
 
         ExpressionNode caseFalseNode;
         Function<BuildData, ExpressionNode> caseFalse;
-        if(tokenizer.peek().getType() == Token.Type.ELSE) {
+        if (tokenizer.peek().getType() == Token.Type.ELSE) {
             tokenizer.consume();
-            if(tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
+            if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
                 caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data);
                 caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference(buildData)));
             } else {

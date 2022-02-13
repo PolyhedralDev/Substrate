@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
 
 public class BooleanNode extends ConstantExpressionNode<Boolean> {
     public BooleanNode(boolean value, Position position) {

@@ -44,7 +44,7 @@ public class TupleRule implements Rule {
             }
         }
 
-        if(args.size() == 1) {
+        if (args.size() == 1) {
             return args.get(0); // expand out 1-tuples
         }
         return new TupleNode(args, begin.getPosition());

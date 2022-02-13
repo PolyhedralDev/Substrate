@@ -2,12 +2,12 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.lang.node.expression.constant.StringNode;
+import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lang.rules.value.ValueAssignmentRule;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -38,7 +38,7 @@ public class BasicExpressionRule implements Rule {
             return new IntegerNode(Integer.parseInt(token.getContent()), token.getPosition());
         } else {
             ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-            if(tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
+            if (tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
                 return ValueAssignmentRule.getInstance().assemble(tokenizer, data);
             }
             return new ValueReferenceNode(tokenizer.consume());

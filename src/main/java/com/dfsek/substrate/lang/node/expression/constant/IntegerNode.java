@@ -5,9 +5,6 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
-
-import java.awt.*;
 
 public class IntegerNode extends ConstantExpressionNode<Integer> {
     public IntegerNode(int value, Position position) {

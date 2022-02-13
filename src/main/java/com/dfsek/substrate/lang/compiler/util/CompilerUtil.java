@@ -4,16 +4,11 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.ParserUtil;
-import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -30,7 +25,7 @@ public final class CompilerUtil implements Opcodes {
     }
 
     public static void dump(String clazz, byte[] bytes, ZipOutputStream zipOutputStream) {
-        if(zipOutputStream == null) return;
+        if (zipOutputStream == null) return;
         try {
             zipOutputStream.putNextEntry(new ZipEntry(internalName(clazz) + ".class"));
             IOUtils.write(bytes, zipOutputStream);
@@ -50,7 +45,7 @@ public final class CompilerUtil implements Opcodes {
                 "java/lang/Object",
                 ifaces);
 
-        if(!iface & defaultConstructor) {
+        if (!iface & defaultConstructor) {
             MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
                     "<init>", // Constructor method name is <init>
                     "()V",
@@ -79,7 +74,7 @@ public final class CompilerUtil implements Opcodes {
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
             else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
-        } else if(!returnType.getSimpleReturn().isSimple()) {
+        } else if (!returnType.getSimpleReturn().isSimple()) {
             ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.getSimpleReturn())) + ";";
         }
         return ret;

@@ -2,10 +2,10 @@ package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
+import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
-import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.std.function.Curry;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;

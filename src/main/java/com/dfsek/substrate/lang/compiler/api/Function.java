@@ -11,6 +11,7 @@ import org.objectweb.asm.Opcodes;
  */
 public interface Function extends Typed, Opcodes {
     Signature arguments();
+
     default void prepare(MethodBuilder visitor) {
     }
 

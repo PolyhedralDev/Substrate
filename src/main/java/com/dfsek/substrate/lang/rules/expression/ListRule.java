@@ -14,13 +14,14 @@ import java.util.List;
 
 public class ListRule implements Rule {
     private static final ListRule INSTANCE = new ListRule();
+
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
         Token op = ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_BEGIN);
 
         List<ExpressionNode> elements = new ArrayList<>();
 
-        while(tokenizer.peek().getType() != Token.Type.LIST_END) {
+        while (tokenizer.peek().getType() != Token.Type.LIST_END) {
             elements.add(ExpressionRule.getInstance().assemble(tokenizer, data));
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.LIST_END, Token.Type.STATEMENT_END, Token.Type.GROUP_BEGIN).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator

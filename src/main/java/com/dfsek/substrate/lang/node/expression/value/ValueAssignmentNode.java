@@ -39,7 +39,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
         data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference(data).frames());
 
-        if(value instanceof LambdaExpressionNode) {
+        if (value instanceof LambdaExpressionNode) {
             System.out.println("SELF: " + id);
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
@@ -69,7 +69,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(value instanceof ConstantExpressionNode) {
+        if (value instanceof ConstantExpressionNode) {
             return new ConstantValueNode(id, (ConstantExpressionNode<?>) value);
         }
         return this;

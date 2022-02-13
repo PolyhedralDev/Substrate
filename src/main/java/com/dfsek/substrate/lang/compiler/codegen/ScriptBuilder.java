@@ -3,6 +3,7 @@ package com.dfsek.substrate.lang.compiler.codegen;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
+import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
@@ -11,12 +12,14 @@ import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
-import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.pair.Pair;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +49,7 @@ public class ScriptBuilder {
             try {
                 File out = new File(".substrate/dumps/" + builds + ".jar");
                 System.out.println("Dumping to " + out.getAbsolutePath());
-                if(out.exists()) out.delete();
+                if (out.exists()) out.delete();
                 out.getParentFile().mkdirs();
                 out.createNewFile();
                 zipOutputStream = new ZipOutputStream(new FileOutputStream(out));
@@ -113,7 +116,7 @@ public class ScriptBuilder {
         data.lambdaFactory().buildAll();
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
 
-        if(zipOutputStream != null) {
+        if (zipOutputStream != null) {
             try {
                 zipOutputStream.close();
             } catch (IOException e) {

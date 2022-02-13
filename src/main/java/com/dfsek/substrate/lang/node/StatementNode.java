@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.node;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
-import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.NodeHolder;
@@ -30,8 +29,8 @@ public class StatementNode extends NodeHolder {
         content.simplify().apply(builder, data);
 
         Signature ref = content.reference(data);
-        if(!ref.equals(Signature.empty())) {
-            if(ref.equals(Signature.decimal())) builder.pop2();
+        if (!ref.equals(Signature.empty())) {
+            if (ref.equals(Signature.decimal())) builder.pop2();
             else builder.pop();
         }
 

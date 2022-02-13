@@ -17,10 +17,10 @@ public final class Pair<L, R> {
         return new Pair<>(left, right);
     }
 
-   @SuppressWarnings("unchecked")
-   public static <L1, R1> Pair<L1, R1> ofNull() {
-       return (Pair<L1, R1>) NULL;
-   }
+    @SuppressWarnings("unchecked")
+    public static <L1, R1> Pair<L1, R1> ofNull() {
+        return (Pair<L1, R1>) NULL;
+    }
 
     public Mutable<L, R> mutable() {
         return Mutable.of(left, right);

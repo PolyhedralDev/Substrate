@@ -16,7 +16,7 @@ public final class Lazy<T> {
     }
 
     public T get() {
-        if(calc) return result;
+        if (calc) return result;
         result = value.get();
         calc = true;
         return result;

@@ -42,7 +42,7 @@ public class Tokenizer {
             cache.add(fetch());
         }
         Token result = cache.get(n);
-        if(result == null) {
+        if (result == null) {
             throw new ParseException("Unexpected end of input", current.getPosition());
         }
         return result;

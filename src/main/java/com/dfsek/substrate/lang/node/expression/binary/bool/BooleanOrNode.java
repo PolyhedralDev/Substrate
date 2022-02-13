@@ -22,15 +22,15 @@ public class BooleanOrNode extends BooleanOperationNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(left instanceof BooleanNode) {
-            if(((BooleanNode) left).getValue()) {
+        if (left instanceof BooleanNode) {
+            if (((BooleanNode) left).getValue()) {
                 return left; // short-circuit.
             } else {
                 return right; // left does not matter
             }
         }
-        if(right instanceof BooleanNode) {
-            if(((BooleanNode) right).getValue()) {
+        if (right instanceof BooleanNode) {
+            if (((BooleanNode) right).getValue()) {
                 return left; // short-circuit.
             } else {
                 return right; // left does not matter

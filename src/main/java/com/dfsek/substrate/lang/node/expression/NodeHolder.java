@@ -11,7 +11,7 @@ public abstract class NodeHolder implements Node {
     protected abstract Collection<? extends Node> contents();
 
     private final Lazy<Collection<? extends Node>> cachedContents = Lazy.of(this::contents);
-    
+
     public Stream<? extends Node> streamContents() {
         return streamContents(this);
     }

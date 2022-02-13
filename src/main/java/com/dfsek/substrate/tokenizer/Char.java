@@ -1,6 +1,6 @@
 package com.dfsek.substrate.tokenizer;
 
-public class Char implements Positioned{
+public class Char implements Positioned {
     private final char character;
     private final int index;
     private final int line;

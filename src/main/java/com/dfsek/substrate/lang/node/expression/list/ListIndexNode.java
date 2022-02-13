@@ -31,7 +31,7 @@ public class ListIndexNode extends ExpressionNode {
 
         Signature ref = reference(data);
 
-        if(ref.isSimple()) {
+        if (ref.isSimple()) {
             builder.insn(ref.getType(0).arrayLoadInsn());
         } else {
             builder.aaload();

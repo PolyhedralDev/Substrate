@@ -34,7 +34,7 @@ public class ToStringNode extends TypeCastNode<Object, String> {
 
     @Override
     public ExpressionNode simplify() {
-        if(value instanceof DecimalNode || value instanceof IntegerNode) {
+        if (value instanceof DecimalNode || value instanceof IntegerNode) {
             return new StringNode(((ConstantExpressionNode<?>) value).getValue().toString(), value.getPosition());
         }
         return super.simplify();

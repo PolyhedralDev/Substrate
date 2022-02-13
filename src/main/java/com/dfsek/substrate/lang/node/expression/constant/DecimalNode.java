@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
 
 public class DecimalNode extends ConstantExpressionNode<Double> {
     public DecimalNode(double value, Position position) {

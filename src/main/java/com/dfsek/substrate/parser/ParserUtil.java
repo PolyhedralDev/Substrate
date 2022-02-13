@@ -69,19 +69,19 @@ public final class ParserUtil {
 
     public static Signature parseSignatureNotation(Tokenizer tokenizer) {
         Signature signature = Signature.empty();
-        while(tokenizer.peek().isType()) {
+        while (tokenizer.peek().isType()) {
             Token type = checkType(tokenizer.consume(), Token.Type.INT_TYPE, Token.Type.NUM_TYPE, Token.Type.STRING_TYPE, Token.Type.BOOL_TYPE, Token.Type.FUN_TYPE, Token.Type.LIST_TYPE);
             Signature other = new Signature(DataType.fromToken(type));
-            if(!(other.weakEquals(Signature.integer())
+            if (!(other.weakEquals(Signature.integer())
                     || other.weakEquals(Signature.bool())
                     || other.weakEquals(Signature.decimal())
                     || other.weakEquals(Signature.string()))) {
                 ParserUtil.checkType(tokenizer.consume(), Token.Type.LESS_THAN_OPERATOR);
-                if(other.weakEquals(Signature.list())) {
+                if (other.weakEquals(Signature.list())) {
                     other = other.applyGenericReturn(0, parseSignatureNotation(tokenizer));
-                } else if(other.weakEquals(Signature.fun())) {
+                } else if (other.weakEquals(Signature.fun())) {
                     other = other.applyGenericArgument(0, parseSignatureNotation(tokenizer));
-                    if(tokenizer.peek().getType() == Token.Type.ARROW) {
+                    if (tokenizer.peek().getType() == Token.Type.ARROW) {
                         tokenizer.consume();
                         Signature ret = parseSignatureNotation(tokenizer);
                         other = other.applyGenericReturn(0, ret);
@@ -91,7 +91,7 @@ public final class ParserUtil {
             }
             signature = signature.and(other);
 
-            if(tokenizer.peek().getType() == Token.Type.SEPARATOR &&tokenizer.peek(2).getType() != Token.Type.TYPE) {
+            if (tokenizer.peek().getType() == Token.Type.SEPARATOR && tokenizer.peek(2).getType() != Token.Type.TYPE) {
                 tokenizer.consume();
             }
         }

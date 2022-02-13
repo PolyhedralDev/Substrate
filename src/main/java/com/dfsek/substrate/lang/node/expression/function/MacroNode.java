@@ -27,7 +27,7 @@ public class MacroNode extends ExpressionNode {
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         Signature argSignature = CompilerUtil.expandArguments(data, args);
-        if(!macro.argsMatch(argSignature)) {
+        if (!macro.argsMatch(argSignature)) {
             throw new ParseException("Macro expects " + macro.arguments() + ", got " + argSignature, position);
         }
 

@@ -1,9 +1,9 @@
 package com.dfsek.substrate.lang.std.function;
 
+import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.api.Function;
 
 public class Println implements Function {
     @Override

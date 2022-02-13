@@ -5,7 +5,9 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.*;
+import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
+import com.dfsek.substrate.lang.compiler.value.ShadowValue;
+import com.dfsek.substrate.lang.compiler.value.ThisReferenceValue;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
@@ -56,9 +58,9 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .map(node -> (ValueReferenceNode) node)
                 .forEach(valueReferenceNode -> {
                     String id = valueReferenceNode.getId().getContent();
-                    if(!closureIDs.contains(id) && !id.equals(self)) {
+                    if (!closureIDs.contains(id) && !id.equals(self)) {
                         closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), data -> {
-                            if(!valueReferenceNode.getId().getContent().equals(self)) {
+                            if (!valueReferenceNode.getId().getContent().equals(self)) {
                                 return valueReferenceNode.reference(data);
                             }
                             return Signature.empty();
@@ -117,10 +119,10 @@ public class LambdaExpressionNode extends ExpressionNode {
 
             System.out.println("CONTENT REF: " + content.reference(delegate));
             ParserUtil.checkReferenceType(content, delegate, returnType).simplify().apply(methodBuilder, delegate);
-            if(!(content instanceof BlockNode)) {
-                if(returnType.isSimple()) {
+            if (!(content instanceof BlockNode)) {
+                if (returnType.isSimple()) {
                     methodBuilder.insn(returnType.getType(0).returnInsn());
-                } else if(returnType.size() > 1) {
+                } else if (returnType.size() > 1) {
                     methodBuilder.refReturn();
                 }
             }
@@ -130,7 +132,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .dup();
 
         for (Pair<String, Function<BuildData, Signature>> pair : closureTypes) {
-            if(pair.getLeft().equals(self)) continue; // dont load self into closure.
+            if (pair.getLeft().equals(self)) continue; // dont load self into closure.
             data.getValue(pair.getLeft()).load(builder, data);
         }
 

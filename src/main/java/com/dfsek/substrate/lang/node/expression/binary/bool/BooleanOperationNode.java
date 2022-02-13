@@ -24,7 +24,7 @@ public abstract class BooleanOperationNode extends ExpressionNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(left instanceof BooleanNode && right instanceof BooleanNode) {
+        if (left instanceof BooleanNode && right instanceof BooleanNode) {
             return new BooleanNode(apply(((BooleanNode) left).getValue(), ((BooleanNode) right).getValue()), left.getPosition());
         }
 

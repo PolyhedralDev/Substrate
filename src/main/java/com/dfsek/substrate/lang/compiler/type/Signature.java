@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.compiler.type;
 import com.dfsek.substrate.util.pair.Pair;
 import org.objectweb.asm.Opcodes;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -160,7 +159,7 @@ public class Signature implements Opcodes {
 
     @Override
     public String toString() {
-        if(this.equals(empty())) return "()";
+        if (this.equals(empty())) return "()";
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
             builder.append(types.get(i));

@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.binary.comparison;
 
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.tokenizer.Token;
 
