@@ -2,17 +2,17 @@ package com.dfsek.substrate.lang.compiler.build;
 
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.type.Typed;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Positioned;
 import com.dfsek.substrate.util.pair.Pair;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ParseData {
     private final Map<String, Macro> macros = new HashMap<>();
-    private final List<Pair<ExpressionNode, Set<Signature>>> assertions = new ArrayList<>();
+    private final List<Consumer<BuildData>> assertions = new ArrayList<>();
 
     public Macro getMacro(String id) {
         if (!macros.containsKey(id)) {
@@ -32,11 +32,16 @@ public class ParseData {
     }
 
     public <T extends ExpressionNode> T checkType(T typed, Signature... expected) throws ParseException {
-        assertions.add(Pair.of(typed, Set.of(expected)));
+        assertions.add(data -> ParserUtil.checkType(typed, data, expected));
         return typed;
     }
 
-    public List<Pair<ExpressionNode, Set<Signature>>> getAssertions() {
+    public <T extends ExpressionNode> T assertEqual(T typed, T... others) throws ParseException {
+        assertions.add(data -> Arrays.stream(others).forEach(node -> ParserUtil.checkType(typed, data, node.reference(data))));
+        return typed;
+    }
+
+    public List<Consumer<BuildData>> getAssertions() {
         return assertions;
     }
 }

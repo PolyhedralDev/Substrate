@@ -116,7 +116,7 @@ public class ScriptBuilder {
 
         parseData
                 .getAssertions()
-                .forEach(pair -> ParserUtil.checkType(pair.getLeft(), data, pair.getRight().toArray(new Signature[0]))); // perform assertions
+                .forEach(consumer -> consumer.accept(data)); // perform assertions
 
         data.lambdaFactory().buildAll();
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
