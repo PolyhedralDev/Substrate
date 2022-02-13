@@ -15,6 +15,11 @@ public class BooleanOrNode extends BooleanOperationNode {
     }
 
     @Override
+    public boolean apply(boolean left, boolean right) {
+        return left || right;
+    }
+
+    @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkType(left, data, Signature.bool()).simplify().apply(builder, data);
         Label shortTrue = new Label();

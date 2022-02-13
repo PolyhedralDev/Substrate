@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.tokenizer.Position;
 import com.dfsek.substrate.tokenizer.Token;
 
@@ -22,6 +23,15 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     }
 
     @Override
+    public ExpressionNode simplify() {
+        if(left instanceof BooleanNode && right instanceof BooleanNode) {
+            return new BooleanNode(apply(((BooleanNode) left).getValue(), ((BooleanNode) right).getValue()), left.getPosition());
+        }
+
+        return this;
+    }
+
+    @Override
     public Signature reference(BuildData data) {
         return Signature.bool();
     }
@@ -35,4 +45,6 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return Arrays.asList(left, right);
     }
+
+    public abstract boolean apply(boolean left, boolean right);
 }
