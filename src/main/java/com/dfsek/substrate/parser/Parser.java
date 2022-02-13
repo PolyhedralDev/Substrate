@@ -32,7 +32,7 @@ public class Parser {
         while (tokenizer.hasNext()) {
             builder.addOperation(base.assemble(tokenizer, data));
         }
-        return builder.build();
+        return builder.build(data);
     }
 
     public void registerMacro(String id, Macro macro) {

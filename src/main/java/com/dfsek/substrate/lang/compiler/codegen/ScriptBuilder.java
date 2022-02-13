@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
@@ -13,6 +14,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.parser.DynamicClassLoader;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.pair.Pair;
 
@@ -42,7 +44,7 @@ public class ScriptBuilder {
         ops.add(op);
     }
 
-    public Script build() throws ParseException {
+    public Script build(ParseData parseData) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         ZipOutputStream zipOutputStream;
         if (DUMP) {
@@ -112,6 +114,9 @@ public class ScriptBuilder {
 
         ops.forEach(op -> op.simplify().apply(absMethod, data));
 
+        parseData
+                .getAssertions()
+                .forEach(pair -> ParserUtil.checkType(pair.getLeft(), data, pair.getRight().toArray(new Signature[0]))); // perform assertions
 
         data.lambdaFactory().buildAll();
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
