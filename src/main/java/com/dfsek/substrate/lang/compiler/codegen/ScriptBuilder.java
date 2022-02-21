@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder {
-    private static final boolean DUMP = true;//"true".equals(System.getProperty("terrascript.asm.dump"));
     public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
     private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
@@ -46,7 +45,7 @@ public class ScriptBuilder {
     public Script build(ParseData parseData) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         ZipOutputStream zipOutputStream;
-        if (DUMP) {
+        if ("true".equals(System.getProperty("substrate.Dump"))) {
             try {
                 File out = new File(".substrate/dumps/" + builds + ".jar");
                 System.out.println("Dumping to " + out.getAbsolutePath());

@@ -30,6 +30,10 @@ public class SubstrateTests {
 
     private static final String property = "substrate.DisableOptimisation";
 
+    static {
+        System.setProperty("substrate.Dump", Boolean.toString(false));
+    }
+
     private Parser createParser(String script) {
         Parser parser = new Parser(script, new BaseRule());
         parser.registerFunction("fail", new com.dfsek.substrate.lang.compiler.api.Function() {
