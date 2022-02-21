@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class SubstrateTests {
 
+    private static final String property = "substrate.DisableOptimisation";
+
     private Parser createParser(String script) {
         Parser parser = new Parser(script, new BaseRule());
         parser.registerFunction("fail", new com.dfsek.substrate.lang.compiler.api.Function() {
@@ -73,22 +75,28 @@ public class SubstrateTests {
 
     @TestFactory
     public Stream<DynamicNode> tests() {
+        return Stream.of(tests(true), tests(false));
+    }
+
+    public DynamicNode tests(boolean optimisations) {
         List<DynamicNode> nodes = new ArrayList<>();
 
         List<DynamicNode> parserNodes = new ArrayList<>();
-        parserNodes.add(register("valid", Paths.get("src", "test", "resources", "parser", "valid"), path -> () -> {
+        parserNodes.add(register("Valid Scripts", Paths.get("src", "test", "resources", "parser", "valid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser parser = createParser(data);
+                System.setProperty(property, Boolean.toString(optimisations));
                 parser.parse().execute(null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }));
-        parserNodes.add(register("invalid", Paths.get("src", "test", "resources", "parser", "invalid"), path -> () -> {
+        parserNodes.add(register("Invalid Scripts", Paths.get("src", "test", "resources", "parser", "invalid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser parser = createParser(data);
+                System.setProperty(property, Boolean.toString(optimisations));
                 parser.parse().execute(null);
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -98,11 +106,11 @@ public class SubstrateTests {
             }
             fail();
         }));
-        nodes.add(DynamicContainer.dynamicContainer("parser", parserNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
+        nodes.add(DynamicContainer.dynamicContainer("Parser Tests", parserNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
 
         List<DynamicNode> tokenizerNodes = new ArrayList<>();
 
-        tokenizerNodes.add(register("invalid", Paths.get("src", "test", "resources", "tokenizer", "invalid"), path -> () -> {
+        tokenizerNodes.add(register("Invalid Scripts", Paths.get("src", "test", "resources", "tokenizer", "invalid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Tokenizer tokenizer = new Tokenizer(data);
@@ -119,7 +127,7 @@ public class SubstrateTests {
             fail(); // If it parsed, something is wrong.
         }));
 
-        tokenizerNodes.add(register("valid", Paths.get("src", "test", "resources", "tokenizer", "valid"), path -> () -> {
+        tokenizerNodes.add(register("Valid Scripts", Paths.get("src", "test", "resources", "tokenizer", "valid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Tokenizer tokenizer = new Tokenizer(data);
@@ -132,9 +140,9 @@ public class SubstrateTests {
             }
         }));
 
-        nodes.add(DynamicContainer.dynamicContainer("tokenizer", tokenizerNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
+        nodes.add(DynamicContainer.dynamicContainer("Tokenizer Tests", tokenizerNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
 
-        return nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName));
+        return DynamicContainer.dynamicContainer(optimisations ? "Optimised Compilation (default)" : "Unoptimised Compilation", nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName)));
     }
 
     public DynamicContainer register(String name, Path parent, Function<Path, Executable> executable) {
