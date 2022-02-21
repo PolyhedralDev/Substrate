@@ -1,6 +1,8 @@
-# Substrate
-![Gradle Build](https://github.com/PolyhedralDev/Substrate/actions/workflows/gradle.yml/badge.svg)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/PolyhedralDev/Substrate/Java%20CI?style=for-the-badge)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
+
+# Substrate
+
 
 Substrate is a high-performance scripting engine & language for data-driven Java applications.
 
