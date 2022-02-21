@@ -16,7 +16,7 @@ public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
 
     @Override
     public void applyCast(MethodBuilder visitor, BuildData data) {
-        ParserUtil.checkType(value, data, Signature.integer());
+        ParserUtil.checkType(value, Signature.integer());
         visitor.i2d();
     }
 
@@ -29,7 +29,7 @@ public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.decimal();
     }
 }

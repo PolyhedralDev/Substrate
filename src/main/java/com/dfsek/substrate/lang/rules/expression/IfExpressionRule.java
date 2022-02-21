@@ -36,7 +36,7 @@ public class IfExpressionRule implements Rule {
         Function<BuildData, ExpressionNode> caseTrue;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
             caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
-            caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference(buildData)));
+            caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference()));
         } else {
             caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
             caseTrue = buildData -> caseTrueNode;
@@ -48,7 +48,7 @@ public class IfExpressionRule implements Rule {
             tokenizer.consume();
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
                 caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
-                caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference(buildData)));
+                caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference()));
             } else {
                 caseFalseNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
                 caseFalse = buildData -> caseFalseNode;
@@ -62,7 +62,7 @@ public class IfExpressionRule implements Rule {
                 }
 
                 @Override
-                public Signature reference(BuildData buildData) {
+                public Signature reference() {
                     return Signature.empty();
                 }
 

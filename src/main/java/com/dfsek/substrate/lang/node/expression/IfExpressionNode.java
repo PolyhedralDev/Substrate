@@ -31,10 +31,10 @@ public class IfExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(predicate, data, Signature.bool());
+        ParserUtil.checkType(predicate, Signature.bool());
         ExpressionNode caseFalse = this.caseFalse.apply(data);
         ExpressionNode caseTrue = this.caseTrue.apply(data);
-        ParserUtil.checkType(caseTrue, data, caseFalse.reference(data).getSimpleReturn());
+        ParserUtil.checkType(caseTrue, caseFalse.reference().getSimpleReturn());
 
         Label equal = new Label();
         Label end = new Label();
@@ -58,8 +58,8 @@ public class IfExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return caseTrue.apply(data).reference(data).getSimpleReturn();
+    public Signature reference() {
+        return caseTrueNode.reference().getSimpleReturn();
     }
 
     @Override

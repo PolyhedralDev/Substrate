@@ -30,14 +30,10 @@ public class ValueAssignmentNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        if (data.valueExists(id.getContent())) {
-            throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
-        }
-
-        Signature ref = value.reference(data);
+        Signature ref = value.reference();
 
 
-        data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference(data).frames());
+        data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference().frames());
 
         if (value instanceof LambdaExpressionNode) {
             System.out.println("SELF: " + id);
@@ -81,8 +77,8 @@ public class ValueAssignmentNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return value.reference(data);
+    public Signature reference() {
+        return value.reference();
     }
 
     @Override

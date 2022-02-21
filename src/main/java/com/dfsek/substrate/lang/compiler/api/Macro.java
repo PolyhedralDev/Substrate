@@ -14,7 +14,7 @@ import java.util.List;
 public interface Macro extends Opcodes {
     Signature arguments();
 
-    Signature reference(Signature arguments, BuildData data);
+    Signature reference(Signature arguments);
 
     default void prepare(MethodBuilder visitor) {
     }

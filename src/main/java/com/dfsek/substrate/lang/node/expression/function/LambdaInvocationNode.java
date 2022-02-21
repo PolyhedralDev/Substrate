@@ -28,11 +28,11 @@ public class LambdaInvocationNode extends ExpressionNode {
 
         data.loadImplementationArguments(builder);
 
-        ParserUtil.checkWeakReferenceType(lambda, data, Signature.fun());
+        ParserUtil.checkWeakReferenceType(lambda, Signature.fun());
 
-        Signature returnType = lambda.reference(data).getSimpleReturn();
+        Signature returnType = lambda.reference().getSimpleReturn();
 
-        Signature args = lambda.reference(data).getGenericArguments(0);
+        Signature args = lambda.reference().getGenericArguments(0);
 
         data.lambdaFactory().invoke(args, returnType, data, builder);
     }
@@ -43,8 +43,8 @@ public class LambdaInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return lambda.reference(data);
+    public Signature reference() {
+        return lambda.reference();
     }
 
     @Override

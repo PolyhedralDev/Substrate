@@ -22,7 +22,7 @@ public class Println implements Function {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.fun().applyGenericArgument(0, Signature.string());
     }
 }

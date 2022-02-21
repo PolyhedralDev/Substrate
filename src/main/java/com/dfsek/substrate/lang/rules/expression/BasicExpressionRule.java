@@ -42,7 +42,11 @@ public class BasicExpressionRule implements Rule {
             if (tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
                 return ValueAssignmentRule.getInstance().assemble(tokenizer, data, scope);
             }
-            return new ValueReferenceNode(tokenizer.consume());
+            Token id = tokenizer.consume();
+            if (!scope.contains(id.getContent())) {
+                throw new ParseException("No such value: " + id.getContent(), id.getPosition());
+            }
+            return new ValueReferenceNode(id, scope.get(id.getContent()));
         }
     }
 }

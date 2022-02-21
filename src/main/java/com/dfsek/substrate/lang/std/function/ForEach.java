@@ -76,7 +76,7 @@ public class ForEach implements Macro {
     }
 
     @Override
-    public Signature reference(Signature arguments, BuildData data) {
+    public Signature reference(Signature arguments) {
         return Signature.fun().applyGenericReturn(0, Signature.empty()).applyGenericArgument(0, arguments());
     }
 }

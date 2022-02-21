@@ -47,21 +47,21 @@ public final class ParserUtil {
         throw new ParseException("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition());
     }
 
-    public static <T extends Typed & Positioned> T checkType(T typed, BuildData data, Signature... expected) throws ParseException {
-        Signature ref = typed.reference(data).getSimpleReturn();
+    public static <T extends Typed & Positioned> T checkType(T typed, Signature... expected) throws ParseException {
+        Signature ref = typed.reference().getSimpleReturn();
         for (Signature type : expected) if (ref.equals(type)) return typed;
         throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
     }
 
-    public static <T extends Typed & Positioned> T checkReferenceType(T typed, BuildData data, Signature... expected) throws ParseException {
-        Signature ref = typed.reference(data);
+    public static <T extends Typed & Positioned> T checkReferenceType(T typed, Signature... expected) throws ParseException {
+        Signature ref = typed.reference();
         for (Signature type : expected) if (ref.equals(type)) return typed;
         System.out.println(typed);
         throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
     }
 
-    public static <T extends Typed & Positioned> T checkWeakReferenceType(T typed, BuildData data, Signature... expected) throws ParseException {
-        Signature ref = typed.reference(data);
+    public static <T extends Typed & Positioned> T checkWeakReferenceType(T typed, Signature... expected) throws ParseException {
+        Signature ref = typed.reference();
         for (Signature type : expected) if (ref.weakEquals(type)) return typed;
         System.out.println(typed);
         throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());

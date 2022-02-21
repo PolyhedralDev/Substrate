@@ -31,7 +31,7 @@ public class Curry implements Macro {
     @Override
     public void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes) {
         Signature functionArgs = args.getGenericArguments(0);
-        generateClosure(0, functionArgs, reference(args, data).getSimpleReturn(), argNodes.get(0))
+        generateClosure(0, functionArgs, reference(args).getSimpleReturn(), argNodes.get(0))
                 .simplify().apply(visitor, data);
     }
 
@@ -52,7 +52,7 @@ public class Curry implements Macro {
         List<ExpressionNode> nodes = new ArrayList<>();
 
         for (int i = 0; i < args.size(); i++) {
-            ValueReferenceNode node = new ValueReferenceNode("closure$" + i);
+            ValueReferenceNode node = new ValueReferenceNode("closure$" + i, args.get(i));
             node.setLambdaArgument(true);
             nodes.add(node);
         }
@@ -63,7 +63,7 @@ public class Curry implements Macro {
     }
 
     @Override
-    public Signature reference(Signature arguments, BuildData data) {
+    public Signature reference(Signature arguments) {
         if (!arguments.isSimple() || !arguments.weakEquals(Signature.fun())) {
             throw new IllegalArgumentException("Invalid signature");
         }

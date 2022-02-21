@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.binary.bool;
 
 import com.dfsek.substrate.lang.Node;
-import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
@@ -32,7 +31,7 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.bool();
     }
 

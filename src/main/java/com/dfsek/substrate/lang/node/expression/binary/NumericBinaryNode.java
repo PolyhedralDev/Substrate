@@ -17,10 +17,10 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodBuilder visitor, BuildData data) {
-        Signature leftType = ParserUtil.checkType(left, data, Signature.integer(), Signature.decimal()).reference(data);
-        ParserUtil.checkType(right, data, Signature.integer(), Signature.decimal()).reference(data);
+        Signature leftType = ParserUtil.checkType(left, Signature.integer(), Signature.decimal()).reference();
+        ParserUtil.checkType(right, Signature.integer(), Signature.decimal()).reference();
 
-        ParserUtil.checkType(right, data, leftType);
+        ParserUtil.checkType(right, leftType);
         if (leftType.equals(Signature.integer())) {
             visitor.insn(intOp());
         } else if (leftType.equals(Signature.decimal())) {
@@ -33,8 +33,8 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
     protected abstract int doubleOp();
 
     @Override
-    public Signature reference(BuildData data) {
-        Signature ref = left.reference(data);
+    public Signature reference() {
+        Signature ref = left.reference();
         if (ref.weakEquals(Signature.fun())) {
             return ref.getGenericReturn(0);
         }

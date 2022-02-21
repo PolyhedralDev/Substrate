@@ -23,11 +23,11 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Signature signature = elements.get(0).reference(data);
-        elements.forEach(element -> ParserUtil.checkReferenceType(element, data, signature));
+        Signature signature = elements.get(0).reference();
+        elements.forEach(element -> ParserUtil.checkReferenceType(element, signature));
 
         builder.pushInt(elements.size());
-        Signature elementSignature = elements.get(0).reference(data);
+        Signature elementSignature = elements.get(0).reference();
         if (elementSignature.isSimple()) {
             elementSignature.getType(0).applyNewArray(builder, elementSignature);
         } else {
@@ -52,8 +52,8 @@ public class ListNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return Signature.list().applyGenericReturn(0, elements.get(0).reference(data));
+    public Signature reference() {
+        return Signature.list().applyGenericReturn(0, elements.get(0).reference());
     }
 
     @Override

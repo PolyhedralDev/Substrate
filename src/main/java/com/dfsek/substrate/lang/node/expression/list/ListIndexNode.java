@@ -23,13 +23,13 @@ public class ListIndexNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkWeakReferenceType(listReference, data, Signature.list())
+        ParserUtil.checkWeakReferenceType(listReference, Signature.list())
                 .simplify().apply(builder, data);
 
-        ParserUtil.checkType(index, data, Signature.integer())
+        ParserUtil.checkType(index, Signature.integer())
                 .simplify().apply(builder, data);
 
-        Signature ref = reference(data);
+        Signature ref = reference();
 
         if (ref.isSimple()) {
             builder.insn(ref.getType(0).arrayLoadInsn());
@@ -44,8 +44,8 @@ public class ListIndexNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return listReference.reference(data).getSimpleReturn();
+    public Signature reference() {
+        return listReference.reference().getSimpleReturn();
     }
 
     @Override

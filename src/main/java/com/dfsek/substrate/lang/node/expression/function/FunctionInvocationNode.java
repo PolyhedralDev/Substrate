@@ -25,15 +25,15 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        System.out.println("INVOKING: " + function.reference(data));
+        System.out.println("INVOKING: " + function.reference());
         System.out.println("INVOKING: " + function);
         System.out.println("INVOKING: " + function.getPosition());
-        ParserUtil.checkWeakReferenceType(function, data, Signature.fun());
+        ParserUtil.checkWeakReferenceType(function, Signature.fun());
 
-        Signature argSignature = CompilerUtil.expandArguments(data, arguments);
+        Signature argSignature = CompilerUtil.expandArguments(arguments);
 
-        if (!function.reference(data).getGenericArguments(0).equals(argSignature)) {
-            throw new ParseException("Function argument mismatch, expected " + function.reference(data).getGenericArguments(0) + ", got " + argSignature, function.getPosition());
+        if (!function.reference().getGenericArguments(0).equals(argSignature)) {
+            throw new ParseException("Function argument mismatch, expected " + function.reference().getGenericArguments(0) + ", got " + argSignature, function.getPosition());
         }
 
         function.apply(builder, data);
@@ -46,7 +46,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         }
 
 
-        Signature ref = reference(data);
+        Signature ref = reference();
         data.lambdaFactory().invoke(argSignature, ref, data, builder);
     }
 
@@ -56,8 +56,8 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return function.reference(data).getSimpleReturn();
+    public Signature reference() {
+        return function.reference().getSimpleReturn();
     }
 
     @Override

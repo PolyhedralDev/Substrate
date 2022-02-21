@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.std.function.Curry;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
@@ -16,6 +17,7 @@ public class Parser {
     private final Tokenizer tokenizer;
     private final Rule base;
     private final ScriptBuilder builder = new ScriptBuilder();
+    private final ParserScope scope = new ParserScope();
 
     private final ParseData data = new ParseData();
 
@@ -29,7 +31,6 @@ public class Parser {
     }
 
     public Script parse() throws ParseException {
-        ParserScope scope = new ParserScope();
         while (tokenizer.hasNext()) {
             builder.addOperation(base.assemble(tokenizer, data, scope));
         }
@@ -43,5 +44,6 @@ public class Parser {
 
     public void registerFunction(String id, Function function) {
         builder.registerFunction(id, function);
+        scope.register(id, function.reference());
     }
 }

@@ -8,15 +8,20 @@ import java.util.Map;
 public class ParserScope {
     private final Map<String, Signature> values = new HashMap<>();
 
-    private static ParserScope NULL = new ParserScope() {
+    private static final ParserScope NULL = new ParserScope() {
         @Override
         public void register(String val, Signature signature) {
             throw new IllegalArgumentException();
         }
 
         @Override
+        public boolean contains(String val) {
+            return false;
+        }
+
+        @Override
         public Signature get(String val) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No such value " + val);
         }
     };
 
@@ -32,6 +37,11 @@ public class ParserScope {
 
     public void register(String val, Signature signature) {
         if(values.containsKey(val) || parent.values.containsKey(val)) throw new IllegalArgumentException("Value " + val + " already exists in this scope.");
+        values.put(val, signature);
+    }
+
+    public boolean contains(String val) {
+        return values.containsKey(val) || parent.contains(val);
     }
 
     public Signature get(String val) {

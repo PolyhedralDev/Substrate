@@ -26,7 +26,7 @@ public class MacroNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Signature argSignature = CompilerUtil.expandArguments(data, args);
+        Signature argSignature = CompilerUtil.expandArguments(args);
         if (!macro.argsMatch(argSignature)) {
             throw new ParseException("Macro expects " + macro.arguments() + ", got " + argSignature, position);
         }
@@ -37,8 +37,8 @@ public class MacroNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return macro.reference(CompilerUtil.expandArguments(data, args), data).getSimpleReturn();
+    public Signature reference() {
+        return macro.reference(CompilerUtil.expandArguments(args)).getSimpleReturn();
     }
 
     @Override

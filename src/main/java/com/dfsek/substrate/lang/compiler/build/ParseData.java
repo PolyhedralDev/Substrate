@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.pair.Pair;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -32,12 +31,13 @@ public class ParseData {
     }
 
     public <T extends ExpressionNode> T checkType(T typed, Signature... expected) throws ParseException {
-        assertions.add(data -> ParserUtil.checkType(typed, data, expected));
+        assertions.add(data -> ParserUtil.checkType(typed, expected));
         return typed;
     }
 
-    public <T extends ExpressionNode> T assertEqual(T typed, T... others) throws ParseException {
-        assertions.add(data -> Arrays.stream(others).forEach(node -> ParserUtil.checkType(typed, data, node.reference(data))));
+    @SafeVarargs
+    public final <T extends ExpressionNode> T assertEqual(T typed, T... others) throws ParseException {
+        assertions.add(data -> Arrays.stream(others).forEach(node -> ParserUtil.checkType(typed, node.reference())));
         return typed;
     }
 

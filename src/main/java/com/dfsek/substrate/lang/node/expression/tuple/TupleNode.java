@@ -23,7 +23,7 @@ public class TupleNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Signature signature = reference(data);
+        Signature signature = reference();
 
         Class<?> tuple = data.tupleFactory().generate(signature);
 
@@ -45,8 +45,8 @@ public class TupleNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return CompilerUtil.expandArguments(data, args);
+    public Signature reference() {
+        return CompilerUtil.expandArguments(args);
     }
 
     @Override

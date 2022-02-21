@@ -29,6 +29,7 @@ public class LambdaExpressionRule implements Rule {
 
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+        ParserScope lambda = scope.sub();
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
@@ -37,7 +38,12 @@ public class LambdaExpressionRule implements Rule {
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
             Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
-            types.add(Pair.of(id.getContent(), ParserUtil.parseSignatureNotation(tokenizer)));
+            String argName = id.getContent();
+            Signature argSignature = ParserUtil.parseSignatureNotation(tokenizer);
+            types.add(Pair.of(argName, argSignature));
+
+            lambda.register(argName, argSignature);
+
             args.add(id.getContent());
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume();
@@ -60,9 +66,9 @@ public class LambdaExpressionRule implements Rule {
 
         ExpressionNode expression;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            expression = BlockRule.getInstance().assemble(tokenizer, data, scope);
+            expression = BlockRule.getInstance().assemble(tokenizer, data, lambda);
         } else {
-            expression = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
+            expression = ExpressionRule.getInstance().assemble(tokenizer, data, lambda);
         }
 
         expression.streamScopedContents()

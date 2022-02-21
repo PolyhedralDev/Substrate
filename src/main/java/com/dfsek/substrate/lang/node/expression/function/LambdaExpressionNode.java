@@ -61,7 +61,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                     if (!closureIDs.contains(id) && !id.equals(self)) {
                         closureTypes.add(Pair.of(valueReferenceNode.getId().getContent(), data -> {
                             if (!valueReferenceNode.getId().getContent().equals(self)) {
-                                return valueReferenceNode.reference(data);
+                                return valueReferenceNode.reference();
                             }
                             return Signature.empty();
                         }));
@@ -101,7 +101,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         Signature closureSignature = closure.apply(closureFinder);
 
-        String lambda = data.lambdaFactory().implement(parameters, reference(data).getSimpleReturn(), closureSignature, methodBuilder -> {
+        String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closureSignature, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
 
             for (int i = 0; i < closureTypes.size(); i++) {
@@ -114,11 +114,11 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
 
             if (self != null) {
-                delegate.registerUnchecked(self, new ThisReferenceValue(reference(data)));
+                delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
             }
 
-            System.out.println("CONTENT REF: " + content.reference(delegate));
-            ParserUtil.checkReferenceType(content, delegate, returnType).simplify().apply(methodBuilder, delegate);
+            System.out.println("CONTENT REF: " + content.reference());
+            ParserUtil.checkReferenceType(content, returnType).simplify().apply(methodBuilder, delegate);
             if (!(content instanceof BlockNode)) {
                 if (returnType.isSimple()) {
                     methodBuilder.insn(returnType.getType(0).returnInsn());
@@ -151,7 +151,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, getParameters());
     }
 

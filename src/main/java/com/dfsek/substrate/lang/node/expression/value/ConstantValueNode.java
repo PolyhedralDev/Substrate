@@ -34,8 +34,8 @@ public class ConstantValueNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        return value.reference(data);
+    public Signature reference() {
+        return value.reference();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class ReturnNode extends ExpressionNode {
         if (value == null) builder.voidReturn();
         else {
             value.simplify().apply(builder, data);
-            Signature ret = value.reference(data);
+            Signature ret = value.reference();
             if (ret.size() == 1) builder.insn(ret.getType(0).returnInsn());
             else builder.refReturn();
         }
@@ -36,9 +36,9 @@ public class ReturnNode extends ExpressionNode {
         return position;
     }
 
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         if (value == null) return Signature.empty();
-        return value.reference(data);
+        return value.reference();
     }
 
     @Override

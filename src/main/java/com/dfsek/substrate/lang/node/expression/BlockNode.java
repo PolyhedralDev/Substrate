@@ -35,10 +35,10 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         if (returnType.isEmpty()) return Signature.empty();
-        Signature test = returnType.get(0).reference(data);
-        returnType.forEach(type -> ParserUtil.checkReferenceType(type, data, test));
+        Signature test = returnType.get(0).reference();
+        returnType.forEach(type -> ParserUtil.checkReferenceType(type, test));
         return test;
     }
 

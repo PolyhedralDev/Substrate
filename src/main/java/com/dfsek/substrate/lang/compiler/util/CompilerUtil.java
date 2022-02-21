@@ -80,23 +80,23 @@ public final class CompilerUtil implements Opcodes {
         return ret;
     }
 
-    public static Signature expandArguments(BuildData data, List<ExpressionNode> arguments) {
+    public static Signature expandArguments(List<ExpressionNode> arguments) {
         Signature argSignature;
         if (arguments.isEmpty()) {
             argSignature = Signature.empty();
         } else if (arguments.size() == 1) {
-            argSignature = arguments.get(0).reference(data);
+            argSignature = arguments.get(0).reference();
         } else {
-            argSignature = arguments.get(0).reference(data);
+            argSignature = arguments.get(0).reference();
             for (int i = 1; i < arguments.size(); i++) {
-                argSignature = argSignature.and(arguments.get(i).reference(data));
+                argSignature = argSignature.and(arguments.get(i).reference());
             }
         }
         return argSignature;
     }
 
     public static void deconstructTuple(ExpressionNode node, BuildData data, MethodBuilder visitor) {
-        Signature ref = node.reference(data);
+        Signature ref = node.reference();
         if (!ref.isSimple()) {
             data.offsetInc(1);
             int offset = data.getOffset();

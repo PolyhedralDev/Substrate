@@ -10,14 +10,12 @@ import java.util.function.Supplier;
 
 public class FunctionValue implements Value {
     private final Function function;
-    private final BuildData data;
     private final String implementationClassName;
     private final String fieldName;
     private final Lazy<String> name;
 
-    public FunctionValue(Function function, BuildData data, String implementationClassName, String fieldName, Supplier<String> onInvoke) {
+    public FunctionValue(Function function, String implementationClassName, String fieldName, Supplier<String> onInvoke) {
         this.function = function;
-        this.data = data;
         this.implementationClassName = implementationClassName;
         this.fieldName = fieldName;
         this.name = Lazy.of(onInvoke);
@@ -25,7 +23,7 @@ public class FunctionValue implements Value {
 
     @Override
     public Signature reference() {
-        return function.reference(data);
+        return function.reference();
     }
 
     @Override

@@ -17,12 +17,12 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
 
     @Override
     public void applyOp(MethodBuilder visitor, BuildData data) {
-        Signature leftType = ParserUtil.checkType(left, data, Signature.integer(), Signature.decimal(), Signature.string())
-                .reference(data).getSimpleReturn();
-        Signature rightType = ParserUtil.checkType(right, data, Signature.integer(), Signature.decimal(), Signature.string())
-                .reference(data).getSimpleReturn();
+        Signature leftType = ParserUtil.checkType(left, Signature.integer(), Signature.decimal(), Signature.string())
+                .reference().getSimpleReturn();
+        Signature rightType = ParserUtil.checkType(right, Signature.integer(), Signature.decimal(), Signature.string())
+                .reference().getSimpleReturn();
 
-        ParserUtil.checkType(left, data, rightType);
+        ParserUtil.checkType(left, rightType);
 
         if (leftType.equals(Signature.integer())) {
             Label f = new Label();
@@ -65,7 +65,7 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.bool();
     }
 }

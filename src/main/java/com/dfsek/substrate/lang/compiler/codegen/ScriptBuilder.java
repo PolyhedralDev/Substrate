@@ -14,7 +14,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.pair.Pair;
 
@@ -78,9 +77,9 @@ public class ScriptBuilder {
             Function function = stringFunctionPair.getRight();
             String functionName = "wrap$" + stringFunctionPair.getLeft();
 
-            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, data, implementationClassName, functionName, () -> {
+            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, implementationClassName, functionName, () -> {
                 BuildData separate = data.sub();
-                Signature ref = function.reference(separate);
+                Signature ref = function.reference();
 
                 String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
                     function.prepare(method);

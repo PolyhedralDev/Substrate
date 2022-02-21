@@ -28,7 +28,7 @@ public class StatementNode extends NodeHolder {
         builder.label(statement);
         content.simplify().apply(builder, data);
 
-        Signature ref = content.reference(data);
+        Signature ref = content.reference();
         if (!ref.equals(Signature.empty())) {
             if (ref.equals(Signature.decimal())) builder.pop2();
             else builder.pop();

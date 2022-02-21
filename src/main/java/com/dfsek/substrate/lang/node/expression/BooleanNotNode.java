@@ -22,7 +22,7 @@ public class BooleanNotNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(node, data, Signature.bool()).simplify().apply(builder, data);
+        ParserUtil.checkType(node, Signature.bool()).simplify().apply(builder, data);
         builder.invertBoolean();
     }
 
@@ -32,7 +32,7 @@ public class BooleanNotNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
+    public Signature reference() {
         return Signature.bool();
     }
 

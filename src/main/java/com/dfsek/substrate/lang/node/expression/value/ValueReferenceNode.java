@@ -15,11 +15,10 @@ import java.util.Collections;
 
 public class ValueReferenceNode extends ExpressionNode {
     private final Token id;
+    private final Signature signature;
 
     private boolean isLambdaArgument = false;
     private boolean isLocal = false;
-
-    private volatile Signature signature;
 
     public void setLocal(boolean local) {
         isLocal = local;
@@ -37,21 +36,19 @@ public class ValueReferenceNode extends ExpressionNode {
         return isLambdaArgument;
     }
 
-    public ValueReferenceNode(Token id) {
+    public ValueReferenceNode(Token id, Signature signature) {
         this.id = id;
+        this.signature = signature;
     }
 
-    public ValueReferenceNode(String id) {
+    public ValueReferenceNode(String id, Signature signature) {
         this.id = new Token(id, Token.Type.IDENTIFIER, Position.getNull());
+        this.signature = signature;
     }
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        if (!data.valueExists(id.getContent())) {
-            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-        }
         Value value = data.getValue(id.getContent());
-        this.signature = value.reference();
         value.load(builder, data);
     }
 
@@ -67,13 +64,8 @@ public class ValueReferenceNode extends ExpressionNode {
     }
 
     @Override
-    public Signature reference(BuildData data) {
-        if(signature != null) return signature;
-        if (!data.valueExists(id.getContent())) {
-            System.out.println(data.getValues());
-            throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-        }
-        return data.getValue(id.getContent()).reference();
+    public Signature reference() {
+        return signature;
     }
 
     public Token getId() {
