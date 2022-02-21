@@ -18,7 +18,7 @@ public class ToStringNode extends TypeCastNode<Object, String> {
 
     @Override
     public void applyCast(MethodBuilder visitor, BuildData data) {
-        Signature ref = ParserUtil.checkType(value, Signature.decimal(), Signature.integer())
+        Signature ref = ParserUtil.checkType(value, Signature.decimal(), Signature.integer(), Signature.bool())
                 .reference()
                 .getSimpleReturn();
         if (ref.equals(Signature.integer())) {
@@ -29,6 +29,10 @@ public class ToStringNode extends TypeCastNode<Object, String> {
             visitor.invokeStatic("java/lang/Double",
                     "toString",
                     "(D)Ljava/lang/String;");
+        } else if (ref.equals(Signature.bool())) {
+            visitor.invokeStatic("java/lang/Boolean",
+                    "toString",
+                    "(Z)Ljava/lang/String;");
         }
     }
 
