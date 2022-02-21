@@ -36,7 +36,6 @@ public class ValueAssignmentNode extends ExpressionNode {
         data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference().frames());
 
         if (value instanceof LambdaExpressionNode) {
-            System.out.println("SELF: " + id);
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
         value.apply(builder, data);

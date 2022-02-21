@@ -70,10 +70,8 @@ public class LambdaExpressionNode extends ExpressionNode {
         content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
-                .peek(a -> System.out.println("REF: " + ((ValueReferenceNode) a).getId()))
                 .map(node -> (ValueReferenceNode) node)
                 .forEach(valueReferenceNode -> {
-                    System.out.println("Found: " + valueReferenceNode.getId());
                     String id = valueReferenceNode.getId().getContent();
                     boolean isArg = argRefs.contains(id);
                     if(!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
@@ -92,14 +90,12 @@ public class LambdaExpressionNode extends ExpressionNode {
             closure = closure.and(type.getRight());
         }
 
-        System.out.println("CLOSURE: " + closure);
 
         String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, methodBuilder -> {
             BuildData delegate = data.sub(methodBuilder.classWriter());
 
             for (int i = 0; i < closureTypes.size(); i++) {
                 Pair<String, Signature> pair = closureTypes.get(i);
-                System.out.println("Injecting: " + pair.getLeft() + " at " + i);
                 delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight(), i));
             }
             for (Pair<String, Signature> argument : types) {
@@ -126,7 +122,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         for (Pair<String, Signature> pair : closureTypes) {
             if (pair.getLeft().equals(self)) continue; // dont load self into closure.
-            System.out.println("ARGS: " + argRefs);
             data.getValue(pair.getLeft()).load(builder, data);
         }
 

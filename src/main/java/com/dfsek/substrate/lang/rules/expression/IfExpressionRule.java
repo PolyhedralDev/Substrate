@@ -36,7 +36,6 @@ public class IfExpressionRule implements Rule {
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
             ExpressionNode internal = BlockRule.getInstance().assemble(tokenizer, data, scope);
             caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, Collections.emptyList(), internal.getPosition(), internal.reference()));
-            System.out.println("IF ^");
         } else {
             caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
         }
