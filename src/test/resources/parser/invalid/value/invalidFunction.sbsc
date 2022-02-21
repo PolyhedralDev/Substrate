@@ -1,0 +1,3 @@
+// invoke a nonexistent function
+
+a(4);
