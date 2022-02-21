@@ -65,10 +65,6 @@ public class BuildData {
         this.implArgsOffset = implArgsOffset;
     }
 
-    public Map<String, Value> getValues() {
-        return values;
-    }
-
     public LambdaFactory lambdaFactory() {
         return lambdaFactory;
     }
@@ -104,18 +100,6 @@ public class BuildData {
 
     public int getOffset() {
         return offset;
-    }
-
-    public boolean hasOffset(String id) {
-        if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
-
-        BuildData test = this;
-        while (!valueOffsets.containsKey(Pair.of(test, id))) {
-            if (test == null) return false;
-            test = test.parent;
-        }
-
-        return true;
     }
 
     public Value getValue(String id) {
