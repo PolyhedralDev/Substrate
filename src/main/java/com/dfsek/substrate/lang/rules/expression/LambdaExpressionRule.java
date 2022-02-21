@@ -13,7 +13,7 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
 import com.dfsek.substrate.tokenizer.Tokenizer;
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;

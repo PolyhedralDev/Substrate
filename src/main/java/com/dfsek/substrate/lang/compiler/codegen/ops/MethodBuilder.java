@@ -1,6 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen.ops;
 
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;

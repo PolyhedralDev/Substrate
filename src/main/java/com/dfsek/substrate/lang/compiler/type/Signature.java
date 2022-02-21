@@ -1,6 +1,6 @@
 package com.dfsek.substrate.lang.compiler.type;
 
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;

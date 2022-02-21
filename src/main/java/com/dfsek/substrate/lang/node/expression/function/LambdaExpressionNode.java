@@ -14,10 +14,9 @@ import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;

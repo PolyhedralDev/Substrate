@@ -11,7 +11,7 @@ import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;

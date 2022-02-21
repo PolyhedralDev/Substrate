@@ -7,7 +7,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.pair.Pair;
+import com.dfsek.substrate.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
