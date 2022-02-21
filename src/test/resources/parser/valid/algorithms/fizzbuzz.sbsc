@@ -1,0 +1,11 @@
+fizzbuzz = (i: int) -> {
+    if(i >= 1) {
+        fizzbuzz(i-1);
+        println(
+            if(i % 3 == 0) if(i % 5 == 0) "FizzBuzz" else "Fizz"
+            else if(i % 5 == 0) "Buzz" else str(i)
+        );
+    };
+};
+
+fizzbuzz(100);
