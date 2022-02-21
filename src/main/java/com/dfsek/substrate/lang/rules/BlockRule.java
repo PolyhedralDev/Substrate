@@ -38,12 +38,16 @@ public class BlockRule implements Rule {
         while (tokenizer.peek().getType() != Token.Type.BLOCK_END) {
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
                 contents.add(this.assemble(tokenizer, data, sub));
-            } else if (tokenizer.peek().isIdentifier() || tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) { // Parse a statement.
+            } else if (tokenizer.peek().isIdentifier()
+                    || tokenizer.peek().getType() == Token.Type.GROUP_BEGIN
+                    || tokenizer.peek().getType() == Token.Type.IF) { // Parse a statement.
                 contents.add(StatementRule.getInstance().assemble(tokenizer, data, sub));
             } else if (tokenizer.peek().getType() == Token.Type.RETURN) { // Parse a return
                 ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer, data, sub);
                 ret.add(returnNode);
                 contents.add(returnNode);
+            } else {
+                throw new ParseException("Unexpected token: " + tokenizer.peek(), tokenizer.consume().getPosition());
             }
         }
 

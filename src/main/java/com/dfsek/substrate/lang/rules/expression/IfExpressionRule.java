@@ -33,25 +33,21 @@ public class IfExpressionRule implements Rule {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
 
         ExpressionNode caseTrueNode;
-        Function<BuildData, ExpressionNode> caseTrue;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
-            caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference()));
+            ExpressionNode internal = BlockRule.getInstance().assemble(tokenizer, data, scope);
+            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, Collections.emptyList(), internal.getPosition(), internal.reference()));
         } else {
             caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
-            caseTrue = buildData -> caseTrueNode;
         }
 
         ExpressionNode caseFalseNode;
-        Function<BuildData, ExpressionNode> caseFalse;
         if (tokenizer.peek().getType() == Token.Type.ELSE) {
             tokenizer.consume();
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-                caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
-                caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference()));
+                ExpressionNode internal = BlockRule.getInstance().assemble(tokenizer, data, scope);
+                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, Collections.emptyList(), internal.getPosition(), internal.reference()));
             } else {
                 caseFalseNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
-                caseFalse = buildData -> caseFalseNode;
             }
         } else {
             caseFalseNode = new ExpressionNode() {
@@ -76,10 +72,9 @@ public class IfExpressionRule implements Rule {
                     return predicate.getPosition();
                 }
             };
-            caseFalse = buildData -> caseFalseNode;
         }
 
-        return new IfExpressionNode(predicate, caseTrue, caseFalse, caseTrueNode, caseFalseNode);
+        return new IfExpressionNode(predicate, caseTrueNode, caseFalseNode);
     }
 
     public static IfExpressionRule getInstance() {

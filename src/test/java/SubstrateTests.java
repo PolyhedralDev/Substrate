@@ -31,7 +31,7 @@ public class SubstrateTests {
     private static final String property = "substrate.DisableOptimisation";
 
     private static final boolean STACK_TRACES_FOR_INVALID = false;
-    private static final boolean DUMP_TO_JARS = false;
+    private static final boolean DUMP_TO_JARS = true;
 
     static {
         System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));

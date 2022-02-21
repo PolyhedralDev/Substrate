@@ -15,16 +15,12 @@ import java.util.function.Function;
 
 public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode predicate;
-    private final Function<BuildData, ExpressionNode> caseTrue;
-    private final Function<BuildData, ExpressionNode> caseFalse;
 
     private final ExpressionNode caseTrueNode;
     private final ExpressionNode caseFalseNode;
 
-    public IfExpressionNode(ExpressionNode predicate, Function<BuildData, ExpressionNode> caseTrue, Function<BuildData, ExpressionNode> caseFalse, ExpressionNode caseTrueNode, ExpressionNode caseFalseNode) {
+    public IfExpressionNode(ExpressionNode predicate, ExpressionNode caseTrueNode, ExpressionNode caseFalseNode) {
         this.predicate = predicate;
-        this.caseTrue = caseTrue;
-        this.caseFalse = caseFalse;
         this.caseTrueNode = caseTrueNode;
         this.caseFalseNode = caseFalseNode;
     }
@@ -32,9 +28,7 @@ public class IfExpressionNode extends ExpressionNode {
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         ParserUtil.checkType(predicate, Signature.bool());
-        ExpressionNode caseFalse = this.caseFalse.apply(data);
-        ExpressionNode caseTrue = this.caseTrue.apply(data);
-        ParserUtil.checkType(caseTrue, caseFalse.reference().getSimpleReturn());
+        ParserUtil.checkType(caseTrueNode, caseFalseNode.reference().getSimpleReturn());
 
         Label equal = new Label();
         Label end = new Label();
@@ -42,12 +36,12 @@ public class IfExpressionNode extends ExpressionNode {
 
         builder.ifEQ(equal);
 
-        caseTrue.simplify().apply(builder, data);
+        caseTrueNode.simplify().apply(builder, data);
 
         builder.goTo(end)
                 .label(equal);
 
-        caseFalse.simplify().apply(builder, data);
+        caseFalseNode.simplify().apply(builder, data);
 
         builder.label(end);
     }
