@@ -77,9 +77,6 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
             return closure;
         };
-
-        System.out.println("Return type " + returnType);
-        System.out.println("args " + parameters);
     }
 
     public void setSelf(String self) {
@@ -91,7 +88,6 @@ public class LambdaExpressionNode extends ExpressionNode {
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
         BuildData closureFinder = data.sub();
 
-        System.out.println("CONTENT:");
         content.streamContents().forEach(System.out::println);
 
         for (Pair<String, Signature> type : types) {
@@ -116,8 +112,7 @@ public class LambdaExpressionNode extends ExpressionNode {
             if (self != null) {
                 delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
             }
-
-            System.out.println("CONTENT REF: " + content.reference());
+            
             ParserUtil.checkReferenceType(content, returnType).simplify().apply(methodBuilder, delegate);
             if (!(content instanceof BlockNode)) {
                 if (returnType.isSimple()) {
