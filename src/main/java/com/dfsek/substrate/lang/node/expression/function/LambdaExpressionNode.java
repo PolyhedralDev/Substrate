@@ -30,6 +30,8 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     private final Signature returnType;
 
+    private final Signature ref;
+
     private String self;
 
     public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start, Signature returnType) {
@@ -77,6 +79,8 @@ public class LambdaExpressionNode extends ExpressionNode {
             }
             return closure;
         };
+
+        this.ref = Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, parameters);
     }
 
     public void setSelf(String self) {
@@ -136,10 +140,6 @@ public class LambdaExpressionNode extends ExpressionNode {
                 "(" + closureSignature.internalDescriptor() + ")V");
     }
 
-    public Signature getParameters() {
-        return parameters;
-    }
-
     @Override
     public Position getPosition() {
         return start;
@@ -147,7 +147,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, getParameters());
+        return ref;
     }
 
     @Override

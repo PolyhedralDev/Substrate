@@ -22,7 +22,7 @@ public class ValueAssignmentRule implements Rule {
     public ValueAssignmentNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
         Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.ASSIGNMENT); // next token should be =
-        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
+        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer, data, scope, id.getContent());
         if(scope.contains(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }

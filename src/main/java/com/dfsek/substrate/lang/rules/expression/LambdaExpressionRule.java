@@ -27,19 +27,21 @@ public class LambdaExpressionRule implements Rule {
         return INSTANCE;
     }
 
-    @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) throws ParseException {
         ParserScope lambda = scope.sub();
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
         Set<String> args = new HashSet<>();
 
+        Signature argSig = Signature.empty();
+
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
             Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
             ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
             String argName = id.getContent();
             Signature argSignature = ParserUtil.parseSignatureNotation(tokenizer);
+            argSig = argSig.and(argSignature);
             types.add(Pair.of(argName, argSignature));
 
             lambda.register(argName, argSignature);
@@ -61,6 +63,9 @@ public class LambdaExpressionRule implements Rule {
             returnType = Signature.empty(); // void
         }
 
+        if(variableName != null) {
+            lambda.register(variableName, Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType));
+        }
 
         ParserUtil.checkType(tokenizer.consume(), Token.Type.ARROW);
 
@@ -89,5 +94,9 @@ public class LambdaExpressionRule implements Rule {
 
 
         return new LambdaExpressionNode(expression, types, begin.getPosition(), returnType);
+    }
+
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+        return assemble(tokenizer, data, scope, null);
     }
 }

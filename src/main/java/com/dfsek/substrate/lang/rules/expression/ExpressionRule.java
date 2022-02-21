@@ -32,14 +32,18 @@ public class ExpressionRule implements Rule {
 
     @Override
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        ExpressionNode node = simple(tokenizer, data, scope);
+        return assemble(tokenizer, data, scope, null);
+    }
+
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+        ExpressionNode node = simple(tokenizer, data, scope, variableName);
         if (tokenizer.peek().isBinaryOperator()) {
-            node = assembleBinaryOperator(node, tokenizer, data, scope);
+            node = assembleBinaryOperator(node, tokenizer, data, scope, variableName);
         }
         return node;
     }
 
-    private ExpressionNode simple(Tokenizer tokenizer, ParseData data, ParserScope scope) {
+    private ExpressionNode simple(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) {
         Token test = tokenizer.peek();
 
         boolean not = false;
@@ -73,7 +77,7 @@ public class ExpressionRule implements Rule {
         } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
                 || tokenizer.peek(2).getType() == Token.Type.ARROW
                 || tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
-            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data, scope);
+            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data, scope, variableName);
         } else if (test.getType() == Token.Type.GROUP_BEGIN) {
             node = TupleRule.getInstance().assemble(tokenizer, data, scope);
             possibleFunctionSite = false;
@@ -119,16 +123,16 @@ public class ExpressionRule implements Rule {
         return args;
     }
 
-    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data, ParserScope scope) {
+    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) {
         Token op = tokenizer.consume();
-        ExpressionNode right = simple(tokenizer, data, scope);
+        ExpressionNode right = simple(tokenizer, data, scope, variableName);
 
         Token next = tokenizer.peek();
         if (next.isBinaryOperator()) {
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                return join(left, op, assembleBinaryOperator(right, tokenizer, data, scope), data);
+                return join(left, op, assembleBinaryOperator(right, tokenizer, data, scope, variableName), data);
             } else {
-                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data, scope);
+                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data, scope, variableName);
             }
         }
 
