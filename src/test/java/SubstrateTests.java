@@ -30,8 +30,11 @@ public class SubstrateTests {
 
     private static final String property = "substrate.DisableOptimisation";
 
+    private static final boolean STACK_TRACES_FOR_INVALID = false;
+    private static final boolean DUMP_TO_JARS = false;
+
     static {
-        System.setProperty("substrate.Dump", Boolean.toString(false));
+        System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));
     }
 
     private Parser createParser(String script) {
@@ -103,7 +106,7 @@ public class SubstrateTests {
                 System.setProperty(property, Boolean.toString(optimisations));
                 parser.parse().execute(null);
             } catch (ParseException e) {
-                e.printStackTrace();
+                if(STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -123,7 +126,7 @@ public class SubstrateTests {
                     tokenizer.consume();
                 }
             } catch (TokenizerException e) {
-                e.printStackTrace();
+                if(STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return; // These scripts should fail to parse
             } catch (IOException e) {
                 throw new RuntimeException(e);
