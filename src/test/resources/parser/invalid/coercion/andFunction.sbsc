@@ -1,0 +1,3 @@
+// should not be able to && a function
+
+a = false && (): bool -> false;
