@@ -76,24 +76,26 @@ public class LambdaExpressionRule implements Rule {
             expression = ExpressionRule.getInstance().assemble(tokenizer, data, lambda);
         }
 
-        expression.streamScopedContents()
-                .filter(node -> node instanceof ValueReferenceNode)
-                .filter(node -> args.contains(((ValueReferenceNode) node).getId().getContent()))
-                .forEach(node -> ((ValueReferenceNode) node).setLambdaArgument(true));
-
         Set<String> locals = new HashSet<>();
-        expression.streamScopedContents()
+        expression.streamContents()
                 .filter(node -> node instanceof ValueAssignmentNode)
                 .forEach(node -> locals.add(((ValueAssignmentNode) node).getId().getContent()));
 
-
-        expression.streamScopedContents()
+        expression.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> locals.contains(((ValueReferenceNode) node).getId().getContent()))
                 .forEach(node -> ((ValueReferenceNode) node).setLocal(true));
 
+        LambdaExpressionNode lambdaExpressionNode = new LambdaExpressionNode(expression, types, begin.getPosition(), returnType);
+        expression.streamContents()
+                .filter(node -> node instanceof ValueReferenceNode)
+                .filter(node -> args.contains(((ValueReferenceNode) node).getId().getContent()))
+                .forEach(node -> {
+                    ((ValueReferenceNode) node).setLambdaArgument(true);
+                    lambdaExpressionNode.addArgumentReference(((ValueReferenceNode) node).getId().getContent());
+                });
 
-        return new LambdaExpressionNode(expression, types, begin.getPosition(), returnType);
+        return lambdaExpressionNode;
     }
 
     public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {

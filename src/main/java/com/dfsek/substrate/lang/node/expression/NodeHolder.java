@@ -16,23 +16,8 @@ public abstract class NodeHolder implements Node {
         return streamContents(this);
     }
 
-    public Stream<? extends Node> streamScopedContents() {
-        return streamScopedContents(this);
-    }
-
     private Stream<? extends Node> streamContents(Node start) {
         if (start instanceof NodeHolder) {
-            return ((NodeHolder) start)
-                    .cachedContents.get()
-                    .stream()
-                    .flatMap(node -> Stream.concat(Stream.of(node), streamContents(node)));
-        } else {
-            return Stream.empty();
-        }
-    }
-
-    private Stream<? extends Node> streamScopedContents(Node start) {
-        if (start instanceof NodeHolder && !(start instanceof LambdaExpressionNode)) {
             return ((NodeHolder) start)
                     .cachedContents.get()
                     .stream()
