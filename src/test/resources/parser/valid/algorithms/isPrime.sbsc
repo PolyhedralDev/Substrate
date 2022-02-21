@@ -1,0 +1,20 @@
+isPrime = (n: int): bool -> if(n % 2 == 0) n == 2
+                            else if(n % 3 == 0) n == 3
+                            else {
+                                test = (d: int): bool -> if(d * d <= n)
+                                                            if(n % d == 0) false
+                                                            else test(d + 2)
+                                                         else true;
+                                return test(5);
+                            };
+
+
+assert(!isPrime(4));
+assert(!isPrime(21));
+assert(!isPrime(100));
+assert(!isPrime(207));
+
+assert(isPrime(2));
+assert(isPrime(3));
+assert(isPrime(29));
+assert(isPrime(277));
