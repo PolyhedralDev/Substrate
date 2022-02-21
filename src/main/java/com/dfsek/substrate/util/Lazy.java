@@ -21,8 +21,4 @@ public final class Lazy<T> {
         calc = true;
         return result;
     }
-
-    public void invalidate() {
-        calc = false;
-    }
 }
