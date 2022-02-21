@@ -444,6 +444,14 @@ public class MethodBuilder implements Opcodes {
         return exceptions;
     }
 
+    public MethodBuilder iNeg() {
+        return insn(INEG);
+    }
+
+    public MethodBuilder dNeg() {
+        return insn(DNEG);
+    }
+
     public interface Bytecode {
         int getCode();
     }

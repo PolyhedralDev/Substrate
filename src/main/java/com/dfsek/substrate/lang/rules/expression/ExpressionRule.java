@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.NumberInverseNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanAndNode;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanOrNode;
@@ -46,9 +47,18 @@ public class ExpressionRule implements Rule {
     private ExpressionNode simple(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) {
         Token test = tokenizer.peek();
 
+
+
+        boolean invert = false;
+        Position numberInvert = null;
+        if (test.getType() == Token.Type.SUBTRACTION_OPERATOR) {
+            invert = true;
+            numberInvert = tokenizer.consume().getPosition();
+            test = tokenizer.peek();
+        }
+
         boolean not = false;
         Position booleanNot = null;
-
         if (test.getType() == Token.Type.BOOLEAN_NOT) {
             not = true;
             booleanNot = tokenizer.consume().getPosition();
@@ -105,6 +115,7 @@ public class ExpressionRule implements Rule {
             node = new FunctionInvocationNode(node, parseArguments(tokenizer, data, scope));
         }
 
+        if (invert) return new NumberInverseNode(numberInvert, node);
         if (not) return new BooleanNotNode(booleanNot, node);
         return node;
     }
