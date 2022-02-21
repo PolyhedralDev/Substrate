@@ -13,6 +13,7 @@ import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.lang.node.expression.function.MacroNode;
 import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.list.RangeNode;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -30,15 +31,15 @@ public class ExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
-        ExpressionNode node = simple(tokenizer, data);
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+        ExpressionNode node = simple(tokenizer, data, scope);
         if (tokenizer.peek().isBinaryOperator()) {
-            node = assembleBinaryOperator(node, tokenizer, data);
+            node = assembleBinaryOperator(node, tokenizer, data, scope);
         }
         return node;
     }
 
-    private ExpressionNode simple(Tokenizer tokenizer, ParseData data) {
+    private ExpressionNode simple(Tokenizer tokenizer, ParseData data, ParserScope scope) {
         Token test = tokenizer.peek();
 
         boolean not = false;
@@ -57,24 +58,24 @@ public class ExpressionRule implements Rule {
         if (test.isConstant() || test.isIdentifier()) { // simple expression
             if (test.isIdentifier() && data.hasMacro(test.getContent())) {
                 tokenizer.consume();
-                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(tokenizer, data));
+                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(tokenizer, data, scope));
             } else {
-                node = BasicExpressionRule.getInstance().assemble(tokenizer, data);
+                node = BasicExpressionRule.getInstance().assemble(tokenizer, data, scope);
             }
         } else if (test.isType()) {
-            node = CastRule.getInstance().assemble(tokenizer, data);
+            node = CastRule.getInstance().assemble(tokenizer, data, scope);
             possibleFunctionSite = false;
         } else if (test.getType() == Token.Type.IF) {
-            node = IfExpressionRule.getInstance().assemble(tokenizer, data);
+            node = IfExpressionRule.getInstance().assemble(tokenizer, data, scope);
         } else if (test.getType() == Token.Type.LIST_BEGIN) {
-            node = ListRule.getInstance().assemble(tokenizer, data);
+            node = ListRule.getInstance().assemble(tokenizer, data, scope);
             possibleFunctionSite = false;
         } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
                 || tokenizer.peek(2).getType() == Token.Type.ARROW
                 || tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
-            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data);
+            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data, scope);
         } else if (test.getType() == Token.Type.GROUP_BEGIN) {
-            node = TupleRule.getInstance().assemble(tokenizer, data);
+            node = TupleRule.getInstance().assemble(tokenizer, data, scope);
             possibleFunctionSite = false;
         } else {
             throw new ParseException("Unexpected token: " + test, test.getPosition());
@@ -83,13 +84,13 @@ public class ExpressionRule implements Rule {
 
         if (tokenizer.peek().getType() == Token.Type.RANGE) {
             Position pos = tokenizer.consume().getPosition();
-            node = new RangeNode(node, assemble(tokenizer, data), pos);
+            node = new RangeNode(node, assemble(tokenizer, data, scope), pos);
         }
 
         if (tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
             tokenizer.consume();
 
-            ExpressionNode index = assemble(tokenizer, data);
+            ExpressionNode index = assemble(tokenizer, data, scope);
 
             node = new ListIndexNode(node, index);
 
@@ -97,19 +98,19 @@ public class ExpressionRule implements Rule {
         }
 
         while (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN && possibleFunctionSite) {
-            node = new FunctionInvocationNode(node, parseArguments(tokenizer, data));
+            node = new FunctionInvocationNode(node, parseArguments(tokenizer, data, scope));
         }
 
         if (not) return new BooleanNotNode(booleanNot, node);
         return node;
     }
 
-    private List<ExpressionNode> parseArguments(Tokenizer tokenizer, ParseData data) {
+    private List<ExpressionNode> parseArguments(Tokenizer tokenizer, ParseData data, ParserScope scope) {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<ExpressionNode> args = new ArrayList<>();
         while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-            args.add(ExpressionRule.getInstance().assemble(tokenizer, data));
+            args.add(ExpressionRule.getInstance().assemble(tokenizer, data, scope));
             if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
                 tokenizer.consume(); // consume separator
             }
@@ -118,16 +119,16 @@ public class ExpressionRule implements Rule {
         return args;
     }
 
-    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data) {
+    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data, ParserScope scope) {
         Token op = tokenizer.consume();
-        ExpressionNode right = simple(tokenizer, data);
+        ExpressionNode right = simple(tokenizer, data, scope);
 
         Token next = tokenizer.peek();
         if (next.isBinaryOperator()) {
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                return join(left, op, assembleBinaryOperator(right, tokenizer, data), data);
+                return join(left, op, assembleBinaryOperator(right, tokenizer, data, scope), data);
             } else {
-                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data);
+                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data, scope);
             }
         }
 

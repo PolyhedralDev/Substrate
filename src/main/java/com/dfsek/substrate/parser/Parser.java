@@ -29,8 +29,9 @@ public class Parser {
     }
 
     public Script parse() throws ParseException {
+        ParserScope scope = new ParserScope();
         while (tokenizer.hasNext()) {
-            builder.addOperation(base.assemble(tokenizer, data));
+            builder.addOperation(base.assemble(tokenizer, data, scope));
         }
         return builder.build(data);
     }

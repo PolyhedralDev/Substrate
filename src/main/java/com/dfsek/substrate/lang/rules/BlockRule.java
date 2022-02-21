@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ReturnNode;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -24,7 +25,7 @@ public class BlockRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         List<ReturnNode> ret = new ArrayList<>();
@@ -32,13 +33,15 @@ public class BlockRule implements Rule {
         Position begin = tokenizer.peek().getPosition();
         ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_BEGIN); // Block beginning
 
+        ParserScope sub = scope.sub(); // sub-scope
+
         while (tokenizer.peek().getType() != Token.Type.BLOCK_END) {
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(this.assemble(tokenizer, data));
+                contents.add(this.assemble(tokenizer, data, sub));
             } else if (tokenizer.peek().isIdentifier() || tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(tokenizer, data));
+                contents.add(StatementRule.getInstance().assemble(tokenizer, data, sub));
             } else if (tokenizer.peek().getType() == Token.Type.RETURN) { // Parse a return
-                ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer, data);
+                ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer, data, sub);
                 ret.add(returnNode);
                 contents.add(returnNode);
             }

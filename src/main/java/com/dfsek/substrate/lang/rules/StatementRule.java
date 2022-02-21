@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.StatementNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -19,8 +20,8 @@ public class StatementRule implements Rule {
     }
 
     @Override
-    public Node assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
-        ExpressionNode node = ExpressionRule.getInstance().assemble(tokenizer, data);
+    public Node assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+        ExpressionNode node = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
         Token end = ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // Must finish with statement end token
         return new StatementNode(end.getPosition(), node);
     }

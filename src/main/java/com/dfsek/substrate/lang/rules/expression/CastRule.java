@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.node.expression.cast.IntToNumCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.NumToIntCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.ToStringNode;
 import com.dfsek.substrate.lang.node.expression.cast.TypeCastNode;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -20,13 +21,13 @@ public class CastRule implements Rule {
     }
 
     @Override
-    public TypeCastNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
+    public TypeCastNode<?, ?> assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
         Token type = ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
-        ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, data);
+        ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
 
-        TypeCastNode node;
+        TypeCastNode<?, ?> node;
         if (type.getType() == Token.Type.INT_TYPE) {
             node = new NumToIntCastNode(type, expressionNode);
         } else if (type.getType() == Token.Type.STRING_TYPE) {

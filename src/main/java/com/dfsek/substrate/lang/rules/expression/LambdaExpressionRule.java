@@ -8,6 +8,7 @@ import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Token;
@@ -27,7 +28,7 @@ public class LambdaExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
         Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
@@ -59,9 +60,9 @@ public class LambdaExpressionRule implements Rule {
 
         ExpressionNode expression;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            expression = BlockRule.getInstance().assemble(tokenizer, data);
+            expression = BlockRule.getInstance().assemble(tokenizer, data, scope);
         } else {
-            expression = ExpressionRule.getInstance().assemble(tokenizer, data);
+            expression = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
         }
 
         expression.streamScopedContents()

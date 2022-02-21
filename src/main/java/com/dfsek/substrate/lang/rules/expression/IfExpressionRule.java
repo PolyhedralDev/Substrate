@@ -11,6 +11,7 @@ import com.dfsek.substrate.lang.node.expression.IfExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaInvocationNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.tokenizer.Position;
@@ -25,19 +26,19 @@ public class IfExpressionRule implements Rule {
     private static final IfExpressionRule INSTANCE = new IfExpressionRule();
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data) throws ParseException {
+    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
         ParserUtil.checkType(tokenizer.consume(), Token.Type.IF);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
-        ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer, data);
+        ExpressionNode predicate = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
         ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
 
         ExpressionNode caseTrueNode;
         Function<BuildData, ExpressionNode> caseTrue;
         if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data);
+            caseTrueNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
             caseTrue = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseTrueNode, Collections.emptyList(), caseTrueNode.getPosition(), caseTrueNode.reference(buildData)));
         } else {
-            caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data);
+            caseTrueNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
             caseTrue = buildData -> caseTrueNode;
         }
 
@@ -46,10 +47,10 @@ public class IfExpressionRule implements Rule {
         if (tokenizer.peek().getType() == Token.Type.ELSE) {
             tokenizer.consume();
             if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-                caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data);
+                caseFalseNode = BlockRule.getInstance().assemble(tokenizer, data, scope);
                 caseFalse = buildData -> new LambdaInvocationNode(new LambdaExpressionNode(caseFalseNode, Collections.emptyList(), caseFalseNode.getPosition(), caseFalseNode.reference(buildData)));
             } else {
-                caseFalseNode = ExpressionRule.getInstance().assemble(tokenizer, data);
+                caseFalseNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
                 caseFalse = buildData -> caseFalseNode;
             }
         } else {
