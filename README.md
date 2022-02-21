@@ -1,5 +1,7 @@
 # Substrate
 
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
+
 Substrate is a high-performance scripting engine & language for data-driven Java applications.
 
 Subscript, the language implemented by Substrate, is a functional programming language designed for scripting in Java
