@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.cast;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -38,6 +39,7 @@ public class ToStringNode extends TypeCastNode<Object, String> {
 
     @Override
     public ExpressionNode simplify() {
+        if(Node.disableOptimisation()) return this;
         if (value instanceof DecimalNode || value instanceof IntegerNode) {
             return new StringNode(((ConstantExpressionNode<?>) value).getValue().toString(), value.getPosition());
         }

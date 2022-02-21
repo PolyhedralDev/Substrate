@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.binary.bool;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -22,6 +23,7 @@ public class BooleanOrNode extends BooleanOperationNode {
 
     @Override
     public ExpressionNode simplify() {
+        if(Node.disableOptimisation()) return this;
         if (left instanceof BooleanNode) {
             if (((BooleanNode) left).getValue()) {
                 return left; // short-circuit.

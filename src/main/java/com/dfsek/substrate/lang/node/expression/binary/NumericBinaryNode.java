@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.binary;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -47,6 +48,7 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
     @Override
     public ExpressionNode simplify() {
+        if(Node.disableOptimisation()) return this;
         if (left instanceof DecimalNode && right instanceof DecimalNode) {
             return new DecimalNode(
                     apply(((DecimalNode) left).getValue(), ((DecimalNode) right).getValue()),

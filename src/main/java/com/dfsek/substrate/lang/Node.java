@@ -13,4 +13,9 @@ public interface Node extends Opcodes, Positioned {
     default Node simplify() {
         return this;
     }
+
+    static boolean disableOptimisation() {
+        String p = System.getProperty("substrate.DisableOptimisation");
+        return p != null && p.equals("true");
+    }
 }

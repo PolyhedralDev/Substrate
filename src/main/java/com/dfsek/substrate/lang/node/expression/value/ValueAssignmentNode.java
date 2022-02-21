@@ -65,6 +65,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
     @Override
     public ExpressionNode simplify() {
+        if(Node.disableOptimisation()) return this;
         if (value instanceof ConstantExpressionNode) {
             return new ConstantValueNode(id, (ConstantExpressionNode<?>) value);
         }

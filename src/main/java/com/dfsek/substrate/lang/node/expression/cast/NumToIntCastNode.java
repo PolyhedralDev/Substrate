@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.node.expression.cast;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -22,6 +23,7 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
 
     @Override
     public ExpressionNode simplify() {
+        if(Node.disableOptimisation()) return this;
         if (value instanceof DecimalNode) {
             return new IntegerNode(((DecimalNode) value).getValue().intValue(), value.getPosition());
         }
