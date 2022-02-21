@@ -88,12 +88,14 @@ public class LambdaFactory {
         constructor.aLoad(0)
                 .invokeSpecial("java/lang/Object", "<init>", "()V");
 
+        int var = 1;
         for (int i = 0; i < scope.size(); i++) {
             builder.field("scope" + i, scope.getType(i).descriptor(), MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL);
 
             constructor.aLoad(0)
-                    .varInsn(scope.getType(i).loadInsn(), i + 1)
+                    .varInsn(scope.getType(i).loadInsn(), var)
                     .putField(name, "scope" + i, scope.getType(i).descriptor());
+            var += scope.get(i).frames();
         }
 
         constructor.voidReturn(); // Void return
