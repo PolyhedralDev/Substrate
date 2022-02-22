@@ -1,6 +1,6 @@
-package com.dfsek.substrate.tokenizer.exceptions;
+package com.dfsek.substrate.lexer.exceptions;
 
-import com.dfsek.substrate.tokenizer.Position;
+import com.dfsek.substrate.lexer.read.Position;
 
 public class FormatException extends TokenizerException {
 

@@ -1,4 +1,4 @@
-package com.dfsek.substrate.tokenizer;
+package com.dfsek.substrate.lexer.read;
 
 public class Position {
     private static final Position NULL = new Position(0, 0) {

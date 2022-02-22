@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang.node.expression.binary.comparison;
 
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.token.Token;
 
 public class NotEqualsNode extends ComparisonBinaryNode {
     public NotEqualsNode(ExpressionNode left, ExpressionNode right, Token op) {

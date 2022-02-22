@@ -1,4 +1,4 @@
-package com.dfsek.substrate.tokenizer;
+package com.dfsek.substrate.lexer.read;
 
 public class Char implements Positioned {
     private final char character;

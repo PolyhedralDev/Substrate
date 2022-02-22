@@ -8,7 +8,7 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.token.Token;
 
 public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
     public IntToNumCastNode(Token type, ExpressionNode value) {

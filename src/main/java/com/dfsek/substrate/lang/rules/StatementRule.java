@@ -9,8 +9,9 @@ import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class StatementRule implements Rule {
     private static final StatementRule INSTANCE = new StatementRule();
@@ -20,9 +21,9 @@ public class StatementRule implements Rule {
     }
 
     @Override
-    public Node assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        ExpressionNode node = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
-        Token end = ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // Must finish with statement end token
+    public Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        ExpressionNode node = ExpressionRule.getInstance().assemble(lexer, data, scope);
+        Token end = ParserUtil.checkType(lexer.consume(), TokenType.STATEMENT_END); // Must finish with statement end token
         return new StatementNode(end.getPosition(), node);
     }
 }

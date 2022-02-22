@@ -1,4 +1,4 @@
-package com.dfsek.substrate.tokenizer;
+package com.dfsek.substrate.lexer.read;
 
 import java.io.IOException;
 import java.io.Reader;

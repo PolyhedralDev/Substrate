@@ -7,8 +7,9 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +43,7 @@ public class ValueReferenceNode extends ExpressionNode {
     }
 
     public ValueReferenceNode(String id, Signature signature) {
-        this.id = new Token(id, Token.Type.IDENTIFIER, Position.getNull());
+        this.id = new Token(id, TokenType.IDENTIFIER, Position.getNull());
         this.signature = signature;
     }
 

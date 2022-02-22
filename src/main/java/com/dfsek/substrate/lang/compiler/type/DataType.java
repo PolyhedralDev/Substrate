@@ -4,7 +4,8 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 import org.objectweb.asm.Opcodes;
 
 public enum DataType implements Opcodes {
@@ -204,17 +205,17 @@ public enum DataType implements Opcodes {
     };
 
     public static DataType fromToken(Token token) {
-        if (token.getType() == Token.Type.BOOL_TYPE) {
+        if (token.getType() == TokenType.BOOL_TYPE) {
             return BOOL;
-        } else if (token.getType() == Token.Type.INT_TYPE) {
+        } else if (token.getType() == TokenType.INT_TYPE) {
             return INT;
-        } else if (token.getType() == Token.Type.STRING_TYPE) {
+        } else if (token.getType() == TokenType.STRING_TYPE) {
             return STR;
-        } else if (token.getType() == Token.Type.NUM_TYPE) {
+        } else if (token.getType() == TokenType.NUM_TYPE) {
             return NUM;
-        } else if (token.getType() == Token.Type.FUN_TYPE) {
+        } else if (token.getType() == TokenType.FUN_TYPE) {
             return FUN;
-        } else if (token.getType() == Token.Type.LIST_TYPE) {
+        } else if (token.getType() == TokenType.LIST_TYPE) {
             return LIST;
         }
         throw new IllegalArgumentException("Invalid token: " + token);

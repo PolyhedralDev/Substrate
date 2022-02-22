@@ -9,9 +9,9 @@ import com.dfsek.substrate.lang.node.expression.ReturnNode;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,33 +25,33 @@ public class BlockRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = new ArrayList<>();
 
         List<ReturnNode> ret = new ArrayList<>();
 
-        Position begin = tokenizer.peek().getPosition();
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_BEGIN); // Block beginning
+        Position begin = lexer.peek().getPosition();
+        ParserUtil.checkType(lexer.consume(), TokenType.BLOCK_BEGIN); // Block beginning
 
         ParserScope sub = scope.sub(); // sub-scope
 
-        while (tokenizer.peek().getType() != Token.Type.BLOCK_END) {
-            if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) { // Parse a new block
-                contents.add(this.assemble(tokenizer, data, sub));
-            } else if (tokenizer.peek().isIdentifier()
-                    || tokenizer.peek().getType() == Token.Type.GROUP_BEGIN
-                    || tokenizer.peek().getType() == Token.Type.IF) { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(tokenizer, data, sub));
-            } else if (tokenizer.peek().getType() == Token.Type.RETURN) { // Parse a return
-                ReturnNode returnNode = ReturnRule.getInstance().assemble(tokenizer, data, sub);
+        while (lexer.peek().getType() != TokenType.BLOCK_END) {
+            if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
+                contents.add(this.assemble(lexer, data, sub));
+            } else if (lexer.peek().isIdentifier()
+                    || lexer.peek().getType() == TokenType.GROUP_BEGIN
+                    || lexer.peek().getType() == TokenType.IF) { // Parse a statement.
+                contents.add(StatementRule.getInstance().assemble(lexer, data, sub));
+            } else if (lexer.peek().getType() == TokenType.RETURN) { // Parse a return
+                ReturnNode returnNode = ReturnRule.getInstance().assemble(lexer, data, sub);
                 ret.add(returnNode);
                 contents.add(returnNode);
             } else {
-                throw new ParseException("Unexpected token: " + tokenizer.peek(), tokenizer.consume().getPosition());
+                throw new ParseException("Unexpected token: " + lexer.peek(), lexer.consume().getPosition());
             }
         }
 
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.BLOCK_END); // Block must end.
+        ParserUtil.checkType(lexer.consume(), TokenType.BLOCK_END); // Block must end.
 
         return new BlockNode(contents, ret, begin);
     }

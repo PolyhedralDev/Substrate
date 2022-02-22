@@ -5,8 +5,8 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.Token;
 
 import java.util.Arrays;
 import java.util.Collection;

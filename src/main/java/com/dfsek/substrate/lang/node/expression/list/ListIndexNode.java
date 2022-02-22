@@ -7,7 +7,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
+import com.dfsek.substrate.lexer.read.Position;
 
 import java.util.Arrays;
 import java.util.Collection;

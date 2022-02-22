@@ -12,8 +12,9 @@ import com.dfsek.substrate.lang.rules.value.ValueAssignmentRule;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class BasicExpressionRule implements Rule {
     private static final BasicExpressionRule INSTANCE = new BasicExpressionRule();
@@ -23,26 +24,26 @@ public class BasicExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER, Token.Type.STRING, Token.Type.BOOLEAN, Token.Type.NUMBER, Token.Type.INT);
-        if (tokenizer.peek().getType() == Token.Type.STRING) {
-            Token token = tokenizer.consume();
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        ParserUtil.checkType(lexer.peek(), TokenType.IDENTIFIER, TokenType.STRING, TokenType.BOOLEAN, TokenType.NUMBER, TokenType.INT);
+        if (lexer.peek().getType() == TokenType.STRING) {
+            Token token = lexer.consume();
             return new StringNode(token.getContent(), token.getPosition());
-        } else if (tokenizer.peek().getType() == Token.Type.BOOLEAN) {
-            Token token = tokenizer.consume();
+        } else if (lexer.peek().getType() == TokenType.BOOLEAN) {
+            Token token = lexer.consume();
             return new BooleanNode(Boolean.parseBoolean(token.getContent()), token.getPosition());
-        } else if (tokenizer.peek().getType() == Token.Type.NUMBER) {
-            Token token = tokenizer.consume();
+        } else if (lexer.peek().getType() == TokenType.NUMBER) {
+            Token token = lexer.consume();
             return new DecimalNode(Double.parseDouble(token.getContent()), token.getPosition());
-        } else if (tokenizer.peek().getType() == Token.Type.INT) {
-            Token token = tokenizer.consume();
+        } else if (lexer.peek().getType() == TokenType.INT) {
+            Token token = lexer.consume();
             return new IntegerNode(Integer.parseInt(token.getContent()), token.getPosition());
         } else {
-            ParserUtil.checkType(tokenizer.peek(), Token.Type.IDENTIFIER);
-            if (tokenizer.peek(1).getType() == Token.Type.ASSIGNMENT) {
-                return ValueAssignmentRule.getInstance().assemble(tokenizer, data, scope);
+            ParserUtil.checkType(lexer.peek(), TokenType.IDENTIFIER);
+            if (lexer.peek(1).getType() == TokenType.ASSIGNMENT) {
+                return ValueAssignmentRule.getInstance().assemble(lexer, data, scope);
             }
-            Token id = tokenizer.consume();
+            Token id = lexer.consume();
             if (!scope.contains(id.getContent())) {
                 throw new ParseException("No such value: " + id.getContent(), id.getPosition());
             }

@@ -2,7 +2,7 @@ package com.dfsek.substrate.lang.node.expression.binary.arithmetic;
 
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.token.Token;
 
 public class DivisionNode extends NumericBinaryNode {
     public DivisionNode(ExpressionNode left, ExpressionNode right, Token op) {

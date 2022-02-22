@@ -1,14 +1,19 @@
-package com.dfsek.substrate.tokenizer;
+package com.dfsek.substrate.lexer;
 
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.exceptions.EOFException;
-import com.dfsek.substrate.tokenizer.exceptions.FormatException;
-import com.dfsek.substrate.tokenizer.exceptions.TokenizerException;
+import com.dfsek.substrate.lexer.read.Lookahead;
+import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.exceptions.EOFException;
+import com.dfsek.substrate.lexer.exceptions.FormatException;
+import com.dfsek.substrate.lexer.exceptions.TokenizerException;
+import com.dfsek.substrate.lexer.read.Char;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 
 import java.io.StringReader;
 import java.util.*;
 
-public class Tokenizer {
+public class Lexer {
     public static final Set<Character> syntaxSignificant;
 
     static {
@@ -20,8 +25,8 @@ public class Tokenizer {
     private final List<Token> cache = new ArrayList<>();
     private Token current;
 
-    public Tokenizer(String data) throws ParseException {
-        reader = new com.dfsek.substrate.tokenizer.Lookahead(new StringReader(data + '\0'));
+    public Lexer(String data) throws ParseException {
+        reader = new Lookahead(new StringReader(data + '\0'));
         cache.add(fetch());
     }
 
@@ -88,38 +93,38 @@ public class Tokenizer {
         }
 
         if (reader.matches("==", true)) {
-            return new Token("==", Token.Type.EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("==", TokenType.EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches("!=", true)) {
-            return new Token("!=", Token.Type.NOT_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("!=", TokenType.NOT_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches(">=", true)) {
-            return new Token(">=", Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(">=", TokenType.GREATER_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches("<=", true)) {
-            return new Token("<=", Token.Type.LESS_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("<=", TokenType.LESS_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches(">", true)) {
-            return new Token(">", Token.Type.GREATER_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(">", TokenType.GREATER_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches("<", true)) {
-            return new Token("<", Token.Type.LESS_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("<", TokenType.LESS_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
         }
 
 
         if (reader.matches("||", true)) {
-            return new Token("||", Token.Type.BOOLEAN_OR, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("||", TokenType.BOOLEAN_OR, new Position(reader.getLine(), reader.getIndex()));
         }
         if (reader.matches("&&", true)) {
-            return new Token("&&", Token.Type.BOOLEAN_AND, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("&&", TokenType.BOOLEAN_AND, new Position(reader.getLine(), reader.getIndex()));
         }
 
         if (reader.matches("->", true)) {
-            return new Token("->", Token.Type.ARROW, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("->", TokenType.ARROW, new Position(reader.getLine(), reader.getIndex()));
         }
 
         if (reader.matches("..", true)) {
-            return new Token("..", Token.Type.RANGE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token("..", TokenType.RANGE, new Position(reader.getLine(), reader.getIndex()));
         }
 
 
@@ -130,9 +135,9 @@ public class Tokenizer {
             }
             String number = num.toString();
             if (number.contains(".")) {
-                return new Token(num.toString(), Token.Type.NUMBER, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(num.toString(), TokenType.NUMBER, new Position(reader.getLine(), reader.getIndex()));
             } else {
-                return new Token(num.toString(), Token.Type.INT, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(num.toString(), TokenType.INT, new Position(reader.getLine(), reader.getIndex()));
             }
         }
 
@@ -152,48 +157,48 @@ public class Tokenizer {
             }
             reader.consume(); // Consume last quote
 
-            return new Token(string.toString(), Token.Type.STRING, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(string.toString(), TokenType.STRING, new Position(reader.getLine(), reader.getIndex()));
         }
 
         switch (reader.current().getCharacter()) {
             case '(':
-                return new Token(reader.consume().toString(), Token.Type.GROUP_BEGIN, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.GROUP_BEGIN, new Position(reader.getLine(), reader.getIndex()));
             case ')':
-                return new Token(reader.consume().toString(), Token.Type.GROUP_END, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.GROUP_END, new Position(reader.getLine(), reader.getIndex()));
             case ';':
-                return new Token(reader.consume().toString(), Token.Type.STATEMENT_END, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.STATEMENT_END, new Position(reader.getLine(), reader.getIndex()));
             case ',':
-                return new Token(reader.consume().toString(), Token.Type.SEPARATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.SEPARATOR, new Position(reader.getLine(), reader.getIndex()));
             case '{':
-                return new Token(reader.consume().toString(), Token.Type.BLOCK_BEGIN, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.BLOCK_BEGIN, new Position(reader.getLine(), reader.getIndex()));
             case '}':
-                return new Token(reader.consume().toString(), Token.Type.BLOCK_END, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.BLOCK_END, new Position(reader.getLine(), reader.getIndex()));
             case '=':
-                return new Token(reader.consume().toString(), Token.Type.ASSIGNMENT, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.ASSIGNMENT, new Position(reader.getLine(), reader.getIndex()));
             case '+':
-                return new Token(reader.consume().toString(), Token.Type.ADDITION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.ADDITION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
             case '-':
-                return new Token(reader.consume().toString(), Token.Type.SUBTRACTION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.SUBTRACTION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
             case '*':
-                return new Token(reader.consume().toString(), Token.Type.MULTIPLICATION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.MULTIPLICATION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
             case '/':
-                return new Token(reader.consume().toString(), Token.Type.DIVISION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.DIVISION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
             case '%':
-                return new Token(reader.consume().toString(), Token.Type.MODULO_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.MODULO_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
             case '!':
-                return new Token(reader.consume().toString(), Token.Type.BOOLEAN_NOT, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.BOOLEAN_NOT, new Position(reader.getLine(), reader.getIndex()));
             case ':':
-                return new Token(reader.consume().toString(), Token.Type.TYPE, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.TYPE, new Position(reader.getLine(), reader.getIndex()));
             case '[':
-                return new Token(reader.consume().toString(), Token.Type.LIST_BEGIN, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.LIST_BEGIN, new Position(reader.getLine(), reader.getIndex()));
             case ']':
-                return new Token(reader.consume().toString(), Token.Type.LIST_END, new Position(reader.getLine(), reader.getIndex()));
+                return new Token(reader.consume().toString(), TokenType.LIST_END, new Position(reader.getLine(), reader.getIndex()));
         }
 
 
         StringBuilder token = new StringBuilder();
         while (!reader.current().isEOF() && !isSyntaxSignificant(reader.current().getCharacter())) {
-            com.dfsek.substrate.tokenizer.Char c = reader.consume();
+            Char c = reader.consume();
             if (c.isWhitespace()) break;
             token.append(c);
         }
@@ -201,44 +206,44 @@ public class Tokenizer {
         String tokenString = token.toString();
 
         if (tokenString.equals("true")) {
-            return new Token(tokenString, Token.Type.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("false")) {
-            return new Token(tokenString, Token.Type.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
         }
 
         if (tokenString.equals("return")) {
-            return new Token(tokenString, Token.Type.RETURN, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.RETURN, new Position(reader.getLine(), reader.getIndex()));
         }
 
         if (tokenString.equals("num")) {
-            return new Token(tokenString, Token.Type.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("int")) {
-            return new Token(tokenString, Token.Type.INT_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.INT_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("bool")) {
-            return new Token(tokenString, Token.Type.BOOL_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.BOOL_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("str")) {
-            return new Token(tokenString, Token.Type.STRING_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.STRING_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("fun")) {
-            return new Token(tokenString, Token.Type.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("list")) {
-            return new Token(tokenString, Token.Type.LIST_TYPE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.LIST_TYPE, new Position(reader.getLine(), reader.getIndex()));
         }
 
         if (tokenString.equals("if")) {
-            return new Token(tokenString, Token.Type.IF, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.IF, new Position(reader.getLine(), reader.getIndex()));
         }
         if (tokenString.equals("else")) {
-            return new Token(tokenString, Token.Type.ELSE, new Position(reader.getLine(), reader.getIndex()));
+            return new Token(tokenString, TokenType.ELSE, new Position(reader.getLine(), reader.getIndex()));
         }
 
 
-        return new Token(tokenString, Token.Type.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
+        return new Token(tokenString, TokenType.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
     }
 
     private boolean isNumberLike() {

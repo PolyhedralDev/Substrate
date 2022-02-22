@@ -1,6 +1,6 @@
 package com.dfsek.substrate.parser.exception;
 
-import com.dfsek.substrate.tokenizer.Position;
+import com.dfsek.substrate.lexer.read.Position;
 
 public class ParseException extends RuntimeException {
     private static final long serialVersionUID = 6744390543046766386L;

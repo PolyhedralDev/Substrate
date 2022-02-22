@@ -8,8 +8,9 @@ import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class ReturnRule implements Rule {
     private static final ReturnRule INSTANCE = new ReturnRule();
@@ -19,18 +20,18 @@ public class ReturnRule implements Rule {
     }
 
     @Override
-    public ReturnNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        Token r = ParserUtil.checkType(tokenizer.consume(), Token.Type.RETURN);
+    public ReturnNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        Token r = ParserUtil.checkType(lexer.consume(), TokenType.RETURN);
 
         ReturnNode node;
-        if (tokenizer.peek().getType() == Token.Type.STATEMENT_END) {
+        if (lexer.peek().getType() == TokenType.STATEMENT_END) {
             node = new ReturnNode(r.getPosition(), null);
         } else {
-            ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
+            ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
             node = new ReturnNode(r.getPosition(), expressionNode);
         }
 
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END);
+        ParserUtil.checkType(lexer.consume(), TokenType.STATEMENT_END);
         return node;
     }
 }

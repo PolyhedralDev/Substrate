@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.node.expression.binary.comparison;
 
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.tokenizer.Token;
+import com.dfsek.substrate.lexer.token.Token;
 
 public class LessThanNode extends ComparisonBinaryNode {
     public LessThanNode(ExpressionNode left, ExpressionNode right, Token op) {

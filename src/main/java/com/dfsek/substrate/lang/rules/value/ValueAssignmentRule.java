@@ -8,8 +8,9 @@ import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class ValueAssignmentRule implements Rule {
     private static final ValueAssignmentRule INSTANCE = new ValueAssignmentRule();
@@ -19,10 +20,10 @@ public class ValueAssignmentRule implements Rule {
     }
 
     @Override
-    public ValueAssignmentNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.ASSIGNMENT); // next token should be =
-        ExpressionNode value = ExpressionRule.getInstance().assemble(tokenizer, data, scope, id.getContent());
+    public ValueAssignmentNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        Token id = ParserUtil.checkType(lexer.consume(), TokenType.IDENTIFIER);
+        ParserUtil.checkType(lexer.consume(), TokenType.ASSIGNMENT); // next token should be =
+        ExpressionNode value = ExpressionRule.getInstance().assemble(lexer, data, scope, id.getContent());
         if(scope.contains(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }

@@ -14,12 +14,13 @@ import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.lang.node.expression.function.MacroNode;
 import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.list.RangeNode;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Position;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,37 +33,37 @@ public class ExpressionRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        return assemble(tokenizer, data, scope, null);
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        return assemble(lexer, data, scope, null);
     }
 
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) throws ParseException {
-        ExpressionNode node = simple(tokenizer, data, scope, variableName);
-        if (tokenizer.peek().isBinaryOperator()) {
-            node = assembleBinaryOperator(node, tokenizer, data, scope, variableName);
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+        ExpressionNode node = simple(lexer, data, scope, variableName);
+        if (lexer.peek().isBinaryOperator()) {
+            node = assembleBinaryOperator(node, lexer, data, scope, variableName);
         }
         return node;
     }
 
-    private ExpressionNode simple(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) {
-        Token test = tokenizer.peek();
+    private ExpressionNode simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+        Token test = lexer.peek();
 
 
 
         boolean invert = false;
         Position numberInvert = null;
-        if (test.getType() == Token.Type.SUBTRACTION_OPERATOR) {
+        if (test.getType() == TokenType.SUBTRACTION_OPERATOR) {
             invert = true;
-            numberInvert = tokenizer.consume().getPosition();
-            test = tokenizer.peek();
+            numberInvert = lexer.consume().getPosition();
+            test = lexer.peek();
         }
 
         boolean not = false;
         Position booleanNot = null;
-        if (test.getType() == Token.Type.BOOLEAN_NOT) {
+        if (test.getType() == TokenType.BOOLEAN_NOT) {
             not = true;
-            booleanNot = tokenizer.consume().getPosition();
-            test = tokenizer.peek();
+            booleanNot = lexer.consume().getPosition();
+            test = lexer.peek();
         }
 
         ExpressionNode node;
@@ -71,48 +72,48 @@ public class ExpressionRule implements Rule {
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
             if (test.isIdentifier() && data.hasMacro(test.getContent())) {
-                tokenizer.consume();
-                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(tokenizer, data, scope));
+                lexer.consume();
+                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(lexer, data, scope));
             } else {
-                node = BasicExpressionRule.getInstance().assemble(tokenizer, data, scope);
+                node = BasicExpressionRule.getInstance().assemble(lexer, data, scope);
             }
         } else if (test.isType()) {
-            node = CastRule.getInstance().assemble(tokenizer, data, scope);
+            node = CastRule.getInstance().assemble(lexer, data, scope);
             possibleFunctionSite = false;
-        } else if (test.getType() == Token.Type.IF) {
-            node = IfExpressionRule.getInstance().assemble(tokenizer, data, scope);
-        } else if (test.getType() == Token.Type.LIST_BEGIN) {
-            node = ListRule.getInstance().assemble(tokenizer, data, scope);
+        } else if (test.getType() == TokenType.IF) {
+            node = IfExpressionRule.getInstance().assemble(lexer, data, scope);
+        } else if (test.getType() == TokenType.LIST_BEGIN) {
+            node = ListRule.getInstance().assemble(lexer, data, scope);
             possibleFunctionSite = false;
-        } else if ((tokenizer.peek(1).isIdentifier() && tokenizer.peek(2).getType() == Token.Type.TYPE)
-                || tokenizer.peek(2).getType() == Token.Type.ARROW
-                || tokenizer.peek(2).getType() == Token.Type.TYPE) { // lambda or function
-            node = LambdaExpressionRule.getInstance().assemble(tokenizer, data, scope, variableName);
-        } else if (test.getType() == Token.Type.GROUP_BEGIN) {
-            node = TupleRule.getInstance().assemble(tokenizer, data, scope);
+        } else if ((lexer.peek(1).isIdentifier() && lexer.peek(2).getType() == TokenType.TYPE)
+                || lexer.peek(2).getType() == TokenType.ARROW
+                || lexer.peek(2).getType() == TokenType.TYPE) { // lambda or function
+            node = LambdaExpressionRule.getInstance().assemble(lexer, data, scope, variableName);
+        } else if (test.getType() == TokenType.GROUP_BEGIN) {
+            node = TupleRule.getInstance().assemble(lexer, data, scope);
             possibleFunctionSite = false;
         } else {
             throw new ParseException("Unexpected token: " + test, test.getPosition());
         }
 
 
-        if (tokenizer.peek().getType() == Token.Type.RANGE) {
-            Position pos = tokenizer.consume().getPosition();
-            node = new RangeNode(node, assemble(tokenizer, data, scope), pos);
+        if (lexer.peek().getType() == TokenType.RANGE) {
+            Position pos = lexer.consume().getPosition();
+            node = new RangeNode(node, assemble(lexer, data, scope), pos);
         }
 
-        if (tokenizer.peek().getType() == Token.Type.LIST_BEGIN) {
-            tokenizer.consume();
+        if (lexer.peek().getType() == TokenType.LIST_BEGIN) {
+            lexer.consume();
 
-            ExpressionNode index = assemble(tokenizer, data, scope);
+            ExpressionNode index = assemble(lexer, data, scope);
 
             node = new ListIndexNode(node, index);
 
-            ParserUtil.checkType(tokenizer.consume(), Token.Type.LIST_END);
+            ParserUtil.checkType(lexer.consume(), TokenType.LIST_END);
         }
 
-        while (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN && possibleFunctionSite) {
-            node = new FunctionInvocationNode(node, parseArguments(tokenizer, data, scope));
+        while (lexer.peek().getType() == TokenType.GROUP_BEGIN && possibleFunctionSite) {
+            node = new FunctionInvocationNode(node, parseArguments(lexer, data, scope));
         }
 
         if (invert) return new NumberInverseNode(numberInvert, node);
@@ -120,30 +121,30 @@ public class ExpressionRule implements Rule {
         return node;
     }
 
-    private List<ExpressionNode> parseArguments(Tokenizer tokenizer, ParseData data, ParserScope scope) {
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
+    private List<ExpressionNode> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
+        ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<ExpressionNode> args = new ArrayList<>();
-        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-            args.add(ExpressionRule.getInstance().assemble(tokenizer, data, scope));
-            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
-                tokenizer.consume(); // consume separator
+        while (lexer.peek().getType() != TokenType.GROUP_END) {
+            args.add(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
+                lexer.consume(); // consume separator
             }
         }
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+        ParserUtil.checkType(lexer.consume(), TokenType.GROUP_END);
         return args;
     }
 
-    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) {
-        Token op = tokenizer.consume();
-        ExpressionNode right = simple(tokenizer, data, scope, variableName);
+    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+        Token op = lexer.consume();
+        ExpressionNode right = simple(lexer, data, scope, variableName);
 
-        Token next = tokenizer.peek();
+        Token next = lexer.peek();
         if (next.isBinaryOperator()) {
             if (ParserUtil.hasPrecedence(op.getType(), next.getType())) {
-                return join(left, op, assembleBinaryOperator(right, tokenizer, data, scope, variableName), data);
+                return join(left, op, assembleBinaryOperator(right, lexer, data, scope, variableName), data);
             } else {
-                return assembleBinaryOperator(join(left, op, right, data), tokenizer, data, scope, variableName);
+                return assembleBinaryOperator(join(left, op, right, data), lexer, data, scope, variableName);
             }
         }
 
@@ -151,67 +152,67 @@ public class ExpressionRule implements Rule {
     }
 
     private ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right, ParseData data) {
-        if (op.getType() == Token.Type.ADDITION_OPERATOR) {
+        if (op.getType() == TokenType.ADDITION_OPERATOR) {
             return new AdditionNode(
                     data.checkType(left, Signature.integer(), Signature.string(), Signature.decimal()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.SUBTRACTION_OPERATOR) {
+        } else if (op.getType() == TokenType.SUBTRACTION_OPERATOR) {
             return new SubtractionNode(
                     data.checkType(left, Signature.integer(), Signature.decimal()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.MULTIPLICATION_OPERATOR) {
+        } else if (op.getType() == TokenType.MULTIPLICATION_OPERATOR) {
             return new MultiplyNode(
                     data.checkType(left, Signature.integer(), Signature.decimal()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.DIVISION_OPERATOR) {
+        } else if (op.getType() == TokenType.DIVISION_OPERATOR) {
             return new DivisionNode(
                     data.checkType(left, Signature.integer(), Signature.decimal()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.MODULO_OPERATOR) {
+        } else if (op.getType() == TokenType.MODULO_OPERATOR) {
             return new ModulusNode(
                     data.checkType(left, Signature.integer(), Signature.decimal()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.EQUALS_OPERATOR) {
+        } else if (op.getType() == TokenType.EQUALS_OPERATOR) {
             return new EqualsNode(
                     left,
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.NOT_EQUALS_OPERATOR) {
+        } else if (op.getType() == TokenType.NOT_EQUALS_OPERATOR) {
             return new NotEqualsNode(
                     left,
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.GREATER_THAN_OPERATOR) {
+        } else if (op.getType() == TokenType.GREATER_THAN_OPERATOR) {
             return new GreaterThanNode(
                     data.checkType(left, Signature.decimal(), Signature.integer()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.LESS_THAN_OPERATOR) {
+        } else if (op.getType() == TokenType.LESS_THAN_OPERATOR) {
             return new LessThanNode(
                     data.checkType(left, Signature.decimal(), Signature.integer()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.GREATER_THAN_OR_EQUALS_OPERATOR) {
+        } else if (op.getType() == TokenType.GREATER_THAN_OR_EQUALS_OPERATOR) {
             return new GreaterThanOrEqualsNode(
                     data.checkType(left, Signature.decimal(), Signature.integer()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.LESS_THAN_OR_EQUALS_OPERATOR) {
+        } else if (op.getType() == TokenType.LESS_THAN_OR_EQUALS_OPERATOR) {
             return new LessThanOrEqualsNode(
                     data.checkType(left, Signature.decimal(), Signature.integer()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.BOOLEAN_AND) {
+        } else if (op.getType() == TokenType.BOOLEAN_AND) {
             return new BooleanAndNode(
                     data.checkType(left, Signature.bool()),
                     data.assertEqual(right, left),
                     op);
-        } else if (op.getType() == Token.Type.BOOLEAN_OR) {
+        } else if (op.getType() == TokenType.BOOLEAN_OR) {
             return new BooleanOrNode(
                     data.checkType(left, Signature.bool()),
                     data.assertEqual(right, left),

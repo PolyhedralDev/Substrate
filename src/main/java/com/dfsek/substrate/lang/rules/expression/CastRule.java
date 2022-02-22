@@ -10,8 +10,9 @@ import com.dfsek.substrate.lang.node.expression.cast.TypeCastNode;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class CastRule implements Rule {
     private static final CastRule INSTANCE = new CastRule();
@@ -21,23 +22,23 @@ public class CastRule implements Rule {
     }
 
     @Override
-    public TypeCastNode<?, ?> assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        Token type = ParserUtil.checkType(tokenizer.consume(), Token.Type.STRING_TYPE, Token.Type.INT_TYPE, Token.Type.NUM_TYPE);
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
+    public TypeCastNode<?, ?> assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        Token type = ParserUtil.checkType(lexer.consume(), TokenType.STRING_TYPE, TokenType.INT_TYPE, TokenType.NUM_TYPE);
+        ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
-        ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(tokenizer, data, scope);
+        ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
 
         TypeCastNode<?, ?> node;
-        if (type.getType() == Token.Type.INT_TYPE) {
+        if (type.getType() == TokenType.INT_TYPE) {
             node = new NumToIntCastNode(type, expressionNode);
-        } else if (type.getType() == Token.Type.STRING_TYPE) {
+        } else if (type.getType() == TokenType.STRING_TYPE) {
             node = new ToStringNode(type, expressionNode);
-        } else if (type.getType() == Token.Type.NUM_TYPE) {
+        } else if (type.getType() == TokenType.NUM_TYPE) {
             node = new IntToNumCastNode(type, expressionNode);
         } else {
             throw new ParseException("Invalid type: " + type.getType(), type.getPosition()); // Should never happen
         }
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+        ParserUtil.checkType(lexer.consume(), TokenType.GROUP_END);
         return node;
     }
 }

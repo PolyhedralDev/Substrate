@@ -6,16 +6,15 @@ import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.std.function.Curry;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.Lexer;
 
 public class Parser {
-    private final Tokenizer tokenizer;
+    private final Lexer lexer;
     private final Rule base;
     private final ScriptBuilder builder = new ScriptBuilder();
     private final ParserScope scope = new ParserScope();
@@ -23,7 +22,7 @@ public class Parser {
     private final ParseData data = new ParseData();
 
     public Parser(String data, Rule base) throws ParseException {
-        tokenizer = new Tokenizer(data);
+        lexer = new Lexer(data);
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
         registerMacro("curry", new Curry());
@@ -46,8 +45,8 @@ public class Parser {
     }
 
     public Script parse() throws ParseException {
-        while (tokenizer.hasNext()) {
-            builder.addOperation(base.assemble(tokenizer, data, scope));
+        while (lexer.hasNext()) {
+            builder.addOperation(base.assemble(lexer, data, scope));
         }
         return builder.build(data);
     }

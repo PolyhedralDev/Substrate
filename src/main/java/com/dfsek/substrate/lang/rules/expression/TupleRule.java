@@ -7,8 +7,9 @@ import com.dfsek.substrate.lang.node.expression.tuple.TupleNode;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,27 +22,27 @@ public class TupleRule implements Rule {
     }
 
     @Override
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN); // Tuples must start with (
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN); // Tuples must start with (
 
         List<ExpressionNode> args = new ArrayList<>();
 
         int groups = 1;
         while (groups > 0) {
-            while (tokenizer.peek().getType() == Token.Type.GROUP_BEGIN) { // sub-groups should just be expanded
+            while (lexer.peek().getType() == TokenType.GROUP_BEGIN) { // sub-groups should just be expanded
                 groups++;
-                tokenizer.consume();
+                lexer.consume();
             }
-            args.add(ExpressionRule.getInstance().assemble(tokenizer, data, scope));
-            while (tokenizer.peek().getType() == Token.Type.GROUP_END) {
+            args.add(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            while (lexer.peek().getType() == TokenType.GROUP_END) {
                 groups--;
                 if (groups < 0) {
-                    ParserUtil.checkType(tokenizer.consume(), Token.Type.STATEMENT_END); // too many close parentheses
+                    ParserUtil.checkType(lexer.consume(), TokenType.STATEMENT_END); // too many close parentheses
                 }
-                tokenizer.consume();
+                lexer.consume();
             }
-            if (tokenizer.peek().getType() == Token.Type.SEPARATOR) {
-                tokenizer.consume(); // consume separator
+            if (lexer.peek().getType() == TokenType.SEPARATOR) {
+                lexer.consume(); // consume separator
             }
         }
 

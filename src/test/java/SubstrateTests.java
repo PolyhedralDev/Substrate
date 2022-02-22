@@ -5,8 +5,8 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Tokenizer;
-import com.dfsek.substrate.tokenizer.exceptions.TokenizerException;
+import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
@@ -120,10 +120,10 @@ public class SubstrateTests {
         tokenizerNodes.add(register("Invalid Scripts", Paths.get("src", "test", "resources", "tokenizer", "invalid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Tokenizer tokenizer = new Tokenizer(data);
+                Lexer lexer = new Lexer(data);
 
-                while (tokenizer.hasNext()) {
-                    tokenizer.consume();
+                while (lexer.hasNext()) {
+                    lexer.consume();
                 }
             } catch (TokenizerException e) {
                 if(STACK_TRACES_FOR_INVALID) e.printStackTrace();
@@ -137,10 +137,10 @@ public class SubstrateTests {
         tokenizerNodes.add(register("Valid Scripts", Paths.get("src", "test", "resources", "tokenizer", "valid"), path -> () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Tokenizer tokenizer = new Tokenizer(data);
+                Lexer lexer = new Lexer(data);
 
-                while (tokenizer.hasNext()) {
-                    tokenizer.consume();
+                while (lexer.hasNext()) {
+                    lexer.consume();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

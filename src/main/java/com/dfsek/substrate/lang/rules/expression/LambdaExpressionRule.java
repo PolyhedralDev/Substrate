@@ -11,8 +11,9 @@ import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.tokenizer.Token;
-import com.dfsek.substrate.tokenizer.Tokenizer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.util.Pair;
 
 import java.util.ArrayList;
@@ -27,38 +28,38 @@ public class LambdaExpressionRule implements Rule {
         return INSTANCE;
     }
 
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
         ParserScope lambda = scope.sub();
-        Token begin = ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_BEGIN);
+        Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<Pair<String, Signature>> types = new ArrayList<>();
         Set<String> args = new HashSet<>();
 
         Signature argSig = Signature.empty();
 
-        while (tokenizer.peek().getType() != Token.Type.GROUP_END) {
-            Token id = ParserUtil.checkType(tokenizer.consume(), Token.Type.IDENTIFIER);
-            ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
+        while (lexer.peek().getType() != TokenType.GROUP_END) {
+            Token id = ParserUtil.checkType(lexer.consume(), TokenType.IDENTIFIER);
+            ParserUtil.checkType(lexer.consume(), TokenType.TYPE);
             String argName = id.getContent();
-            Signature argSignature = ParserUtil.parseSignatureNotation(tokenizer);
+            Signature argSignature = ParserUtil.parseSignatureNotation(lexer);
             argSig = argSig.and(argSignature);
             types.add(Pair.of(argName, argSignature));
 
             lambda.register(argName, argSignature);
 
             args.add(id.getContent());
-            if (ParserUtil.checkType(tokenizer.peek(), Token.Type.SEPARATOR, Token.Type.GROUP_END).getType() == Token.Type.SEPARATOR) {
-                tokenizer.consume();
+            if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
+                lexer.consume();
             }
         }
 
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.GROUP_END);
+        ParserUtil.checkType(lexer.consume(), TokenType.GROUP_END);
 
         Signature returnType;
 
-        if (tokenizer.peek().getType() == Token.Type.TYPE) { // parse type
-            ParserUtil.checkType(tokenizer.consume(), Token.Type.TYPE);
-            returnType = ParserUtil.parseSignatureNotation(tokenizer);
+        if (lexer.peek().getType() == TokenType.TYPE) { // parse type
+            ParserUtil.checkType(lexer.consume(), TokenType.TYPE);
+            returnType = ParserUtil.parseSignatureNotation(lexer);
         } else {
             returnType = Signature.empty(); // void
         }
@@ -67,13 +68,13 @@ public class LambdaExpressionRule implements Rule {
             lambda.register(variableName, Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType));
         }
 
-        ParserUtil.checkType(tokenizer.consume(), Token.Type.ARROW);
+        ParserUtil.checkType(lexer.consume(), TokenType.ARROW);
 
         ExpressionNode expression;
-        if (tokenizer.peek().getType() == Token.Type.BLOCK_BEGIN) {
-            expression = BlockRule.getInstance().assemble(tokenizer, data, lambda);
+        if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
+            expression = BlockRule.getInstance().assemble(lexer, data, lambda);
         } else {
-            expression = ExpressionRule.getInstance().assemble(tokenizer, data, lambda);
+            expression = ExpressionRule.getInstance().assemble(lexer, data, lambda);
         }
 
         Set<String> locals = new HashSet<>();
@@ -98,7 +99,7 @@ public class LambdaExpressionRule implements Rule {
         return lambdaExpressionNode;
     }
 
-    public ExpressionNode assemble(Tokenizer tokenizer, ParseData data, ParserScope scope) throws ParseException {
-        return assemble(tokenizer, data, scope, null);
+    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+        return assemble(lexer, data, scope, null);
     }
 }
