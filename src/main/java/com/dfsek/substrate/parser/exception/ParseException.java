@@ -11,11 +11,6 @@ public class ParseException extends RuntimeException {
         this.position = position;
     }
 
-    public ParseException(String message, Position position, Throwable cause) {
-        super(message, cause);
-        this.position = position;
-    }
-
     public Position getPosition() {
         return position;
     }
