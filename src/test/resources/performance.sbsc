@@ -1,0 +1,17 @@
+// find the square root of a number using Newton's root finding approximation
+
+absoluteValue = (n: num): num -> if(n > 0.0) n else -n;
+
+epsilonCompare = (n: num, target: num, epsilon: num): bool -> absoluteValue(n - target) <= epsilon;
+
+newtonSquareRoot = (n: num, l: num): num -> {
+    approx = (x: num): num -> {
+        calc = 0.5 * (x + n / x);
+        return if(absoluteValue(calc - x) < l) calc else approx(calc);
+    };
+    return approx(n);
+};
+
+epsilon = 0.001;
+
+forEach(0 ..1000000, (i: int) -> assert(epsilonCompare(newtonSquareRoot(num(i), epsilon), sqrt(num(i)), epsilon)));
