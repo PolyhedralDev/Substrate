@@ -242,6 +242,7 @@ public class Tokenizer {
     }
 
     private boolean isNumberLike() {
+        if(reader.current().is('.') && reader.next(1).is('.')) return false; // range
         return reader.current().isDigit()
                 || reader.current().is('_', '.', 'E');
     }
