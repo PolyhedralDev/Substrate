@@ -180,14 +180,6 @@ public class Token implements Positioned {
          */
         RETURN,
         /**
-         * Continue statement
-         */
-        CONTINUE,
-        /**
-         * Break statement
-         */
-        BREAK,
-        /**
          * Arrow token "->"
          */
         ARROW,

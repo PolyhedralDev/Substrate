@@ -210,12 +210,6 @@ public class Tokenizer {
         if (tokenString.equals("return")) {
             return new Token(tokenString, Token.Type.RETURN, new Position(reader.getLine(), reader.getIndex()));
         }
-        if (tokenString.equals("continue")) {
-            return new Token(tokenString, Token.Type.CONTINUE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("break")) {
-            return new Token(tokenString, Token.Type.BREAK, new Position(reader.getLine(), reader.getIndex()));
-        }
 
         if (tokenString.equals("num")) {
             return new Token(tokenString, Token.Type.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
