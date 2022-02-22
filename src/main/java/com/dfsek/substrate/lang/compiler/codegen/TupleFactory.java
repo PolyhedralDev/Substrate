@@ -39,7 +39,7 @@ public class TupleFactory {
             String name = classBuilder.getName() + "$" + endName;
             classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
-            ClassWriter writer = CompilerUtil.generateClass(name, false, false, TUPLE_NAME);
+            ClassWriter writer = CompilerUtil.generateClass(name, false, TUPLE_NAME);
 
             String constructorSig = "(" + args.internalDescriptor() + ")V";
 

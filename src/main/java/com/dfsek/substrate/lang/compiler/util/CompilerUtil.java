@@ -35,7 +35,7 @@ public final class CompilerUtil implements Opcodes {
         }
     }
 
-    public static ClassWriter generateClass(String name, boolean iface, boolean defaultConstructor, String... ifaces) {
+    public static ClassWriter generateClass(String name, boolean iface, String... ifaces) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
 
         writer.visit(V1_8,
@@ -44,26 +44,6 @@ public final class CompilerUtil implements Opcodes {
                 null,
                 "java/lang/Object",
                 ifaces);
-
-        if (!iface & defaultConstructor) {
-            MethodVisitor constructor = writer.visitMethod(ACC_PUBLIC,
-                    "<init>", // Constructor method name is <init>
-                    "()V",
-                    null,
-                    null);
-
-            constructor.visitCode();
-            constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
-            constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
-                    "java/lang/Object",
-                    "<init>",
-                    "()V",
-                    false);
-
-            constructor.visitInsn(RETURN); // Void return
-            constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
-
-        }
 
         return writer;
     }

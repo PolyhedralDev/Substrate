@@ -27,7 +27,7 @@ public class ClassBuilder {
     }
 
     public ClassBuilder(String name, boolean iface, String... interfaces) {
-        this.classWriter = CompilerUtil.generateClass(name, iface, false, interfaces);
+        this.classWriter = CompilerUtil.generateClass(name, iface, interfaces);
         this.name = name;
     }
 
