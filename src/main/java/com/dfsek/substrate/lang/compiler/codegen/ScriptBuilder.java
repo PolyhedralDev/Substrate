@@ -89,7 +89,12 @@ public class ScriptBuilder {
                         frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
                     }
                     function.invoke(method, separate, args);
-                    method.voidReturn();
+                    Signature functionReturn = function.reference().getGenericReturn(0);
+                    if(functionReturn.equals(Signature.empty())) {
+                        method.voidReturn();
+                    } else {
+                        method.insn(functionReturn.getType(0).returnInsn());
+                    }
                 }).getName();
 
                 builder.field(functionName,
