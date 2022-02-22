@@ -1,0 +1,4 @@
+// this function returns type BOOL, we should not be able to NOT it
+
+!(a: bool): bool -> a;
+
