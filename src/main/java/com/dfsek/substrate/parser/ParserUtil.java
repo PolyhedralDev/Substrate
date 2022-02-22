@@ -1,6 +1,5 @@
 package com.dfsek.substrate.parser;
 
-import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Typed;
@@ -47,9 +46,13 @@ public final class ParserUtil {
         throw new ParseException("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition());
     }
 
-    public static <T extends Typed & Positioned> T checkType(T typed, Signature... expected) throws ParseException {
-        Signature ref = typed.reference().getSimpleReturn();
-        for (Signature type : expected) if (ref.equals(type)) return typed;
+    public static <T extends Typed & Positioned> T checkReturnType(T typed, Signature... expected) throws ParseException {
+
+        Signature ref = typed.reference();
+        if(ref.isSimple()) {
+            ref = ref.getSimpleReturn();
+            for (Signature type : expected) if (ref.equals(type)) return typed;
+        }
         throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
     }
 

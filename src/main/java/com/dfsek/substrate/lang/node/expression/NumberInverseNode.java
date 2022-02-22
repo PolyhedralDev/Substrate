@@ -22,7 +22,7 @@ public class NumberInverseNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(node, Signature.integer(), Signature.decimal()).simplify().apply(builder, data);
+        ParserUtil.checkReturnType(node, Signature.integer(), Signature.decimal()).simplify().apply(builder, data);
         if(node.reference().equals(Signature.integer())) builder.iNeg();
         if(node.reference().equals(Signature.decimal())) builder.dNeg();
     }

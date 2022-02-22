@@ -26,7 +26,7 @@ public class ListIndexNode extends ExpressionNode {
         ParserUtil.checkWeakReferenceType(listReference, Signature.list())
                 .simplify().apply(builder, data);
 
-        ParserUtil.checkType(index, Signature.integer())
+        ParserUtil.checkReturnType(index, Signature.integer())
                 .simplify().apply(builder, data);
 
         Signature ref = reference();

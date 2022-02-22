@@ -29,10 +29,10 @@ public class AdditionNode extends NumericBinaryNode {
 
     @Override
     public void applyOp(MethodBuilder visitor, BuildData data) {
-        Signature leftType = ParserUtil.checkType(left, Signature.integer(), Signature.decimal(), Signature.string()).reference();
-        ParserUtil.checkType(right, Signature.integer(), Signature.decimal(), Signature.string()).reference();
+        Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal(), Signature.string()).reference();
+        ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal(), Signature.string()).reference();
 
-        ParserUtil.checkType(right, leftType);
+        ParserUtil.checkReturnType(right, leftType);
 
         if (leftType.equals(Signature.integer())) {
             visitor.iAdd();

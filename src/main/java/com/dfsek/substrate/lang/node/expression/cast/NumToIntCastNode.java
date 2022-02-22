@@ -17,7 +17,7 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
 
     @Override
     public void applyCast(MethodBuilder visitor, BuildData data) {
-        ParserUtil.checkType(value, Signature.decimal());
+        ParserUtil.checkReturnType(value, Signature.decimal());
         visitor.d2i();
     }
 

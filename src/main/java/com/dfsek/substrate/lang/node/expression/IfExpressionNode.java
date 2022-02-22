@@ -11,7 +11,6 @@ import org.objectweb.asm.Label;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.function.Function;
 
 public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode predicate;
@@ -27,8 +26,8 @@ public class IfExpressionNode extends ExpressionNode {
 
     @Override
     public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkType(predicate, Signature.bool());
-        ParserUtil.checkType(caseTrueNode, caseFalseNode.reference().getSimpleReturn());
+        ParserUtil.checkReturnType(predicate, Signature.bool());
+        ParserUtil.checkReturnType(caseTrueNode, caseFalseNode.reference().getSimpleReturn());
 
         Label equal = new Label();
         Label end = new Label();
