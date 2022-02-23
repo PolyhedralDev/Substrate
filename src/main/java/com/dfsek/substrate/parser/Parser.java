@@ -4,6 +4,7 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
+import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.std.function.Curry;
@@ -37,6 +38,10 @@ public class Parser {
             registerFunction("cos", new StaticFunction(Math.class.getMethod("cos", double.class)));
             registerFunction("tan", new StaticFunction(Math.class.getMethod("tan", double.class)));
 
+
+            registerFunction("substring", new StaticFunction(StringUtils.class.getMethod("substring", String.class, int.class, int.class)));
+            registerFunction("upperCase", new StaticFunction(StringUtils.class.getMethod("toUpperCase", String.class)));
+            registerFunction("lowerCase", new StaticFunction(StringUtils.class.getMethod("toLowerCase", String.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(e);
         }
