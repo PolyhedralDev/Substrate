@@ -18,4 +18,13 @@ public final class StringUtils {
     public static String toLowerCase(String s) {
         return s.toLowerCase(Locale.ROOT);
     }
+
+    public static boolean startsWith(String test, String s) {
+        return test.startsWith(s);
+    }
+
+    public static boolean endsWith(String test, String s) {
+        return test.endsWith(s);
+    }
+
 }

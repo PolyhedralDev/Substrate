@@ -42,6 +42,8 @@ public class Parser {
             registerFunction("substring", new StaticFunction(StringUtils.class.getMethod("substring", String.class, int.class, int.class)));
             registerFunction("upperCase", new StaticFunction(StringUtils.class.getMethod("toUpperCase", String.class)));
             registerFunction("lowerCase", new StaticFunction(StringUtils.class.getMethod("toLowerCase", String.class)));
+            registerFunction("startsWith", new StaticFunction(StringUtils.class.getMethod("startsWith", String.class, String.class)));
+            registerFunction("endsWith", new StaticFunction(StringUtils.class.getMethod("endsWith", String.class, String.class)));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(e);
         }
