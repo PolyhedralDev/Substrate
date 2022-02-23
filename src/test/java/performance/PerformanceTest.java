@@ -1,3 +1,5 @@
+package performance;
+
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
@@ -13,7 +15,7 @@ import java.nio.charset.Charset;
 
 public class PerformanceTest {
     public static void main(String... args) throws IOException {
-        Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance.sbsc"), Charset.defaultCharset()), new BaseRule());
+        Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance/performance.sbsc"), Charset.defaultCharset()), new BaseRule());
 
         parser.registerFunction("assert", new com.dfsek.substrate.lang.compiler.api.Function() {
             @Override
