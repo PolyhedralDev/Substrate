@@ -32,6 +32,8 @@ public class StaticFunction implements Function {
             this.ret = Signature.integer();
         } else if(r.equals(double.class)) {
             this.ret = Signature.decimal();
+        } else if(r.equals(boolean.class)) {
+            this.ret = Signature.bool();
         } else {
             throw new IllegalArgumentException("Illegal return type: " + method);
         }
@@ -45,6 +47,8 @@ public class StaticFunction implements Function {
                 args = args.and(Signature.integer());
             } else if(parameterType.equals(double.class)) {
                 args = args.and(Signature.decimal());
+            } else if(parameterType.equals(boolean.class)) {
+                args = args.and(Signature.bool());
             } else {
                 throw new IllegalArgumentException("Illegal parameter type: " + method);
             }
