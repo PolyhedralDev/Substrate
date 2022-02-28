@@ -17,6 +17,8 @@ dependencies {
     implementation("commons-io:commons-io:2.8.0")
     implementation("net.jafama:jafama:2.3.2")
     implementation("org.ow2.asm:asm:9.2")
+
+    implementation("io.vavr:vavr:0.10.4")
 }
 
 java {
