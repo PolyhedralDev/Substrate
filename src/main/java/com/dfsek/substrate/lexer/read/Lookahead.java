@@ -89,6 +89,10 @@ public class Lookahead {
         return index;
     }
 
+    public Position getPosition() {
+        return new Position(getLine(), getIndex());
+    }
+
     /**
      * Consume an amount of characters
      *
