@@ -472,65 +472,6 @@ public class MethodBuilder implements Opcodes {
         return insn(DNEG);
     }
 
-    public interface Bytecode {
-        int getCode();
-    }
-
-    public enum Invoke implements Bytecode {
-        STATIC(INVOKESTATIC),
-        INTERFACE(INVOKEINTERFACE),
-        SPECIAL(INVOKESPECIAL),
-        VIRTUAL(INVOKEVIRTUAL);
-        private final int insn;
-
-        Invoke(int insn) {
-            this.insn = insn;
-        }
-
-        public int getCode() {
-            return insn;
-        }
-    }
-
-    public enum Field implements Bytecode {
-        GETFIELD(Opcodes.GETFIELD),
-        PUTFIELD(Opcodes.PUTFIELD),
-        GETSTATIC(Opcodes.GETSTATIC),
-        PUTSTATIC(Opcodes.PUTSTATIC);
-
-        private final int op;
-
-        Field(int op) {
-            this.op = op;
-        }
-
-        @Override
-        public int getCode() {
-            return op;
-        }
-    }
-
-    public enum Access implements Bytecode {
-        PUBLIC(ACC_PUBLIC),
-        PRIVATE(ACC_PRIVATE),
-        PROTECTED(ACC_PROTECTED),
-        SYNTHETIC(ACC_SYNTHETIC),
-        ABSTRACT(ACC_ABSTRACT),
-        FINAL(ACC_FINAL),
-        STATIC(ACC_STATIC);
-
-        private final int code;
-
-        Access(int code) {
-            this.code = code;
-        }
-
-        @Override
-        public int getCode() {
-            return code;
-        }
-    }
-
     private static class ReturnOpCode implements OpCode {
         private final int opCode;
 

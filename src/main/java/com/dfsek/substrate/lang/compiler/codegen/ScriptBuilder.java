@@ -8,8 +8,8 @@ import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -71,7 +71,7 @@ public class ScriptBuilder implements Opcodes {
 
         // prepare functions.
 
-        MethodVisitor staticInitializer = builder.method("<clinit>", "()V", MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC);
+        MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
         staticInitializer.visitCode();
 
         for (Pair<String, Function> stringFunctionPair : functions) {
@@ -99,7 +99,7 @@ public class ScriptBuilder implements Opcodes {
 
                 builder.field(functionName,
                         "L" + delegate + ";",
-                        MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
+                        Access.PUBLIC, Access.STATIC, Access.STATIC);
 
                 staticInitializer.visitTypeInsn(NEW, delegate);
                 staticInitializer.visitInsn(DUP);
@@ -111,7 +111,7 @@ public class ScriptBuilder implements Opcodes {
         }
 
 
-        MethodVisitor absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V", MethodBuilder.Access.PUBLIC);
+        MethodVisitor absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V", Access.PUBLIC);
         absMethod.visitCode();
         macros.forEach(data::registerMacro);
 

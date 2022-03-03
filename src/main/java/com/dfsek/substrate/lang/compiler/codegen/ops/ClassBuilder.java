@@ -32,7 +32,7 @@ public class ClassBuilder implements Opcodes {
     }
 
     public ClassBuilder defaultConstructor() {
-        MethodVisitor ctor = method("<init>", "()V", MethodBuilder.Access.PUBLIC);
+        MethodVisitor ctor = method("<init>", "()V", Access.PUBLIC);
         ctor.visitCode();
         ctor.visitVarInsn(ALOAD, 0);
         ctor.visitMethodInsn(INVOKESPECIAL,
@@ -45,24 +45,24 @@ public class ClassBuilder implements Opcodes {
         return this;
     }
 
-    public ClassBuilder inner(String name, String outerName, String innerName, MethodBuilder.Access... accesses) {
+    public ClassBuilder inner(String name, String outerName, String innerName, Access... accesses) {
         int access = 0;
 
-        for (MethodBuilder.Access level : accesses) {
+        for (Access level : accesses) {
             access |= level.getCode();
         }
         classWriter.visitInnerClass(name, outerName, innerName, access);
         return this;
     }
 
-    public MethodVisitor method(String name, String descriptor, MethodBuilder.Access... accesses) {
+    public MethodVisitor method(String name, String descriptor, Access... accesses) {
         return method(name, descriptor, null, EMPTY, accesses);
     }
 
-    public MethodVisitor method(String name, String descriptor, String signature, String[] exceptions, MethodBuilder.Access... accesses) {
+    public MethodVisitor method(String name, String descriptor, String signature, String[] exceptions, Access... accesses) {
         int access = 0;
 
-        for (MethodBuilder.Access level : accesses) {
+        for (Access level : accesses) {
             access |= level.getCode();
         }
         return classWriter.visitMethod(access,
@@ -73,18 +73,18 @@ public class ClassBuilder implements Opcodes {
     }
 
 
-    public ClassBuilder field(String name, String descriptor, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, Access... accesses) {
         return field(name, descriptor, null, null, accesses);
     }
 
-    public ClassBuilder field(String name, String descriptor, Object value, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, Object value, Access... accesses) {
         return field(name, descriptor, null, value, accesses);
     }
 
-    public ClassBuilder field(String name, String descriptor, String signature, Object value, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, String signature, Object value, Access... accesses) {
         int access = 0;
 
-        for (MethodBuilder.Access level : accesses) {
+        for (Access level : accesses) {
             access |= level.getCode();
         }
 

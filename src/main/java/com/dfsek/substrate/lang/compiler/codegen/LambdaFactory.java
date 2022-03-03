@@ -3,8 +3,8 @@ package com.dfsek.substrate.lang.compiler.codegen;
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
@@ -59,9 +59,9 @@ public class LambdaFactory implements Opcodes {
                 else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
-            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.ABSTRACT);
+            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, Access.PUBLIC, Access.ABSTRACT);
 
-            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+            classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
             return Pair.of(builder, new AtomicInteger(0));
         });
@@ -79,12 +79,12 @@ public class LambdaFactory implements Opcodes {
         String endName = "IM" + pair.getRight().getAndIncrement();
         String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor() + "$" + endName;
 
-        pair.getLeft().inner(name, pair.getLeft().getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+        pair.getLeft().inner(name, pair.getLeft().getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
 
         MethodVisitor constructor = builder.method("<init>",
-                "(" + scope.internalDescriptor() + ")V", MethodBuilder.Access.PUBLIC);
+                "(" + scope.internalDescriptor() + ")V", Access.PUBLIC);
         constructor.visitCode();
 
         constructor.visitVarInsn(ALOAD, 0);
@@ -92,7 +92,7 @@ public class LambdaFactory implements Opcodes {
 
         int var = 1;
         for (int i = 0; i < scope.size(); i++) {
-            builder.field("scope" + i, scope.getType(i).descriptor(), MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL);
+            builder.field("scope" + i, scope.getType(i).descriptor(), Access.PRIVATE, Access.FINAL);
 
             constructor.visitVarInsn(ALOAD, 0);
             constructor.visitVarInsn(scope.getType(i).loadInsn(), var);
@@ -111,7 +111,7 @@ public class LambdaFactory implements Opcodes {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        MethodVisitor impl = builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, MethodBuilder.Access.PUBLIC);
+        MethodVisitor impl = builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, Access.PUBLIC);
         impl.visitCode();
         List<CompileError> errors = supplier.apply(builder)
                 .flatMap(either -> either.fold(

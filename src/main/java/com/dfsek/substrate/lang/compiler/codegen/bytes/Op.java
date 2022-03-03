@@ -1,7 +1,8 @@
 package com.dfsek.substrate.lang.compiler.codegen.bytes;
 
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.ops.Field;
+import com.dfsek.substrate.lang.compiler.codegen.ops.Invoke;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.List;
@@ -60,7 +61,7 @@ public interface Op {
 
     // field insns
     static Either<CompileError, Op> fieldInsn(
-            MethodBuilder.Field field,
+            Field field,
             String owner,
             String name,
             String descriptor) {
@@ -71,48 +72,48 @@ public interface Op {
             String owner,
             String name,
             String descriptor) {
-        return fieldInsn(MethodBuilder.Field.GETFIELD, owner, name, descriptor);
+        return fieldInsn(Field.GETFIELD, owner, name, descriptor);
     }
 
     static Either<CompileError, Op> putField(
             String owner,
             String name,
             String descriptor) {
-        return fieldInsn(MethodBuilder.Field.PUTFIELD, owner, name, descriptor);
+        return fieldInsn(Field.PUTFIELD, owner, name, descriptor);
     }
 
     static Either<CompileError, Op> getStatic(
             String owner,
             String name,
             String descriptor) {
-        return fieldInsn(MethodBuilder.Field.GETSTATIC, owner, name, descriptor);
+        return fieldInsn(Field.GETSTATIC, owner, name, descriptor);
     }
 
     static Either<CompileError, Op> putStatic(
             String owner,
             String name,
             String descriptor) {
-        return fieldInsn(MethodBuilder.Field.PUTSTATIC, owner, name, descriptor);
+        return fieldInsn(Field.PUTSTATIC, owner, name, descriptor);
     }
 
-    static Either<CompileError, Op> invoke(MethodBuilder.Invoke type, String owner, String name, String descriptor, boolean isInterface) {
+    static Either<CompileError, Op> invoke(Invoke type, String owner, String name, String descriptor, boolean isInterface) {
         return Either.right(visitor -> visitor.visitMethodInsn(type.getCode(), owner, name, descriptor, isInterface));
     }
 
     static Either<CompileError, Op> invokeVirtual(String owner, String name, String descriptor) {
-        return invoke(MethodBuilder.Invoke.VIRTUAL, owner, name, descriptor, false);
+        return invoke(Invoke.VIRTUAL, owner, name, descriptor, false);
     }
 
     static Either<CompileError, Op> invokeSpecial(String owner, String name, String descriptor) {
-        return invoke(MethodBuilder.Invoke.SPECIAL, owner, name, descriptor, false);
+        return invoke(Invoke.SPECIAL, owner, name, descriptor, false);
     }
 
     static Either<CompileError, Op> invokeStatic(String owner, String name, String descriptor) {
-        return invoke(MethodBuilder.Invoke.STATIC, owner, name, descriptor, false);
+        return invoke(Invoke.STATIC, owner, name, descriptor, false);
     }
 
     static Either<CompileError, Op> invokeInterface(String owner, String name, String descriptor) {
-        return invoke(MethodBuilder.Invoke.INTERFACE, owner, name, descriptor, true);
+        return invoke(Invoke.INTERFACE, owner, name, descriptor, true);
     }
 
     // comparisons
