@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.ThisReferenceValue;
-import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -23,8 +22,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
@@ -76,7 +75,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
                             closureIDs.add(id);
                             return List.of(Pair.of(valueReferenceNode.getId().getContent(),
-                                            valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
+                                    valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
                             );
                         }
                     }
@@ -84,46 +83,45 @@ public class LambdaExpressionNode extends ExpressionNode {
                 })
                 .toList();
 
-        Signature closure = Signature.empty();
-        for (Pair<String, Signature> type : closureTypes) {
-            closure = closure.and(type.getRight());
-        }
+        Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair.getRight().and(signature));
 
+        return data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
+                    BuildData delegate = data.sub(clazz);
 
-        String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
-            BuildData delegate = data.sub(clazz);
+                    for (int i = 0; i < closureTypes.size(); i++) {
+                        Pair<String, Signature> pair = closureTypes.get(i);
+                        delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight(), i));
+                    }
+                    for (Pair<String, Signature> argument : types) {
+                        delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
+                        delegate.offsetInc(argument.getRight().frames());
+                    }
 
-            for (int i = 0; i < closureTypes.size(); i++) {
-                Pair<String, Signature> pair = closureTypes.get(i);
-                delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight(), i));
-            }
-            for (Pair<String, Signature> argument : types) {
-                delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
-                delegate.offsetInc(argument.getRight().frames());
-            }
+                    if (self != null) {
+                        delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
+                    }
 
-            if (self != null) {
-                delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
-            }
-
-            return ParserUtil.checkReferenceType(content, returnType).simplify().apply(delegate)
-                    .append(returnType.retInsn()
-                            .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
-                            .map(Op::insnUnwrapped));
-        })._2.getName();
-
-        return List.of(Op.newInsn(lambda))
-                .append(Op.dup())
-                .appendAll(closureTypes
-                        .toStream()
-                        .flatMap(pair -> {
-                            if (pair.getLeft().equals(self)) return List.empty(); // dont load self into closure.
-                            return data.getValue(pair.getLeft()).load(data);
-                        })
-                        .collect(Collectors.toList()))
-                        .append(Op.invokeSpecial(CompilerUtil.internalName(lambda),
+                    return ParserUtil.checkReferenceType(content, returnType).simplify().apply(delegate)
+                            .append(returnType.retInsn()
+                                    .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
+                                    .map(Op::insnUnwrapped));
+                })
+                .apply((errors, clazz) -> errors
+                        .map((Function<CompileError, Either<CompileError, Op>>) Either::left)
+                        .append(Op.newInsn(clazz.getName()))
+                        .append(Op.dup())
+                        .appendAll(closureTypes
+                                .toStream()
+                                .flatMap(pair -> {
+                                    if (pair.getLeft().equals(self))
+                                        return List.empty(); // dont load self into closure.
+                                    return data.getValue(pair.getLeft()).load(data);
+                                })
+                                .collect(Collectors.toList()))
+                        .append(Op.invokeSpecial(CompilerUtil.internalName(clazz.getName()),
                                 "<init>",
-                                "(" + closure.internalDescriptor() + ")V"));
+                                "(" + closure.internalDescriptor() + ")V"))
+                );
     }
 
     @Override
