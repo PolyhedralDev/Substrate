@@ -7,12 +7,11 @@ import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.util.Pair;
 import io.vavr.Tuple2;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import static io.vavr.API.*;
@@ -32,13 +31,13 @@ public class Signature implements Opcodes {
     private final List<Tuple2<Signature, Signature>> generic;
 
     public Signature(DataType type) {
-        this.types = Collections.singletonList(type);
-        this.generic = Collections.singletonList(new Tuple2<>(Signature.empty(), Signature.empty()));
+        this.types = List(type);
+        this.generic = List(new Tuple2<>(Signature.empty(), Signature.empty()));
     }
 
     private Signature() {
-        this.types = Collections.emptyList();
-        this.generic = Collections.emptyList();
+        this.types = List();
+        this.generic = List();
     }
 
     private Signature(List<DataType> types, List<Tuple2<Signature, Signature>> generic) {
@@ -112,20 +111,16 @@ public class Signature implements Opcodes {
 
     public Signature applyGenericReturn(int index, Signature generic) {
         Objects.requireNonNull(generic);
-        List<DataType> otherTypes = new ArrayList<>(types);
-        List<Tuple2<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
-        Signature left = otherGeneric.get(index)._1;
-        otherGeneric.set(index, new Tuple2<>(left == null ? empty() : left, generic));
-        return new Signature(otherTypes, otherGeneric);
+        Signature left = this.generic.get(index)._1;
+        List<Tuple2<Signature, Signature>> other = this.generic.update(index, new Tuple2<>(left == null ? empty() : left, generic));
+        return new Signature(types, other);
     }
 
     public Signature applyGenericArgument(int index, Signature generic) {
         Objects.requireNonNull(generic);
-        List<DataType> otherTypes = new ArrayList<>(types);
-        List<Tuple2<Signature, Signature>> otherGeneric = new ArrayList<>(this.generic);
-        Signature right = otherGeneric.get(index)._2;
-        otherGeneric.set(index, new Tuple2<>(generic, right == null ? empty() : right));
-        return new Signature(otherTypes, otherGeneric);
+        Signature right = this.generic.get(index)._2;
+        List<Tuple2<Signature, Signature>> other = this.generic.update(index, new Tuple2<>(generic, right == null ? empty() : right));
+        return new Signature(types, other);
     }
 
     @Override
@@ -185,11 +180,7 @@ public class Signature implements Opcodes {
     }
 
     public Signature and(Signature other) {
-        List<DataType> otherTypes = new ArrayList<>(types);
-        otherTypes.addAll(other.types);
-        List<Tuple2<Signature, Signature>> otherGeneric = new ArrayList<>(generic);
-        otherGeneric.addAll(other.generic);
-        return new Signature(otherTypes, otherGeneric);
+        return new Signature(this.types.appendAll(other.types), this.generic.appendAll(other.generic));
     }
 
     public int frames() {
