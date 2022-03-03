@@ -2,13 +2,16 @@ package com.dfsek.substrate.lang.node.expression.binary.bool;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 
 public class BooleanOrNode extends BooleanOperationNode {
@@ -42,23 +45,20 @@ public class BooleanOrNode extends BooleanOperationNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkReturnType(left, Signature.bool()).apply(builder, data);
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Label shortTrue = new Label();
         Label shortFalse = new Label();
         Label end = new Label();
 
-        builder.ifNE(shortTrue);
-        ParserUtil.checkReturnType(right, Signature.bool()).apply(builder, data);
-        builder.ifEQ(shortFalse);
-
-        builder.label(shortTrue)
-                .pushInt(1)
-                .goTo(end)
-
-                .label(shortFalse)
-                .pushInt(0)
-
-                .label(end);
+        return ParserUtil.checkReturnType(left, Signature.bool()).apply(data)
+                .append(Op.ifNE(shortTrue))
+                .appendAll(ParserUtil.checkReturnType(right, Signature.bool()).apply(data))
+                        .append(Op.ifEQ(shortFalse))
+                .append(Op.label(shortTrue))
+                .append(Op.pushTrue())
+                .append(Op.goTo(end))
+                .append(Op.label(shortFalse))
+                .append(Op.pushFalse())
+                .append(Op.label(end));
     }
 }

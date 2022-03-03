@@ -15,10 +15,10 @@ import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.util.Pair;
+import io.vavr.collection.List;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class LambdaExpressionRule implements Rule {
@@ -32,7 +32,7 @@ public class LambdaExpressionRule implements Rule {
         ParserScope lambda = scope.sub();
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
-        List<Pair<String, Signature>> types = new ArrayList<>();
+        List<Pair<String, Signature>> types = List.empty();
         Set<String> args = new HashSet<>();
 
         Signature argSig = Signature.empty();
@@ -43,7 +43,7 @@ public class LambdaExpressionRule implements Rule {
             String argName = id.getContent();
             Signature argSignature = ParserUtil.parseSignatureNotation(lexer);
             argSig = argSig.and(argSignature);
-            types.add(Pair.of(argName, argSignature));
+            types = types.append(Pair.of(argName, argSignature));
 
             lambda.register(argName, argSignature);
 

@@ -2,11 +2,14 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,9 +24,11 @@ public class BooleanNotNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        ParserUtil.checkReferenceType(node, Signature.bool()).simplify().apply(builder, data);
-        builder.invertBoolean();
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return ParserUtil.checkReferenceType(node, Signature.bool())
+                .simplify()
+                .apply(data)
+                .appendAll(Op.invertBoolean());
     }
 
     @Override

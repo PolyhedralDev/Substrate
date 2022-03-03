@@ -4,7 +4,8 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.IfExpressionNode;
@@ -17,6 +18,8 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.lexer.Lexer;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +37,7 @@ public class IfExpressionRule implements Rule {
         ExpressionNode caseTrueNode;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
             ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
-            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, Collections.emptyList(), internal.getPosition(), internal.reference()));
+            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference()));
         } else {
             caseTrueNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
         }
@@ -44,7 +47,7 @@ public class IfExpressionRule implements Rule {
             lexer.consume();
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
                 ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
-                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, Collections.emptyList(), internal.getPosition(), internal.reference()));
+                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference()));
             } else {
                 caseFalseNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
             }
@@ -62,8 +65,8 @@ public class IfExpressionRule implements Rule {
                 }
 
                 @Override
-                public void apply(MethodBuilder builder, BuildData buildData) throws ParseException {
-
+                public List<Either<CompileError, Op>> apply(BuildData buildData) throws ParseException {
+                    return List.empty();
                 }
 
                 @Override

@@ -149,7 +149,7 @@ public class BuildData {
                 classWriter.getName(), 2, 1);
     }
 
-    public void loadImplementationArguments(MethodBuilder visitor) {
-        visitor.aLoad(implArgsOffset);
+    public int getImplArgsOffset() {
+        return implArgsOffset;
     }
 }

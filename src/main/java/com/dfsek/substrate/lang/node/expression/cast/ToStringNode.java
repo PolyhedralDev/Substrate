@@ -2,7 +2,8 @@ package com.dfsek.substrate.lang.node.expression.cast;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
@@ -11,6 +12,8 @@ import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.lang.node.expression.constant.StringNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 public class ToStringNode extends TypeCastNode<Object, String> {
     public ToStringNode(Token type, ExpressionNode value) {
@@ -18,23 +21,24 @@ public class ToStringNode extends TypeCastNode<Object, String> {
     }
 
     @Override
-    public void applyCast(MethodBuilder visitor, BuildData data) {
+    public List<Either<CompileError, Op>> applyCast(BuildData data) {
         Signature ref = ParserUtil.checkReturnType(value, Signature.decimal(), Signature.integer(), Signature.bool())
                 .reference()
                 .getSimpleReturn();
         if (ref.equals(Signature.integer())) {
-            visitor.invokeStatic("java/lang/Integer",
+            return List.of(Op.invokeStatic("java/lang/Integer",
                     "toString",
-                    "(I)Ljava/lang/String;");
+                    "(I)Ljava/lang/String;"));
         } else if (ref.equals(Signature.decimal())) {
-            visitor.invokeStatic("java/lang/Double",
+            return List.of(Op.invokeStatic("java/lang/Double",
                     "toString",
-                    "(D)Ljava/lang/String;");
+                    "(D)Ljava/lang/String;"));
         } else if (ref.equals(Signature.bool())) {
-            visitor.invokeStatic("java/lang/Boolean",
+            return List.of(Op.invokeStatic("java/lang/Boolean",
                     "toString",
-                    "(Z)Ljava/lang/String;");
+                    "(Z)Ljava/lang/String;"));
         }
+        return List.of(Op.error("Invalid string target type: " + ref, getPosition()));
     }
 
     @Override

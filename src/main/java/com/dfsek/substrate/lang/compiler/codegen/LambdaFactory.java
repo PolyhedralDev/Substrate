@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.compiler.codegen;
 
 import com.dfsek.substrate.ImplementationArguments;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
@@ -9,18 +10,23 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.Pair;
+import io.vavr.Function1;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.zip.ZipOutputStream;
 
-public class LambdaFactory {
+public class LambdaFactory implements Opcodes {
     private final Map<Signature, Map<Signature, Pair<ClassBuilder, AtomicInteger>>> generated = new HashMap<>();
-    private final List<ClassBuilder> implementations = new ArrayList<>();
+    private final java.util.List<ClassBuilder> implementations = new ArrayList<>();
 
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
@@ -53,9 +59,7 @@ public class LambdaFactory {
                 else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
             }
 
-            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret)
-                    .access(MethodBuilder.Access.PUBLIC)
-                    .access(MethodBuilder.Access.ABSTRACT);
+            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, MethodBuilder.Access.PUBLIC, MethodBuilder.Access.ABSTRACT);
 
             classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
 
@@ -63,14 +67,13 @@ public class LambdaFactory {
         });
     }
 
-    public void invoke(Signature args, Signature ret, BuildData data, MethodBuilder visitor) {
-
-        visitor.invokeInterface(generate(args, ret).getLeft().getName(),
+    public Either<CompileError, Op> invoke(Signature args, Signature ret, BuildData data) {
+        return Op.invokeInterface(generate(args, ret).getLeft().getName(),
                 "apply",
                 "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret));
     }
 
-    public ClassBuilder implement(Signature args, Signature returnType, Signature scope, Consumer<MethodBuilder> consumer) {
+    public Tuple2<List<CompileError>, ClassBuilder> implement(Signature args, Signature returnType, Signature scope, Function1<ClassBuilder, List<Either<CompileError, Op>>> supplier) {
         Pair<ClassBuilder, AtomicInteger> pair = generate(args, returnType);
 
         String endName = "IM" + pair.getRight().getAndIncrement();
@@ -80,25 +83,26 @@ public class LambdaFactory {
 
         ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
 
-        MethodBuilder constructor = builder.method("<init>",
-                        "(" + scope.internalDescriptor() + ")V")
-                .access(MethodBuilder.Access.PUBLIC);
+        MethodVisitor constructor = builder.method("<init>",
+                "(" + scope.internalDescriptor() + ")V", MethodBuilder.Access.PUBLIC);
+        constructor.visitCode();
 
-
-        constructor.aLoad(0)
-                .invokeSpecial("java/lang/Object", "<init>", "()V");
+        constructor.visitVarInsn(ALOAD, 0);
+        constructor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
         int var = 1;
         for (int i = 0; i < scope.size(); i++) {
             builder.field("scope" + i, scope.getType(i).descriptor(), MethodBuilder.Access.PRIVATE, MethodBuilder.Access.FINAL);
 
-            constructor.aLoad(0)
-                    .varInsn(scope.getType(i).loadInsn(), var)
-                    .putField(name, "scope" + i, scope.getType(i).descriptor());
+            constructor.visitVarInsn(ALOAD, 0);
+            constructor.visitVarInsn(scope.getType(i).loadInsn(), var);
+            constructor.visitFieldInsn(PUTFIELD, name, "scope" + i, scope.getType(i).descriptor());
             var += scope.get(i).frames();
         }
 
-        constructor.voidReturn(); // Void return
+        constructor.visitInsn(RETURN); // Void return
+        constructor.visitMaxs(0, 0);
+        constructor.visitEnd();
 
         String ret = returnType.internalDescriptor();
 
@@ -107,12 +111,22 @@ public class LambdaFactory {
             else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
         }
 
-        consumer.accept(builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret)
-                .access(MethodBuilder.Access.PUBLIC)
-                .annotate("java/lang/Override"));
+        MethodVisitor impl = builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, MethodBuilder.Access.PUBLIC);
+        impl.visitCode();
+        List<CompileError> errors = supplier.apply(builder)
+                .flatMap(either -> either.fold(
+                        Option::of,
+                        op -> {
+                            op.apply(impl);
+                            return Option.none();
+                        }
+                ));
+
+        impl.visitMaxs(0, 0);
+        impl.visitEnd();
 
         implementations.add(builder);
-        return builder;
+        return new Tuple2<>(errors, builder);
     }
 
     void buildAll() {

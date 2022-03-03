@@ -2,12 +2,15 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,18 +26,16 @@ public class LambdaInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        lambda.simplify().apply(builder, data);
-
-        data.loadImplementationArguments(builder);
-
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         ParserUtil.checkWeakReferenceType(lambda, Signature.fun());
 
         Signature returnType = lambda.reference().getSimpleReturn();
 
         Signature args = lambda.reference().getGenericArguments(0);
 
-        data.lambdaFactory().invoke(args, returnType, data, builder);
+        return lambda.simplify().apply(data)
+                .append(Op.aLoad(data.getImplArgsOffset()))
+                .append(data.lambdaFactory().invoke(args, returnType, data));
     }
 
     @Override

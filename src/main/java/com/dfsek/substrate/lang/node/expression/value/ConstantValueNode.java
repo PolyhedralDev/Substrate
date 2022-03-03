@@ -2,7 +2,8 @@ package com.dfsek.substrate.lang.node.expression.value;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.BakedValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -10,6 +11,8 @@ import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,12 +28,12 @@ public class ConstantValueNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         if (data.valueExists(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
         data.registerValue(id.getContent(), new BakedValue(value));
-        value.apply(builder, data);
+        return value.apply(data);
     }
 
     @Override

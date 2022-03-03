@@ -21,9 +21,8 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.lexer.Lexer;
+import io.vavr.collection.List;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExpressionRule implements Rule {
     private static final ExpressionRule INSTANCE = new ExpressionRule();
@@ -124,9 +123,9 @@ public class ExpressionRule implements Rule {
     private List<ExpressionNode> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
-        List<ExpressionNode> args = new ArrayList<>();
+        List<ExpressionNode> args = List.empty();
         while (lexer.peek().getType() != TokenType.GROUP_END) {
-            args.add(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            args = args.append(ExpressionRule.getInstance().assemble(lexer, data, scope));
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
                 lexer.consume(); // consume separator
             }

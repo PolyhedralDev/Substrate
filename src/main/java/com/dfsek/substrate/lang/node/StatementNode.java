@@ -2,12 +2,15 @@ package com.dfsek.substrate.lang.node;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.NodeHolder;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 
 import java.util.Collection;
@@ -23,18 +26,10 @@ public class StatementNode extends NodeHolder {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Label statement = new Label();
-        builder.label(statement);
-        content.simplify().apply(builder, data);
-
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature ref = content.reference();
-        if (!ref.equals(Signature.empty())) {
-            if (ref.equals(Signature.decimal())) builder.pop2();
-            else builder.pop();
-        }
-
-        builder.lineNumber(getPosition().getLine(), statement);
+        return content.simplify().apply(data)
+                .append(ref.equals(Signature.empty()) ? Op.nothing() : Op.pop(ref));
     }
 
     @Override

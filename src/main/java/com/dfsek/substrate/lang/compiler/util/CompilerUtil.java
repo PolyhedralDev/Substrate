@@ -1,17 +1,18 @@
 package com.dfsek.substrate.lang.compiler.util;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -75,20 +76,22 @@ public final class CompilerUtil implements Opcodes {
         return argSignature;
     }
 
-    public static void deconstructTuple(ExpressionNode node, BuildData data, MethodBuilder visitor) {
+    public static io.vavr.collection.List<Either<CompileError, Op>> deconstructTuple(ExpressionNode node, BuildData data) {
         Signature ref = node.reference();
         if (!ref.isSimple()) {
             data.offsetInc(1);
             int offset = data.getOffset();
-            visitor.aStore(offset);
+            io.vavr.collection.List<Either<CompileError, Op>> list = io.vavr.collection.List.of(Op.aStore(offset));
 
             for (int i = 0; i < ref.size(); i++) {
-                visitor.aLoad(offset);
-
-                visitor.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(ref)),
-                        "param" + i,
-                        "()" + ref.getType(i).descriptor());
+                list = list
+                        .append(Op.aLoad(offset))
+                        .append(Op.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(ref)),
+                                "param" + i,
+                                "()" + ref.getType(i).descriptor()));
             }
+            return list;
         }
+        return io.vavr.collection.List.empty();
     }
 }

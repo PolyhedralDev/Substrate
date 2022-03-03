@@ -2,17 +2,16 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.read.Position;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 public class FunctionInvocationNode extends ExpressionNode {
     private final List<ExpressionNode> arguments;
@@ -24,7 +23,7 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         ParserUtil.checkWeakReferenceType(function, Signature.fun());
 
         Signature argSignature = CompilerUtil.expandArguments(arguments);
@@ -33,18 +32,13 @@ public class FunctionInvocationNode extends ExpressionNode {
             throw new ParseException("Function argument mismatch, expected " + function.reference().getGenericArguments(0) + ", got " + argSignature, function.getPosition());
         }
 
-        function.apply(builder, data);
+        return function.apply(data)
+                .append(Op.aLoad(data.getImplArgsOffset()))
+                .appendAll(arguments
+                        .flatMap(arg -> arg.simplify().apply(data)
+                                .appendAll(CompilerUtil.deconstructTuple(arg, data))))
+                .append(data.lambdaFactory().invoke(argSignature, reference(), data));
 
-        data.loadImplementationArguments(builder);
-
-        for (ExpressionNode arg : arguments) {
-            arg.simplify().apply(builder, data);
-            CompilerUtil.deconstructTuple(arg, data, builder);
-        }
-
-
-        Signature ref = reference();
-        data.lambdaFactory().invoke(argSignature, ref, data, builder);
     }
 
     @Override
@@ -58,9 +52,7 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public Collection<? extends Node> contents() {
-        List<Node> nodes = new ArrayList<>(arguments);
-        nodes.add(function);
-        return nodes;
+    public Iterable<? extends Node> contents() {
+        return arguments.append(function);
     }
 }

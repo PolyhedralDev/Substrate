@@ -2,7 +2,8 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
@@ -15,8 +16,15 @@ import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.Pair;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
@@ -30,7 +38,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Signature ref;
 
     private String self;
-    
+
     private final Set<String> argRefs = new HashSet<>();
 
     public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start, Signature returnType) {
@@ -56,33 +64,32 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        BuildData closureFinder = data.sub();
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        BuildData closureFinder = data.sub(); // todo: remove?
 
         for (Pair<String, Signature> type : types) {
             Signature signature = type.getRight();
             closureFinder.registerUnchecked(type.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
         }
 
-        List<Pair<String, Signature>> closureTypes = new ArrayList<>();
-
-        content.streamContents()
+        List<Pair<String, Signature>> closureTypes = content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
                 .map(node -> (ValueReferenceNode) node)
-                .forEach(valueReferenceNode -> {
+                .flatMap(valueReferenceNode -> {
                     String id = valueReferenceNode.getId().getContent();
                     boolean isArg = argRefs.contains(id);
-                    if(!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
+                    if (!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
-                            closureTypes.add(
-                                    Pair.of(valueReferenceNode.getId().getContent(),
+                            closureIDs.add(id);
+                            return List.of(Pair.of(valueReferenceNode.getId().getContent(),
                                             valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
                             );
-                            closureIDs.add(id);
                         }
                     }
-                });
+                    return List.empty();
+                })
+                .toList();
 
         Signature closure = Signature.empty();
         for (Pair<String, Signature> type : closureTypes) {
@@ -90,8 +97,8 @@ public class LambdaExpressionNode extends ExpressionNode {
         }
 
 
-        String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, methodBuilder -> {
-            BuildData delegate = data.sub(methodBuilder.classWriter());
+        String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
+            BuildData delegate = data.sub(clazz);
 
             for (int i = 0; i < closureTypes.size(); i++) {
                 Pair<String, Signature> pair = closureTypes.get(i);
@@ -106,27 +113,24 @@ public class LambdaExpressionNode extends ExpressionNode {
                 delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
             }
 
-            ParserUtil.checkReferenceType(content, returnType).simplify().apply(methodBuilder, delegate);
-            if (!(content instanceof BlockNode)) {
-                if (returnType.isSimple()) {
-                    methodBuilder.insn(returnType.getType(0).returnInsn());
-                } else if (returnType.size() > 1) {
-                    methodBuilder.refReturn();
-                }
-            }
-        }).getName();
+            return ParserUtil.checkReferenceType(content, returnType).simplify().apply(delegate)
+                    .append(returnType.retInsn()
+                            .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
+                            .map(Op::insnUnwrapped));
+        })._2.getName();
 
-        builder.newInsn(lambda)
-                .dup();
-
-        for (Pair<String, Signature> pair : closureTypes) {
-            if (pair.getLeft().equals(self)) continue; // dont load self into closure.
-            data.getValue(pair.getLeft()).load(builder, data);
-        }
-
-        builder.invokeSpecial(CompilerUtil.internalName(lambda),
-                "<init>",
-                "(" + closure.internalDescriptor() + ")V");
+        return List.of(Op.newInsn(lambda))
+                .append(Op.dup())
+                .appendAll(closureTypes
+                        .toStream()
+                        .flatMap(pair -> {
+                            if (pair.getLeft().equals(self)) return List.empty(); // dont load self into closure.
+                            return data.getValue(pair.getLeft()).load(data);
+                        })
+                        .collect(Collectors.toList()))
+                        .append(Op.invokeSpecial(CompilerUtil.internalName(lambda),
+                                "<init>",
+                                "(" + closure.internalDescriptor() + ")V"));
     }
 
     @Override

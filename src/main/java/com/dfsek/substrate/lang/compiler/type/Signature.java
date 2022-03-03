@@ -1,12 +1,20 @@
 package com.dfsek.substrate.lang.compiler.type;
 
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.internal.Tuple;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.util.Pair;
+import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static io.vavr.API.*;
 
 
 public class Signature implements Opcodes {
@@ -190,6 +198,64 @@ public class Signature implements Opcodes {
             else frames += 1;
         }
         return frames;
+    }
+
+    public Either<String, Integer> storeInsn() {
+        return Match(this).of(
+                Case($(decimal()), Either.right(Opcodes.DSTORE)),
+                Case($(integer()), Either.right(Opcodes.ISTORE)),
+                Case($(bool()), Either.right(Opcodes.ISTORE)),
+                Case($(empty()), Either.left("Cannot store empty expression")),
+                Case($(), Either.right(Opcodes.ASTORE))
+        );
+    }
+
+    public Either<String, Integer> arrayStoreInsn() {
+        return Match(this).of(
+                Case($(decimal()), Either.right(Opcodes.DASTORE)),
+                Case($(integer()), Either.right(Opcodes.IASTORE)),
+                Case($(bool()), Either.right(Opcodes.BASTORE)),
+                Case($(empty()), Either.left("Cannot store empty expression")),
+                Case($(), Either.right(Opcodes.AASTORE))
+        );
+    }
+
+    public Either<String, Integer> loadInsn() {
+        return Match(this).of(
+                Case($(decimal()), Either.right(Opcodes.DLOAD)),
+                Case($(integer()), Either.right(Opcodes.ILOAD)),
+                Case($(bool()), Either.right(Opcodes.ILOAD)),
+                Case($(empty()), Either.left("Cannot store empty expression")),
+                Case($(), Either.right(Opcodes.ALOAD))
+        );
+    }
+
+    public Either<String, Integer> arrayLoadInsn() {
+        return Match(this).of(
+                Case($(decimal()), Either.right(Opcodes.DALOAD)),
+                Case($(integer()), Either.right(Opcodes.IALOAD)),
+                Case($(bool()), Either.right(Opcodes.BALOAD)),
+                Case($(empty()), Either.left("Cannot store empty expression")),
+                Case($(), Either.right(Opcodes.AALOAD))
+        );
+    }
+
+    public Either<String, Integer> retInsn() {
+        return Match(this).of(
+                Case($(decimal()), Either.right(DRETURN)),
+                Case($(integer()), Either.right(IRETURN)),
+                Case($(bool()), Either.right(IRETURN)),
+                Case($(empty()), Either.right(RETURN)),
+                Case($(), Either.right(ARETURN))
+        );
+    }
+
+    public Either<CompileError, Op> newArrayInsn(Position position) {
+        if (isSimple()) {
+            return getType(0).applyNewArray(this);
+        } else {
+            return Op.aNewArray(CompilerUtil.internalName(Tuple.class));
+        }
     }
 
     public boolean isSimple() {

@@ -9,10 +9,8 @@ import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.lexer.Lexer;
+import io.vavr.collection.List;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The base rule of the parser.
@@ -21,18 +19,18 @@ public class BaseRule implements Rule {
 
     @Override
     public Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
-        List<Node> contents = new ArrayList<>();
+        List<Node> contents = List.empty();
 
         Position begin = lexer.peek().getPosition();
 
         while (lexer.hasNext()) {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
-                contents.add(BlockRule.getInstance().assemble(lexer, data, scope));
+                contents = contents.append(BlockRule.getInstance().assemble(lexer, data, scope));
             } else { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(lexer, data, scope));
+                contents = contents.append(StatementRule.getInstance().assemble(lexer, data, scope));
             }
         }
 
-        return new BlockNode(contents, Collections.emptyList(), begin);
+        return new BlockNode(contents, List.empty(), begin);
     }
 }

@@ -1,12 +1,15 @@
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.parser.Parser;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
+import com.dfsek.substrate.parser.Parser;
+import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
@@ -18,9 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -46,11 +47,11 @@ public class SubstrateTests {
             }
 
             @Override
-            public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
-                visitor.invokeStatic(
+            public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
+                return List.of(Op.invokeStatic(
                         CompilerUtil.internalName(Assertions.class),
                         "fail",
-                        "()V");
+                        "()V"));
             }
 
             @Override
@@ -65,11 +66,11 @@ public class SubstrateTests {
             }
 
             @Override
-            public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
-                visitor.invokeStatic(
+            public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
+                return List.of(Op.invokeStatic(
                         CompilerUtil.internalName(Assertions.class),
                         "assertTrue",
-                        "(Z)V");
+                        "(Z)V"));
             }
 
             @Override
@@ -86,88 +87,87 @@ public class SubstrateTests {
     }
 
     public DynamicNode tests(boolean optimisations) {
-        List<DynamicNode> nodes = new ArrayList<>();
+        List<DynamicNode> parserNodes = List.of(
+                register("Valid Scripts", Paths.get("src", "test", "resources", "parser", "valid"), path -> () -> {
+                    try {
+                        String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
+                        Parser parser = createParser(data);
+                        System.setProperty(property, Boolean.toString(optimisations));
+                        parser.parse().execute(null);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }),
+                register("Invalid Scripts", Paths.get("src", "test", "resources", "parser", "invalid"), path -> () -> {
+                    try {
+                        String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
+                        Parser parser = createParser(data);
+                        System.setProperty(property, Boolean.toString(optimisations));
+                        parser.parse().execute(null);
+                    } catch (ParseException e) {
+                        if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
+                        return;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    fail();
+                })
+        );
 
-        List<DynamicNode> parserNodes = new ArrayList<>();
-        parserNodes.add(register("Valid Scripts", Paths.get("src", "test", "resources", "parser", "valid"), path -> () -> {
-            try {
-                String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = createParser(data);
-                System.setProperty(property, Boolean.toString(optimisations));
-                parser.parse().execute(null);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }));
-        parserNodes.add(register("Invalid Scripts", Paths.get("src", "test", "resources", "parser", "invalid"), path -> () -> {
-            try {
-                String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = createParser(data);
-                System.setProperty(property, Boolean.toString(optimisations));
-                parser.parse().execute(null);
-            } catch (ParseException e) {
-                if(STACK_TRACES_FOR_INVALID) e.printStackTrace();
-                return;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            fail();
-        }));
-        nodes.add(DynamicContainer.dynamicContainer("Parser Tests", parserNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
+        List<DynamicNode> tokenizerNodes = List.of(
+                register("Invalid Scripts", Paths.get("src", "test", "resources", "tokenizer", "invalid"), path -> () -> {
+                    try {
+                        String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
+                        Lexer lexer = new Lexer(data);
 
-        List<DynamicNode> tokenizerNodes = new ArrayList<>();
+                        while (lexer.hasNext()) {
+                            lexer.consume();
+                        }
+                    } catch (TokenizerException e) {
+                        if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
+                        return; // These scripts should fail to parse
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    fail(); // If it parsed, something is wrong.
+                }),
+                register("Valid Scripts", Paths.get("src", "test", "resources", "tokenizer", "valid"), path -> () -> {
+                    try {
+                        String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
+                        Lexer lexer = new Lexer(data);
 
-        tokenizerNodes.add(register("Invalid Scripts", Paths.get("src", "test", "resources", "tokenizer", "invalid"), path -> () -> {
-            try {
-                String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Lexer lexer = new Lexer(data);
+                        while (lexer.hasNext()) {
+                            lexer.consume();
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+        );
 
-                while (lexer.hasNext()) {
-                    lexer.consume();
-                }
-            } catch (TokenizerException e) {
-                if(STACK_TRACES_FOR_INVALID) e.printStackTrace();
-                return; // These scripts should fail to parse
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            fail(); // If it parsed, something is wrong.
-        }));
+        List<DynamicNode> nodes = List.of(
+                DynamicContainer.dynamicContainer("Parser Tests", parserNodes.toStream().sorted(Comparator.comparing(DynamicNode::getDisplayName))),
+                DynamicContainer.dynamicContainer("Tokenizer Tests", tokenizerNodes.toStream().sorted(Comparator.comparing(DynamicNode::getDisplayName)))
+        );
 
-        tokenizerNodes.add(register("Valid Scripts", Paths.get("src", "test", "resources", "tokenizer", "valid"), path -> () -> {
-            try {
-                String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Lexer lexer = new Lexer(data);
-
-                while (lexer.hasNext()) {
-                    lexer.consume();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-
-        nodes.add(DynamicContainer.dynamicContainer("Tokenizer Tests", tokenizerNodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName))));
-
-        return DynamicContainer.dynamicContainer(optimisations ? "Optimised Compilation (default)" : "Unoptimised Compilation", nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName)));
+        return DynamicContainer.dynamicContainer(optimisations ? "Optimised Compilation (default)" : "Unoptimised Compilation", nodes.toStream().sorted(Comparator.comparing(DynamicNode::getDisplayName)));
     }
 
     public DynamicContainer register(String name, Path parent, Function<Path, Executable> executable) {
-        List<DynamicNode> nodes = new ArrayList<>();
         try {
-            Files.walk(parent, 1)
-                    .forEach(path -> {
-                        if (path.equals(parent)) return;
+            return DynamicContainer.dynamicContainer(name, Files.walk(parent, 1)
+                    .flatMap(path -> {
+                        if (path.equals(parent)) return Stream.empty();
                         String testName = parent.relativize(path).toString();
                         if (path.toFile().isDirectory()) {
-                            nodes.add(register(testName, parent.resolve(testName), executable));
+                            return Stream.of(register(testName, parent.resolve(testName), executable));
                         } else {
-                            nodes.add(DynamicTest.dynamicTest(testName, executable.apply(path)));
+                            return Stream.of(DynamicTest.dynamicTest(testName, executable.apply(path)));
                         }
-                    });
+                    })
+                    .sorted(Comparator.comparing(DynamicNode::getDisplayName)));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return DynamicContainer.dynamicContainer(name, nodes.stream().sorted(Comparator.comparing(DynamicNode::getDisplayName)));
     }
 }

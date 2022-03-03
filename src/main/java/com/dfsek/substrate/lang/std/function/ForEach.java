@@ -2,12 +2,13 @@ package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.objectweb.asm.Label;
-
-import java.util.List;
 
 public class ForEach implements Macro {
     @Override
@@ -24,55 +25,55 @@ public class ForEach implements Macro {
     }
 
     @Override
-    public void invoke(MethodBuilder visitor, BuildData data, Signature args, List<ExpressionNode> argNodes) {
-        argNodes.forEach(arg -> arg.simplify().apply(visitor, data));
-
+    public List<Either<CompileError, Op>> invoke(BuildData data, Signature args, List<ExpressionNode> argNodes) {
         Signature type = args.getGenericReturn(0);
         data.offsetInc(1);
         int lambdaLV = data.getOffset();
-        visitor.aStore(lambdaLV) // store lambda in LV
 
-                .dup(); // duplicate array ref
         data.offsetInc(1);
         int arrayLV = data.getOffset();
-        visitor.aStore(arrayLV) // store array in LV
-                .arrayLength();
 
         data.offsetInc(1);
         int arrayLengthLV = data.getOffset();
-        visitor.iStore(arrayLengthLV) // store array length in LV
 
-                .pushInt(0);
         data.offsetInc(1);
         int iLV = data.getOffset();
-        visitor.iStore(iLV); // store iterator value in LV
 
         Label start = new Label();
         Label end = new Label();
 
-        visitor.label(start)
+        return argNodes.flatMap(arg -> arg.simplify().apply(data))
 
-                .iLoad(iLV)
-                .iLoad(arrayLengthLV)
-                .ifICmpGE(end) // jump to end if i >= length
+                .append(Op.aStore(lambdaLV)) // store lambda in LV
 
-                .aLoad(lambdaLV); // load lambda
-        data.loadImplementationArguments(visitor);
-        visitor
-                .aLoad(arrayLV) // get value from array
-                .iLoad(iLV);
-        if (type.isSimple()) {
-            visitor.insn(type.getType(0).arrayLoadInsn());
-        } else {
-            visitor.aaload();
-        }
+                .append(Op.dup()) // duplicate array ref
 
-        data.lambdaFactory().invoke(args.getGenericReturn(0), Signature.empty(), data, visitor);
+                .append(Op.aStore(arrayLV)) // store array in LV
+                .append(Op.arrayLength())
 
-        visitor.iinc(iLV, 1)
-                .goTo(start)
+                .append(Op.iStore(arrayLengthLV))
 
-                .label(end);
+                .append(Op.pushInt(0))
+                .append(Op.iStore(iLV))
+
+                .append(Op.label(start))
+                .append(Op.iLoad(iLV))
+                .append(Op.iLoad(arrayLengthLV)) // store array length in LV
+
+                .append(Op.ifICmpGE(end)) // jump to end if i >= length
+                .append(Op.aLoad(lambdaLV))// load lambda
+                .append(Op.aLoad(data.getImplArgsOffset()))
+                .append(Op.aLoad(arrayLV)) // get value from array
+                .append(Op.iLoad(iLV)) // store iterator value in LV
+                .append(type.arrayLoadInsn().bimap(
+                        s -> Op.errorUnwrapped(s, argNodes.get(0).getPosition()),
+                        Op::insnUnwrapped
+                ))
+                .append(data.lambdaFactory().invoke(args.getGenericReturn(0), Signature.empty(), data))
+                .append(Op.iinc(iLV, 1))
+                .append(Op.goTo(start))
+                .append(Op.label(end));
+
     }
 
     @Override
