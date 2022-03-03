@@ -4,7 +4,6 @@ import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.codegen.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.codegen.TupleFactory;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.util.Pair;
