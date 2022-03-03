@@ -94,8 +94,10 @@ public class BuildData {
         offset += frames;
     }
 
-    public void offsetInc(int offset) {
+    public int offsetInc(int offset) {
+        int o = this.offset;
         this.offset += offset;
+        return o;
     }
 
     public int getOffset() {

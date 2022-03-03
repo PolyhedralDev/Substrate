@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.ThisReferenceValue;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -90,14 +91,10 @@ public class LambdaExpressionNode extends ExpressionNode {
         return data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
                     BuildData delegate = data.sub(clazz);
 
-                    for (int i = 0; i < closureTypes.size(); i++) {
-                        Tuple2<String, Signature> pair = closureTypes.get(i);
-                        delegate.registerUnchecked(pair._1, new ShadowValue(pair._2, i));
-                    }
-                    for (Pair<String, Signature> argument : types) {
-                        delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
-                        delegate.offsetInc(argument.getRight().frames());
-                    }
+                    closureTypes.zipWithIndex()
+                            .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
+                            .appendAll(types.map(argument -> new Tuple2<>(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.offsetInc(argument.getRight().frames())))))
+                            .forEach(v -> delegate.registerUnchecked(v._1, v._2));
 
                     if (self != null) {
                         delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
