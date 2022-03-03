@@ -15,22 +15,21 @@ import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.Pair;
 import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final List<Pair<String, Signature>> types;
+    private final List<Tuple2<String, Signature>> types;
     private final Set<String> closureIDs;
     private final Position start;
     private final Signature parameters;
@@ -41,22 +40,22 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     private String self;
 
-    private final Set<String> argRefs = new HashSet<>();
+    private final Set<String> argRefs;
 
-    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start, Signature returnType) {
+    public LambdaExpressionNode(ExpressionNode content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
         this.content = content;
         this.types = types;
         this.start = start;
         this.returnType = returnType;
-        Signature signature = Signature.empty();
+        this.argRefs = argRefs;
 
-        this.closureIDs = new HashSet<>();
-        for (Pair<String, Signature> type : types) {
-            signature = signature.and(type.getRight());
-            closureIDs.add(type.getLeft());
-        }
-
-        this.parameters = signature;
+        Tuple2<HashSet<String>, Signature> parameterData = types
+                .foldLeft(
+                        new Tuple2<>(HashSet.empty(),
+                                Signature.empty()), (t, type) -> new Tuple2<>(t._1.add(type._1), t._2.and(type._2))
+                );
+        this.closureIDs = parameterData._1;
+        this.parameters = parameterData._2;
 
         this.ref = Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, parameters);
     }
@@ -93,7 +92,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
                     closureTypes.zipWithIndex()
                             .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
-                            .appendAll(types.map(argument -> new Tuple2<>(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.offsetInc(argument.getRight().frames())))))
+                            .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, delegate.offsetInc(argument._2().frames())))))
                             .forEach(v -> delegate.registerUnchecked(v._1, v._2));
 
                     if (self != null) {
@@ -126,10 +125,6 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return start;
-    }
-
-    public void addArgumentReference(String node) {
-        argRefs.add(node);
     }
 
     @Override

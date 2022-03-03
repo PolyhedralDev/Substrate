@@ -18,6 +18,7 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.lexer.Lexer;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -37,7 +38,7 @@ public class IfExpressionRule implements Rule {
         ExpressionNode caseTrueNode;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
             ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
-            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference()));
+            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
         } else {
             caseTrueNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
         }
@@ -47,7 +48,7 @@ public class IfExpressionRule implements Rule {
             lexer.consume();
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
                 ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
-                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference()));
+                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
             } else {
                 caseFalseNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
             }
