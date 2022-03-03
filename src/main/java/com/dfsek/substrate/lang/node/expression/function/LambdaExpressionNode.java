@@ -15,6 +15,7 @@ import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.Pair;
+import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -64,7 +65,8 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        List<Pair<String, Signature>> closureTypes = content.streamContents()
+        List<Tuple2<String, Signature>> closureTypes = content
+                .streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
                 .map(node -> (ValueReferenceNode) node)
@@ -74,7 +76,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                     if (!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
                             closureIDs.add(id);
-                            return List.of(Pair.of(valueReferenceNode.getId().getContent(),
+                            return List.of(new Tuple2<>(valueReferenceNode.getId().getContent(),
                                     valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
                             );
                         }
@@ -83,14 +85,14 @@ public class LambdaExpressionNode extends ExpressionNode {
                 })
                 .toList();
 
-        Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair.getRight().and(signature));
+        Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
 
         return data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
                     BuildData delegate = data.sub(clazz);
 
                     for (int i = 0; i < closureTypes.size(); i++) {
-                        Pair<String, Signature> pair = closureTypes.get(i);
-                        delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight(), i));
+                        Tuple2<String, Signature> pair = closureTypes.get(i);
+                        delegate.registerUnchecked(pair._1, new ShadowValue(pair._2, i));
                     }
                     for (Pair<String, Signature> argument : types) {
                         delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
@@ -113,9 +115,9 @@ public class LambdaExpressionNode extends ExpressionNode {
                         .appendAll(closureTypes
                                 .toStream()
                                 .flatMap(pair -> {
-                                    if (pair.getLeft().equals(self))
+                                    if (pair._1.equals(self))
                                         return List.empty(); // dont load self into closure.
-                                    return data.getValue(pair.getLeft()).load(data);
+                                    return data.getValue(pair._1).load(data);
                                 })
                                 .collect(Collectors.toList()))
                         .append(Op.invokeSpecial(CompilerUtil.internalName(clazz.getName()),
