@@ -65,13 +65,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        BuildData closureFinder = data.sub(); // todo: remove?
-
-        for (Pair<String, Signature> type : types) {
-            Signature signature = type.getRight();
-            closureFinder.registerUnchecked(type.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
-        }
-
         List<Pair<String, Signature>> closureTypes = content.streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
