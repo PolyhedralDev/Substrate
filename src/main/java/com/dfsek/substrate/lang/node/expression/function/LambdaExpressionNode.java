@@ -18,6 +18,7 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.util.Pair;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
+import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 
 import java.util.Collection;
@@ -66,7 +67,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        List<Tuple2<String, Signature>> closureTypes = content
+        Stream<Tuple2<String, Signature>> closureTypes = content
                 .streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
@@ -83,8 +84,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                         }
                     }
                     return List.empty();
-                })
-                .toList();
+                });
 
         Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
 
