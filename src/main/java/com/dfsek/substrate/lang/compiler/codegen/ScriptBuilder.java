@@ -17,7 +17,7 @@ import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.Pair;
+import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.MethodVisitor;
@@ -40,7 +40,7 @@ public class ScriptBuilder implements Opcodes {
 
     private final Map<String, Macro> macros = new HashMap<>();
 
-    private List<Pair<String, Function>> functions = List.empty();
+    private List<Tuple2<String, Function>> functions = List.empty();
 
     public void addOperation(Node op) {
         this.ops = ops.append(op); // todo: bad
@@ -74,11 +74,11 @@ public class ScriptBuilder implements Opcodes {
         MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
         staticInitializer.visitCode();
 
-        for (Pair<String, Function> stringFunctionPair : functions) {
-            Function function = stringFunctionPair.getRight();
-            String functionName = "wrap$" + stringFunctionPair.getLeft();
+        for (Tuple2<String, Function> stringFunctionPair : functions) {
+            Function function = stringFunctionPair._2;
+            String functionName = "wrap$" + stringFunctionPair._1;
 
-            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, implementationClassName, functionName, () -> {
+            data.registerValue(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
                 BuildData separate = data.sub();
                 Signature ref = function.reference();
 
@@ -163,7 +163,7 @@ public class ScriptBuilder implements Opcodes {
     }
 
     public void registerFunction(String id, Function function) {
-        functions = functions.append(Pair.of(id, function)); // todo: bad
+        functions = functions.append(new Tuple2<>(id, function)); // todo: bad
     }
 
     public void registerMacro(String id, Macro macro) {
