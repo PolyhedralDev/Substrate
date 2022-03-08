@@ -37,10 +37,8 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Signature returnType;
 
     private final Signature ref;
-
-    private String self;
-
     private final Set<String> argRefs;
+    private String self;
 
     public LambdaExpressionNode(ExpressionNode content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
         this.content = content;

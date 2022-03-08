@@ -17,17 +17,16 @@ public class Position {
         this.index = index;
     }
 
+    public static Position getNull() {
+        return NULL;
+    }
+
     @Override
     public String toString() {
         return (line + 1) + ":" + index;
     }
 
-
     public int getLine() {
         return line;
-    }
-
-    public static Position getNull() {
-        return NULL;
     }
 }

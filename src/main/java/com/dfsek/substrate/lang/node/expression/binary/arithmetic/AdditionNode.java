@@ -9,8 +9,8 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
@@ -69,18 +69,18 @@ public class AdditionNode extends NumericBinaryNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(Node.disableOptimisation()) return this;
-        if(left instanceof IntegerNode && ((IntegerNode) left).getValue() == 0) {
+        if (Node.disableOptimisation()) return this;
+        if (left instanceof IntegerNode && ((IntegerNode) left).getValue() == 0) {
             return right; // 0 + a == a
         }
-        if(left instanceof DecimalNode && ((DecimalNode) left).getValue() == 0) {
+        if (left instanceof DecimalNode && ((DecimalNode) left).getValue() == 0) {
             return right; // 0 + a == a
         }
 
-        if(right instanceof IntegerNode && ((IntegerNode) right).getValue() == 0) {
+        if (right instanceof IntegerNode && ((IntegerNode) right).getValue() == 0) {
             return left; // a + 0 == a
         }
-        if(right instanceof DecimalNode && ((DecimalNode) right).getValue() == 0) {
+        if (right instanceof DecimalNode && ((DecimalNode) right).getValue() == 0) {
             return left; // a + 0 == a
         }
         return super.simplify();

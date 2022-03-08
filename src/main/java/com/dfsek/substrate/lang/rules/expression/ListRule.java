@@ -15,6 +15,10 @@ import io.vavr.collection.List;
 public class ListRule implements Rule {
     private static final ListRule INSTANCE = new ListRule();
 
+    public static ListRule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token op = ParserUtil.checkType(lexer.consume(), TokenType.LIST_BEGIN);
@@ -32,9 +36,5 @@ public class ListRule implements Rule {
 
 
         return new ListNode(elements, op.getPosition());
-    }
-
-    public static ListRule getInstance() {
-        return INSTANCE;
     }
 }

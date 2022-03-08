@@ -6,12 +6,12 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.StatementNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
+import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
 
 public class StatementRule implements Rule {
     private static final StatementRule INSTANCE = new StatementRule();

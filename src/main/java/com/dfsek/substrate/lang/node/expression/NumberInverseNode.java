@@ -5,9 +5,9 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 

@@ -3,11 +3,11 @@ package com.dfsek.substrate.parser;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Typed;
+import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Positioned;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.parser.exception.ParseException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public final class ParserUtil {
     public static <T extends Typed & Positioned> T checkReturnType(T typed, Signature... expected) throws ParseException {
 
         Signature ref = typed.reference();
-        if(ref.isSimple()) {
+        if (ref.isSimple()) {
             ref = ref.getSimpleReturn();
             for (Signature type : expected) if (ref.equals(type)) return typed;
         }

@@ -7,13 +7,12 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-import static io.vavr.API.*;
 
-import java.util.Collection;
+import static io.vavr.API.List;
 
 public class TupleNode extends ExpressionNode {
     private final List<ExpressionNode> args;

@@ -8,8 +8,8 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -53,7 +53,7 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(Node.disableOptimisation()) return this;
+        if (Node.disableOptimisation()) return this;
         if (left instanceof DecimalNode && right instanceof DecimalNode) {
             return new DecimalNode(
                     apply(((DecimalNode) left).getValue(), ((DecimalNode) right).getValue()),

@@ -1,16 +1,18 @@
 package com.dfsek.substrate.lexer;
 
-import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.read.Lookahead;
-import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.exceptions.EOFException;
 import com.dfsek.substrate.lexer.exceptions.FormatException;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.lexer.read.Char;
+import com.dfsek.substrate.lexer.read.Lookahead;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.parser.exception.ParseException;
 
 import java.io.StringReader;
+import java.util.List;
+import java.util.Set;
 import java.util.*;
 
 import static io.vavr.API.*;
@@ -92,7 +94,7 @@ public class Lexer {
                 new Token(s, tokenType, reader.getPosition()));
     }
 
-    private Match.Case<String, Token> literalMatch(String  literal, TokenType tokenType) {
+    private Match.Case<String, Token> literalMatch(String literal, TokenType tokenType) {
         return Case($(literal::equals), s ->
                 new Token(s, tokenType, reader.getPosition()));
     }
@@ -211,7 +213,7 @@ public class Lexer {
     }
 
     private boolean isNumberLike() {
-        if(reader.current().is('.') && reader.next(1).is('.')) return false; // range
+        if (reader.current().is('.') && reader.next(1).is('.')) return false; // range
         return reader.current().isDigit()
                 || reader.current().is('_', '.', 'E');
     }

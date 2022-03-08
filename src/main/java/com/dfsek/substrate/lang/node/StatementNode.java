@@ -7,11 +7,10 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.NodeHolder;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-import org.objectweb.asm.Label;
 
 import java.util.Collection;
 import java.util.Collections;

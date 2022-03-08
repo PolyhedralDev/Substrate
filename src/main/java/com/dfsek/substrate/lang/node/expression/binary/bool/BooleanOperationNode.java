@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public abstract class BooleanOperationNode extends ExpressionNode {
+    private final Token op;
     protected ExpressionNode left;
     protected ExpressionNode right;
-    private final Token op;
 
     public BooleanOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
         this.left = left.simplify();
@@ -23,7 +23,7 @@ public abstract class BooleanOperationNode extends ExpressionNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(Node.disableOptimisation()) return this;
+        if (Node.disableOptimisation()) return this;
         if (left instanceof BooleanNode && right instanceof BooleanNode) {
             return new BooleanNode(apply(((BooleanNode) left).getValue(), ((BooleanNode) right).getValue()), left.getPosition());
         }

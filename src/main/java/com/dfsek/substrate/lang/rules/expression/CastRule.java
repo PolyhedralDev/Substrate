@@ -7,12 +7,12 @@ import com.dfsek.substrate.lang.node.expression.cast.IntToNumCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.NumToIntCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.ToStringNode;
 import com.dfsek.substrate.lang.node.expression.cast.TypeCastNode;
+import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
 
 public class CastRule implements Rule {
     private static final CastRule INSTANCE = new CastRule();

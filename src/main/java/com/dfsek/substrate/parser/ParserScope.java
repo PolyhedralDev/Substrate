@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ParserScope {
-    private final Map<String, Signature> values = new HashMap<>();
-
     private static final ParserScope NULL = new ParserScope() {
         @Override
         public void register(String val, Signature signature) {
@@ -24,7 +22,7 @@ public class ParserScope {
             throw new IllegalArgumentException("No such value " + val);
         }
     };
-
+    private final Map<String, Signature> values = new HashMap<>();
     private final ParserScope parent;
 
     public ParserScope() {
@@ -36,7 +34,8 @@ public class ParserScope {
     }
 
     public void register(String val, Signature signature) {
-        if(values.containsKey(val) || parent.values.containsKey(val)) throw new IllegalArgumentException("Value " + val + " already exists in this scope.");
+        if (values.containsKey(val) || parent.values.containsKey(val))
+            throw new IllegalArgumentException("Value " + val + " already exists in this scope.");
         values.put(val, signature);
     }
 
@@ -45,7 +44,7 @@ public class ParserScope {
     }
 
     public Signature get(String val) {
-        if(values.containsKey(val)) return values.get(val);
+        if (values.containsKey(val)) return values.get(val);
         return parent.get(val);
     }
 

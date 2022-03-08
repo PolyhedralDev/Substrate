@@ -4,11 +4,11 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
+import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
 import io.vavr.collection.List;
 
 

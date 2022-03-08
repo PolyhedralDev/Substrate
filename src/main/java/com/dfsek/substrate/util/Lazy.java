@@ -7,12 +7,12 @@ public final class Lazy<T> {
     private T result;
     private volatile boolean calc = false;
 
-    public static <T> Lazy<T> of(Supplier<T> value) {
-        return new Lazy<>(value);
-    }
-
     private Lazy(Supplier<T> value) {
         this.value = value;
+    }
+
+    public static <T> Lazy<T> of(Supplier<T> value) {
+        return new Lazy<>(value);
     }
 
     public T get() {

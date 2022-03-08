@@ -13,9 +13,9 @@ import java.util.zip.ZipOutputStream;
 
 @SuppressWarnings("UnusedReturnValue")
 public class ClassBuilder implements Opcodes {
+    private static final String[] EMPTY = new String[0];
     private final List<Consumer<ClassWriter>> fields = new ArrayList<>();
     private final ClassWriter classWriter;
-    private static final String[] EMPTY = new String[0];
     private final String name;
 
     public ClassBuilder(String name) {

@@ -1,8 +1,3 @@
-import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.CompileError;
-import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
-import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
@@ -10,8 +5,6 @@ import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Function1;
-import io.vavr.collection.List;
-import io.vavr.control.Either;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
@@ -26,10 +19,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 public class SubstrateTests {
-
     private static final String property = "substrate.DisableOptimisation";
 
     private static final boolean STACK_TRACES_FOR_INVALID = false;
@@ -39,15 +29,15 @@ public class SubstrateTests {
         System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));
     }
 
+    public static void fail() {
+        Assertions.fail();
+    }
+
     private Parser createParser(String script) throws NoSuchMethodException {
         Parser parser = new Parser(script, new BaseRule());
         parser.registerFunction("fail", new StaticFunction(SubstrateTests.class.getMethod("fail")));
         parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;
-    }
-
-    public static void fail() {
-        Assertions.fail();
     }
 
     @TestFactory
@@ -170,6 +160,4 @@ public class SubstrateTests {
             throw new UncheckedIOException(e);
         }
     }
-
-
 }

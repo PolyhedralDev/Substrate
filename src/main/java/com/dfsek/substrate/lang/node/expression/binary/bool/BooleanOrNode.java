@@ -7,9 +7,9 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
+import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.Token;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
@@ -26,7 +26,7 @@ public class BooleanOrNode extends BooleanOperationNode {
 
     @Override
     public ExpressionNode simplify() {
-        if(Node.disableOptimisation()) return this;
+        if (Node.disableOptimisation()) return this;
         if (left instanceof BooleanNode) {
             if (((BooleanNode) left).getValue()) {
                 return left; // short-circuit.
@@ -53,7 +53,7 @@ public class BooleanOrNode extends BooleanOperationNode {
         return ParserUtil.checkReturnType(left, Signature.bool()).apply(data)
                 .append(Op.ifNE(shortTrue))
                 .appendAll(ParserUtil.checkReturnType(right, Signature.bool()).apply(data))
-                        .append(Op.ifEQ(shortFalse))
+                .append(Op.ifEQ(shortFalse))
                 .append(Op.label(shortTrue))
                 .append(Op.pushTrue())
                 .append(Op.goTo(end))

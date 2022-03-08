@@ -36,10 +36,8 @@ public class ScriptBuilder implements Opcodes {
     public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
     private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
-    private List<Node> ops = List.empty();
-
     private final Map<String, Macro> macros = new HashMap<>();
-
+    private List<Node> ops = List.empty();
     private List<Tuple2<String, Function>> functions = List.empty();
 
     public void addOperation(Node op) {

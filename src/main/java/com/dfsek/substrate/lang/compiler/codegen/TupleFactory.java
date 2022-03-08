@@ -17,12 +17,9 @@ import java.util.zip.ZipOutputStream;
 import static org.objectweb.asm.Opcodes.*;
 
 public class TupleFactory {
-    private final Map<Signature, Class<?>> generated = new HashMap<>();
-
-    private final DynamicClassLoader classLoader;
-
     private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
-
+    private final Map<Signature, Class<?>> generated = new HashMap<>();
+    private final DynamicClassLoader classLoader;
     private final ClassBuilder classBuilder;
     private final ZipOutputStream zipOutputStream;
 

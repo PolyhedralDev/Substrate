@@ -19,10 +19,10 @@ public class ShadowValue implements Value {
     @Override
     public List<Either<CompileError, Op>> load(BuildData data) {
         return List.of(Op.aLoad(0))
-                        .append(Op.getField(
-                                data.getClassName(),
-                                "scope" + field,
-                                reference().internalDescriptor()));
+                .append(Op.getField(
+                        data.getClassName(),
+                        "scope" + field,
+                        reference().internalDescriptor()));
     }
 
     @Override

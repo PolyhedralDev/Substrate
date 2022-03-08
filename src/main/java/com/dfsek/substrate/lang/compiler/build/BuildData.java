@@ -25,9 +25,8 @@ public class BuildData {
     private final ClassBuilder classWriter;
 
     private final String name;
-    private int offset;
-
     private final int implArgsOffset;
+    private int offset;
 
     public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, ZipOutputStream zipOutputStream) {
         this.classLoader = classLoader;

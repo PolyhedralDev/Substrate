@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.dup;
-import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.insn;
 
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;

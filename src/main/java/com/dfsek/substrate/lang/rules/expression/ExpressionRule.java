@@ -14,13 +14,13 @@ import com.dfsek.substrate.lang.node.expression.function.FunctionInvocationNode;
 import com.dfsek.substrate.lang.node.expression.function.MacroNode;
 import com.dfsek.substrate.lang.node.expression.list.ListIndexNode;
 import com.dfsek.substrate.lang.node.expression.list.RangeNode;
+import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
 import io.vavr.collection.List;
 
 
@@ -46,7 +46,6 @@ public class ExpressionRule implements Rule {
 
     private ExpressionNode simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
         Token test = lexer.peek();
-
 
 
         boolean invert = false;

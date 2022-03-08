@@ -11,7 +11,7 @@ public final class MathUtils {
 
     public static double fastCeil(double f) {
         long i = (long) f;
-        if(i < f) i++;
+        if (i < f) i++;
         return i;
     }
 

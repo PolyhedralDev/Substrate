@@ -7,10 +7,10 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
+import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -24,22 +24,6 @@ public class ValueReferenceNode extends ExpressionNode {
     private boolean isLambdaArgument = false;
     private boolean isLocal = false;
 
-    public void setLocal(boolean local) {
-        isLocal = local;
-    }
-
-    public boolean isLocal() {
-        return isLocal;
-    }
-
-    public void setLambdaArgument(boolean lambdaArgument) {
-        isLambdaArgument = lambdaArgument;
-    }
-
-    public boolean isLambdaArgument() {
-        return isLambdaArgument;
-    }
-
     public ValueReferenceNode(Token id, Signature signature) {
         this.id = id;
         this.signature = signature;
@@ -48,6 +32,22 @@ public class ValueReferenceNode extends ExpressionNode {
     public ValueReferenceNode(String id, Signature signature) {
         this.id = new Token(id, TokenType.IDENTIFIER, Position.getNull());
         this.signature = signature;
+    }
+
+    public boolean isLocal() {
+        return isLocal;
+    }
+
+    public void setLocal(boolean local) {
+        isLocal = local;
+    }
+
+    public boolean isLambdaArgument() {
+        return isLambdaArgument;
+    }
+
+    public void setLambdaArgument(boolean lambdaArgument) {
+        isLambdaArgument = lambdaArgument;
     }
 
     @Override

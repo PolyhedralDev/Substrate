@@ -24,16 +24,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipOutputStream;
 
 public class LambdaFactory implements Opcodes {
+    private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
+    private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
     private final Map<Signature, Map<Signature, Tuple2<ClassBuilder, AtomicInteger>>> generated = new HashMap<>();
     private final java.util.List<ClassBuilder> implementations = new ArrayList<>();
-
     private final DynamicClassLoader classLoader;
     private final TupleFactory tupleFactory;
-
-    private static final String IMPL_ARG_CLASS_NAME = ImplementationArguments.class.getCanonicalName().replace('.', '/');
-
-    private static final String LAMBDA_NAME = CompilerUtil.internalName(Lambda.class);
-
     private final ClassBuilder classBuilder;
 
     private final ZipOutputStream zipOutputStream;

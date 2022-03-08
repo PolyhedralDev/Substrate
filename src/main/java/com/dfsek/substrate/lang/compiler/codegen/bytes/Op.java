@@ -9,19 +9,18 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import static org.objectweb.asm.Opcodes.*;
 
+import static org.objectweb.asm.Opcodes.*;
 
 
 public interface Op {
     static Either<CompileError, Op> iinc(int lv, int inc) {
         return Either.right(visitor -> visitor.visitIincInsn(lv, inc));
     }
+
     static Either<CompileError, Op> arrayLength() {
         return insn(ARRAYLENGTH);
     }
-
-    void apply(MethodVisitor visitor);
 
     static Either<CompileError, Op> insn(int insn) {
         return Either.right(insnUnwrapped(insn));
@@ -163,11 +162,11 @@ public interface Op {
         return insn(INEG);
     }
 
-    // double arithmetic
-
     static Either<CompileError, Op> dAdd() {
         return insn(DADD);
     }
+
+    // double arithmetic
 
     static Either<CompileError, Op> dSub() {
         return insn(DSUB);
@@ -189,21 +188,21 @@ public interface Op {
         return insn(DNEG);
     }
 
-    // casts
-
     static Either<CompileError, Op> i2d() {
         return insn(I2D);
     }
+
+    // casts
 
     static Either<CompileError, Op> d2i() {
         return insn(D2I);
     }
 
-    // load insns
-
     static Either<CompileError, Op> iLoad(int i) {
         return varInsn(ILOAD, i);
     }
+
+    // load insns
 
     static Either<CompileError, Op> dLoad(int i) {
         return varInsn(DLOAD, i);
@@ -319,7 +318,7 @@ public interface Op {
     }
 
     static Either<CompileError, Op> pop(Signature signature) {
-        if(signature.equals(Signature.decimal())) return pop2();
+        if (signature.equals(Signature.decimal())) return pop2();
         return pop();
     }
 
@@ -332,7 +331,7 @@ public interface Op {
     }
 
     static Either<CompileError, Op> dup(Signature signature) {
-        if(signature.equals(Signature.decimal())) return dup2();
+        if (signature.equals(Signature.decimal())) return dup2();
         return dup();
     }
 
@@ -348,6 +347,7 @@ public interface Op {
     static Either<CompileError, Op> aNewArray(String type) {
         return typeInsn(ANEWARRAY, type);
     }
+
     static Either<CompileError, Op> error(String message, Position position) {
         return Either.left(errorUnwrapped(message, position));
     }
@@ -367,6 +367,9 @@ public interface Op {
     }
 
     static Either<CompileError, Op> nothing() {
-        return Either.right(v -> {});
+        return Either.right(v -> {
+        });
     }
+
+    void apply(MethodVisitor visitor);
 }

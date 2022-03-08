@@ -12,6 +12,11 @@ public class PrimitiveValue implements Value {
     private final Signature reference;
     private final int offset;
 
+    public PrimitiveValue(Signature reference, int offset) {
+        this.reference = reference;
+        this.offset = offset;
+    }
+
     @Override
     public List<Either<CompileError, Op>> load(BuildData data) {
         return List.of(reference
@@ -20,11 +25,6 @@ public class PrimitiveValue implements Value {
                         s -> Op.errorUnwrapped(s, Position.getNull()),
                         load -> Op.varInsnUnwrapped(load, offset)
                 ));
-    }
-
-    public PrimitiveValue(Signature reference, int offset) {
-        this.reference = reference;
-        this.offset = offset;
     }
 
     @Override

@@ -8,8 +8,8 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -26,7 +26,7 @@ public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
 
     @Override
     public ExpressionNode simplify() {
-        if(Node.disableOptimisation()) return this;
+        if (Node.disableOptimisation()) return this;
         if (value instanceof IntegerNode) {
             return new DecimalNode(((IntegerNode) value).getValue(), value.getPosition());
         }

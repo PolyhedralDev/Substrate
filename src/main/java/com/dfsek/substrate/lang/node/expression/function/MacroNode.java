@@ -8,8 +8,8 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -32,7 +32,7 @@ public class MacroNode extends ExpressionNode {
         }
 
         return macro.prepare()
-                        .appendAll(macro.invoke(data, argSignature, args));
+                .appendAll(macro.invoke(data, argSignature, args));
     }
 
     @Override

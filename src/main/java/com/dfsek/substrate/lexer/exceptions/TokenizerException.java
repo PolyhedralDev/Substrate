@@ -1,8 +1,8 @@
 package com.dfsek.substrate.lexer.exceptions;
 
 
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.exception.ParseException;
 
 public abstract class TokenizerException extends ParseException {
 

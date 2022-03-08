@@ -18,13 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Parser {
-    private final Lexer lexer;
-    private final Rule base;
-    private final ScriptBuilder builder = new ScriptBuilder();
-    private final ParserScope scope = new ParserScope();
-
-    private final ParseData data = new ParseData();
-
     private static final Map<String, StaticFunction> STATIC_FUNCTIONS = new LinkedHashMap<>();
 
     static {
@@ -77,6 +70,12 @@ public class Parser {
             throw new IllegalStateException(e);
         }
     }
+
+    private final Lexer lexer;
+    private final Rule base;
+    private final ScriptBuilder builder = new ScriptBuilder();
+    private final ParserScope scope = new ParserScope();
+    private final ParseData data = new ParseData();
 
     public Parser(String data, Rule base) throws ParseException {
         lexer = new Lexer(data);

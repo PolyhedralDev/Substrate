@@ -25,9 +25,9 @@ public class NotEqualsNode extends ComparisonBinaryNode {
     @Override
     protected List<Either<CompileError, Op>> applyStrComparison() {
         return List.of(Op.invokeVirtual("java/lang/String",
-                "equals",
-                "(Ljava/lang/Object;)Z"))
-                        .appendAll(Op.invertBoolean());
+                        "equals",
+                        "(Ljava/lang/Object;)Z"))
+                .appendAll(Op.invertBoolean());
     }
 
     @Override

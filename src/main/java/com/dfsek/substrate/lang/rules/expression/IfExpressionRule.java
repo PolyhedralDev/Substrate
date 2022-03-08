@@ -12,12 +12,12 @@ import com.dfsek.substrate.lang.node.expression.IfExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaInvocationNode;
 import com.dfsek.substrate.lang.rules.BlockRule;
+import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -27,6 +27,10 @@ import java.util.Collections;
 
 public class IfExpressionRule implements Rule {
     private static final IfExpressionRule INSTANCE = new IfExpressionRule();
+
+    public static IfExpressionRule getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
@@ -78,9 +82,5 @@ public class IfExpressionRule implements Rule {
         }
 
         return new IfExpressionNode(predicate, caseTrueNode, caseFalseNode);
-    }
-
-    public static IfExpressionRule getInstance() {
-        return INSTANCE;
     }
 }
