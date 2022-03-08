@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
+import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.parser.Parser;
@@ -38,47 +39,15 @@ public class SubstrateTests {
         System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));
     }
 
-    private Parser createParser(String script) {
+    private Parser createParser(String script) throws NoSuchMethodException {
         Parser parser = new Parser(script, new BaseRule());
-        parser.registerFunction("fail", new com.dfsek.substrate.lang.compiler.api.Function() {
-            @Override
-            public Signature arguments() {
-                return Signature.empty();
-            }
-
-            @Override
-            public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
-                return List.of(Op.invokeStatic(
-                        CompilerUtil.internalName(Assertions.class),
-                        "fail",
-                        "()V"));
-            }
-
-            @Override
-            public Signature reference() {
-                return Signature.fun();
-            }
-        });
-        parser.registerFunction("assert", new com.dfsek.substrate.lang.compiler.api.Function() {
-            @Override
-            public Signature arguments() {
-                return Signature.bool();
-            }
-
-            @Override
-            public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
-                return List.of(Op.invokeStatic(
-                        CompilerUtil.internalName(Assertions.class),
-                        "assertTrue",
-                        "(Z)V"));
-            }
-
-            @Override
-            public Signature reference() {
-                return Signature.fun().applyGenericArgument(0, Signature.bool());
-            }
-        });
+        parser.registerFunction("fail", new StaticFunction(SubstrateTests.class.getMethod("fail")));
+        parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;
+    }
+
+    public static void fail() {
+        Assertions.fail();
     }
 
     @TestFactory
