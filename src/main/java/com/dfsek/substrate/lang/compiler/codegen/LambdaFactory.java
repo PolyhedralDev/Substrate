@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipOutputStream;
 
 public class LambdaFactory implements Opcodes {
-    private final Map<Signature, Map<Signature, Pair<ClassBuilder, AtomicInteger>>> generated = new HashMap<>();
+    private final Map<Signature, Map<Signature, Tuple2<ClassBuilder, AtomicInteger>>> generated = new HashMap<>();
     private final java.util.List<ClassBuilder> implementations = new ArrayList<>();
 
     private final DynamicClassLoader classLoader;
@@ -46,7 +46,7 @@ public class LambdaFactory implements Opcodes {
         this.zipOutputStream = zipOutputStream;
     }
 
-    public Pair<ClassBuilder, AtomicInteger> generate(Signature args, Signature returnType) {
+    public Tuple2<ClassBuilder, AtomicInteger> generate(Signature args, Signature returnType) {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
             String endName = "Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
@@ -63,25 +63,25 @@ public class LambdaFactory implements Opcodes {
 
             classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
-            return Pair.of(builder, new AtomicInteger(0));
+            return new Tuple2<>(builder, new AtomicInteger(0));
         });
     }
 
     public Either<CompileError, Op> invoke(Signature args, Signature ret, BuildData data) {
-        return Op.invokeInterface(generate(args, ret).getLeft().getName(),
+        return Op.invokeInterface(generate(args, ret)._1.getName(),
                 "apply",
                 "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + CompilerUtil.buildReturnType(data, ret));
     }
 
     public Tuple2<List<CompileError>, ClassBuilder> implement(Signature args, Signature returnType, Signature scope, Function1<ClassBuilder, List<Either<CompileError, Op>>> supplier) {
-        Pair<ClassBuilder, AtomicInteger> pair = generate(args, returnType);
+        Tuple2<ClassBuilder, AtomicInteger> pair = generate(args, returnType);
 
-        String endName = "IM" + pair.getRight().getAndIncrement();
+        String endName = "IM" + pair._2.getAndIncrement();
         String name = classBuilder.getName() + "$Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor() + "$" + endName;
 
-        pair.getLeft().inner(name, pair.getLeft().getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
+        pair._1.inner(name, pair._1.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
-        ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair.getLeft().getName()));
+        ClassBuilder builder = new ClassBuilder(name, CompilerUtil.internalName(pair._1.getName()));
 
         MethodVisitor constructor = builder.method("<init>",
                 "(" + scope.internalDescriptor() + ")V", Access.PUBLIC);
@@ -130,7 +130,7 @@ public class LambdaFactory implements Opcodes {
     }
 
     void buildAll() {
-        generated.forEach((sig, map) -> map.forEach((sig2, pair) -> pair.getLeft().build(classLoader, zipOutputStream)));
+        generated.forEach((sig, map) -> map.forEach((sig2, pair) -> pair._1.build(classLoader, zipOutputStream)));
         implementations.forEach(impl -> impl.build(classLoader, zipOutputStream));
     }
 }
