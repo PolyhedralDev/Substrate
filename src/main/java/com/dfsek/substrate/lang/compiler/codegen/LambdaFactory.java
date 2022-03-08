@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.Pair;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;

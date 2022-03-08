@@ -5,13 +5,11 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.util.Pair;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import static io.vavr.API.*;
