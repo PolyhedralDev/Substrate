@@ -4,10 +4,9 @@ import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.codegen.LambdaFactory;
 import com.dfsek.substrate.lang.compiler.codegen.TupleFactory;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
-import com.dfsek.substrate.util.Pair;
+import io.vavr.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class BuildData {
 
     private final Map<String, Value> values;
     private final Map<String, Macro> macros;
-    private final Map<Pair<BuildData, String>, Integer> valueOffsets;
+    private final Map<Tuple2<BuildData, String>, Integer> valueOffsets;
 
     private final BuildData parent;
     private final DynamicClassLoader classLoader;
@@ -49,7 +48,7 @@ public class BuildData {
                       TupleFactory tupleFactory,
                       LambdaFactory lambdaFactory,
                       Map<String, Value> values,
-                      Map<String, Macro> macros, Map<Pair<BuildData, String>, Integer> valueOffsets,
+                      Map<String, Macro> macros, Map<Tuple2<BuildData, String>, Integer> valueOffsets,
                       BuildData parent,
                       String name, int offset, int implArgsOffset) {
         this.classLoader = classLoader;
@@ -77,12 +76,12 @@ public class BuildData {
         if (values.containsKey(id))
             throw new IllegalArgumentException("Value with identifier \"" + id + "\" already registered.");
         values.put(id, value);
-        valueOffsets.put(Pair.of(this, id), offset);
+        valueOffsets.put(new Tuple2<>(this, id), offset);
     }
 
     public void registerUnchecked(String id, Value value) {
         values.put(id, value);
-        valueOffsets.put(Pair.of(this, id), offset);
+        valueOffsets.put(new Tuple2<>(this, id), offset);
     }
 
     public String getClassName() {
@@ -94,8 +93,10 @@ public class BuildData {
         offset += frames;
     }
 
-    public void offsetInc(int offset) {
+    public int offsetInc(int offset) {
+        int o = this.offset;
         this.offset += offset;
+        return o;
     }
 
     public int getOffset() {
@@ -117,9 +118,9 @@ public class BuildData {
         if (!values.containsKey(id)) throw new IllegalArgumentException("No such value \"" + id + "\"");
 
         BuildData test = this;
-        while (!valueOffsets.containsKey(Pair.of(test, id))) test = test.parent;
+        while (!valueOffsets.containsKey(new Tuple2<>(test, id))) test = test.parent;
 
-        return valueOffsets.get(Pair.of(test, id));
+        return valueOffsets.get(new Tuple2<>(test, id));
     }
 
     public boolean valueExists(String id) {
@@ -149,7 +150,7 @@ public class BuildData {
                 classWriter.getName(), 2, 1);
     }
 
-    public void loadImplementationArguments(MethodBuilder visitor) {
-        visitor.aLoad(implArgsOffset);
+    public int getImplArgsOffset() {
+        return implArgsOffset;
     }
 }

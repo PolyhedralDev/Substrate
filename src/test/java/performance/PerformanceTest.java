@@ -2,11 +2,14 @@ package performance;
 
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 
@@ -24,11 +27,11 @@ public class PerformanceTest {
             }
 
             @Override
-            public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
-                visitor.invokeStatic(
+            public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
+                return List.of(Op.invokeStatic(
                         CompilerUtil.internalName(Assertions.class),
                         "assertTrue",
-                        "(Z)V");
+                        "(Z)V"));
             }
 
             @Override

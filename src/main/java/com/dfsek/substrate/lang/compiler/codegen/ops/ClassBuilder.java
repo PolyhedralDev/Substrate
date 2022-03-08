@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +12,7 @@ import java.util.function.Consumer;
 import java.util.zip.ZipOutputStream;
 
 @SuppressWarnings("UnusedReturnValue")
-public class ClassBuilder {
-    private final List<MethodBuilder> methods = new ArrayList<>();
+public class ClassBuilder implements Opcodes {
     private final List<Consumer<ClassWriter>> fields = new ArrayList<>();
     private final ClassWriter classWriter;
     private static final String[] EMPTY = new String[0];
@@ -32,49 +32,59 @@ public class ClassBuilder {
     }
 
     public ClassBuilder defaultConstructor() {
-        method("<init>", "()V").access(MethodBuilder.Access.PUBLIC)
-                .aLoad(0)
-                .invokeSpecial("java/lang/Object",
-                        "<init>",
-                        "()V")
-                .voidReturn();
-
+        MethodVisitor ctor = method("<init>", "()V", Access.PUBLIC);
+        ctor.visitCode();
+        ctor.visitVarInsn(ALOAD, 0);
+        ctor.visitMethodInsn(INVOKESPECIAL,
+                "java/lang/Object",
+                "<init>",
+                "()V",
+                false);
+        ctor.visitInsn(RETURN);
+        ctor.visitMaxs(0, 0);
         return this;
     }
 
-    public ClassBuilder inner(String name, String outerName, String innerName, MethodBuilder.Access... accesses) {
+    public ClassBuilder inner(String name, String outerName, String innerName, Access... accesses) {
         int access = 0;
 
-        for (MethodBuilder.Access level : accesses) {
+        for (Access level : accesses) {
             access |= level.getCode();
         }
         classWriter.visitInnerClass(name, outerName, innerName, access);
         return this;
     }
 
-    public MethodBuilder method(String name, String descriptor) {
-        return method(name, descriptor, null, EMPTY);
+    public MethodVisitor method(String name, String descriptor, Access... accesses) {
+        return method(name, descriptor, null, EMPTY, accesses);
     }
 
-    public MethodBuilder method(String name, String descriptor, String signature, String... exceptions) {
-        MethodBuilder builder = new MethodBuilder(this, name, descriptor, signature, exceptions);
-        methods.add(builder);
-        return builder;
+    public MethodVisitor method(String name, String descriptor, String signature, String[] exceptions, Access... accesses) {
+        int access = 0;
+
+        for (Access level : accesses) {
+            access |= level.getCode();
+        }
+        return classWriter.visitMethod(access,
+                name,
+                descriptor,
+                signature,
+                exceptions);
     }
 
 
-    public ClassBuilder field(String name, String descriptor, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, Access... accesses) {
         return field(name, descriptor, null, null, accesses);
     }
 
-    public ClassBuilder field(String name, String descriptor, Object value, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, Object value, Access... accesses) {
         return field(name, descriptor, null, value, accesses);
     }
 
-    public ClassBuilder field(String name, String descriptor, String signature, Object value, MethodBuilder.Access... accesses) {
+    public ClassBuilder field(String name, String descriptor, String signature, Object value, Access... accesses) {
         int access = 0;
 
-        for (MethodBuilder.Access level : accesses) {
+        for (Access level : accesses) {
             access |= level.getCode();
         }
 
@@ -84,17 +94,6 @@ public class ClassBuilder {
     }
 
     public Class<?> build(DynamicClassLoader loader, final ZipOutputStream zipOutputStream) {
-        methods.forEach(methodBuilder -> {
-            MethodVisitor visitor = classWriter.visitMethod(methodBuilder.access(),
-                    methodBuilder.getName(),
-                    methodBuilder.getDescriptor(),
-                    methodBuilder.getSignature(),
-                    methodBuilder.getExceptions());
-            visitor.visitCode();
-            methodBuilder.apply(visitor);
-            visitor.visitMaxs(0, 0);
-        });
-
         fields.forEach(consumer -> consumer.accept(classWriter));
         byte[] bytes = classWriter.toByteArray();
         Class<?> clazz = loader.defineClass(name.replace('/', '.'), bytes);

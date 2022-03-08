@@ -2,13 +2,16 @@ package com.dfsek.substrate.lang.node.expression.cast;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
     public NumToIntCastNode(Token type, ExpressionNode value) {
@@ -16,9 +19,9 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
     }
 
     @Override
-    public void applyCast(MethodBuilder visitor, BuildData data) {
+    public List<Either<CompileError, Op>> applyCast(BuildData data) {
         ParserUtil.checkReturnType(value, Signature.decimal());
-        visitor.d2i();
+        return List.of(Op.d2i());
     }
 
     @Override

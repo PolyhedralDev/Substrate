@@ -6,15 +6,14 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ReturnNode;
+import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
+import io.vavr.collection.List;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockRule implements Rule {
 
@@ -26,9 +25,9 @@ public class BlockRule implements Rule {
 
     @Override
     public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
-        List<Node> contents = new ArrayList<>();
+        List<Node> contents = List.empty();
 
-        List<ReturnNode> ret = new ArrayList<>();
+        List<ReturnNode> ret = List.empty();
 
         Position begin = lexer.peek().getPosition();
         ParserUtil.checkType(lexer.consume(), TokenType.BLOCK_BEGIN); // Block beginning
@@ -37,15 +36,15 @@ public class BlockRule implements Rule {
 
         while (lexer.peek().getType() != TokenType.BLOCK_END) {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
-                contents.add(this.assemble(lexer, data, sub));
+                contents = contents.append(this.assemble(lexer, data, sub));
             } else if (lexer.peek().isIdentifier()
                     || lexer.peek().getType() == TokenType.GROUP_BEGIN
                     || lexer.peek().getType() == TokenType.IF) { // Parse a statement.
-                contents.add(StatementRule.getInstance().assemble(lexer, data, sub));
+                contents = contents.append(StatementRule.getInstance().assemble(lexer, data, sub));
             } else if (lexer.peek().getType() == TokenType.RETURN) { // Parse a return
                 ReturnNode returnNode = ReturnRule.getInstance().assemble(lexer, data, sub);
-                ret.add(returnNode);
-                contents.add(returnNode);
+                ret = ret.append(returnNode);
+                contents = contents.append(returnNode);
             } else {
                 throw new ParseException("Unexpected token: " + lexer.peek(), lexer.consume().getPosition());
             }

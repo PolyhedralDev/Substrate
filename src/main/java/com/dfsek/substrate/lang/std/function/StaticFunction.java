@@ -2,14 +2,15 @@ package com.dfsek.substrate.lang.std.function;
 
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StaticFunction implements Function {
     private final String owner, name;
@@ -62,9 +63,9 @@ public class StaticFunction implements Function {
     }
 
     @Override
-    public void invoke(MethodBuilder visitor, BuildData data, Signature args) {
+    public List<Either<CompileError, Op>> invoke(BuildData data, Signature args) {
         String r = ret.equals(Signature.empty()) ? "V" : ret.internalDescriptor();
-        visitor.invokeStatic(owner, name, "(" + args.internalDescriptor() + ")" + r);
+        return List.of(Op.invokeStatic(owner, name, "(" + args.internalDescriptor() + ")" + r));
     }
 
     @Override

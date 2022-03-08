@@ -13,6 +13,8 @@ import com.dfsek.substrate.lexer.token.TokenType;
 import java.io.StringReader;
 import java.util.*;
 
+import static io.vavr.API.*;
+
 public class Lexer {
     public static final Set<Character> syntaxSignificant;
 
@@ -75,6 +77,26 @@ public class Lexer {
         return cache.size() != 0 && cache.get(0) != null;
     }
 
+    private Match.Case<Char, Token> match(String match, TokenType tokenType) {
+        return Case($(c -> reader.matches(match, true)), c ->
+                new Token(match, tokenType, reader.getPosition()));
+    }
+
+    private Match.Case<Char, Token> charMatch(char match, TokenType tokenType) {
+        return Case($(c -> c.getCharacter() == match), c ->
+                new Token("" + reader.consume(), tokenType, reader.getPosition()));
+    }
+
+    private Match.Case<String, Token> literalMatch(io.vavr.collection.Set<String> literal, TokenType tokenType) {
+        return Case($(s -> literal.toStream().find(s::equals).isDefined()), s ->
+                new Token(s, tokenType, reader.getPosition()));
+    }
+
+    private Match.Case<String, Token> literalMatch(String  literal, TokenType tokenType) {
+        return Case($(literal::equals), s ->
+                new Token(s, tokenType, reader.getPosition()));
+    }
+
     private Token fetch() throws TokenizerException {
         while (!reader.current().isEOF() && reader.current().isWhitespace()) {
             reader.consume();
@@ -88,162 +110,104 @@ public class Lexer {
             skipTo("*/"); // Skip multi line comment
         }
 
-        if (reader.current().isEOF()) {
-            return null; // EOF
-        }
+        return Match(reader.current()).of(
+                Case($(Char::isEOF), c -> null),
+                Case($(c -> isNumberStart()), c -> parseNumber()),
+                Case($(c -> c.is('"')), c -> parseString()),
+                match("->", TokenType.ARROW),
+                match("..", TokenType.RANGE),
 
-        if (reader.matches("==", true)) {
-            return new Token("==", TokenType.EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches("!=", true)) {
-            return new Token("!=", TokenType.NOT_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches(">=", true)) {
-            return new Token(">=", TokenType.GREATER_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches("<=", true)) {
-            return new Token("<=", TokenType.LESS_THAN_OR_EQUALS_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches(">", true)) {
-            return new Token(">", TokenType.GREATER_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches("<", true)) {
-            return new Token("<", TokenType.LESS_THAN_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-        }
+                match("==", TokenType.EQUALS_OPERATOR),
+                match("!=", TokenType.NOT_EQUALS_OPERATOR),
+                match(">=", TokenType.GREATER_THAN_OR_EQUALS_OPERATOR),
+                match("<=", TokenType.LESS_THAN_OR_EQUALS_OPERATOR),
+                charMatch('>', TokenType.GREATER_THAN_OPERATOR),
+                charMatch('<', TokenType.LESS_THAN_OPERATOR),
 
+                match("||", TokenType.BOOLEAN_OR),
+                match("&&", TokenType.BOOLEAN_AND),
+                match("!", TokenType.BOOLEAN_NOT),
 
-        if (reader.matches("||", true)) {
-            return new Token("||", TokenType.BOOLEAN_OR, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (reader.matches("&&", true)) {
-            return new Token("&&", TokenType.BOOLEAN_AND, new Position(reader.getLine(), reader.getIndex()));
-        }
+                charMatch('+', TokenType.ADDITION_OPERATOR),
+                charMatch('-', TokenType.SUBTRACTION_OPERATOR),
+                charMatch('/', TokenType.DIVISION_OPERATOR),
+                charMatch('*', TokenType.MULTIPLICATION_OPERATOR),
+                charMatch('%', TokenType.MODULO_OPERATOR),
 
-        if (reader.matches("->", true)) {
-            return new Token("->", TokenType.ARROW, new Position(reader.getLine(), reader.getIndex()));
-        }
+                charMatch('(', TokenType.GROUP_BEGIN),
+                charMatch(')', TokenType.GROUP_END),
 
-        if (reader.matches("..", true)) {
-            return new Token("..", TokenType.RANGE, new Position(reader.getLine(), reader.getIndex()));
-        }
+                charMatch('[', TokenType.LIST_BEGIN),
+                charMatch(']', TokenType.LIST_END),
 
+                charMatch('{', TokenType.BLOCK_BEGIN),
+                charMatch('}', TokenType.BLOCK_END),
 
-        if (isNumberStart()) {
-            StringBuilder num = new StringBuilder();
-            while (!reader.current().isEOF() && isNumberLike()) {
-                num.append(reader.consume());
-            }
-            String number = num.toString();
-            if (number.contains(".")) {
-                return new Token(num.toString(), TokenType.NUMBER, new Position(reader.getLine(), reader.getIndex()));
-            } else {
-                return new Token(num.toString(), TokenType.INT, new Position(reader.getLine(), reader.getIndex()));
-            }
-        }
+                charMatch(';', TokenType.STATEMENT_END),
+                charMatch(',', TokenType.SEPARATOR),
 
-        if (reader.current().is('"')) {
-            reader.consume(); // Consume first quote
-            StringBuilder string = new StringBuilder();
-            boolean ignoreNext = false;
-            while ((!reader.current().is('"')) || ignoreNext) {
-                if (reader.current().is('\\') && !ignoreNext) {
-                    ignoreNext = true;
-                    reader.consume();
-                    continue;
-                } else ignoreNext = false;
-                if (reader.current().isEOF())
-                    throw new FormatException("No end of string literal found. ", new Position(reader.getLine(), reader.getIndex()));
-                string.append(reader.consume());
-            }
-            reader.consume(); // Consume last quote
+                charMatch('=', TokenType.ASSIGNMENT),
+                charMatch(':', TokenType.TYPE),
+                Case($(), c -> Match(parseWord()).of(
+                        literalMatch(Set("true", "false"), TokenType.BOOLEAN),
 
-            return new Token(string.toString(), TokenType.STRING, new Position(reader.getLine(), reader.getIndex()));
-        }
+                        literalMatch("return", TokenType.RETURN),
 
-        switch (reader.current().getCharacter()) {
-            case '(':
-                return new Token(reader.consume().toString(), TokenType.GROUP_BEGIN, new Position(reader.getLine(), reader.getIndex()));
-            case ')':
-                return new Token(reader.consume().toString(), TokenType.GROUP_END, new Position(reader.getLine(), reader.getIndex()));
-            case ';':
-                return new Token(reader.consume().toString(), TokenType.STATEMENT_END, new Position(reader.getLine(), reader.getIndex()));
-            case ',':
-                return new Token(reader.consume().toString(), TokenType.SEPARATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '{':
-                return new Token(reader.consume().toString(), TokenType.BLOCK_BEGIN, new Position(reader.getLine(), reader.getIndex()));
-            case '}':
-                return new Token(reader.consume().toString(), TokenType.BLOCK_END, new Position(reader.getLine(), reader.getIndex()));
-            case '=':
-                return new Token(reader.consume().toString(), TokenType.ASSIGNMENT, new Position(reader.getLine(), reader.getIndex()));
-            case '+':
-                return new Token(reader.consume().toString(), TokenType.ADDITION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '-':
-                return new Token(reader.consume().toString(), TokenType.SUBTRACTION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '*':
-                return new Token(reader.consume().toString(), TokenType.MULTIPLICATION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '/':
-                return new Token(reader.consume().toString(), TokenType.DIVISION_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '%':
-                return new Token(reader.consume().toString(), TokenType.MODULO_OPERATOR, new Position(reader.getLine(), reader.getIndex()));
-            case '!':
-                return new Token(reader.consume().toString(), TokenType.BOOLEAN_NOT, new Position(reader.getLine(), reader.getIndex()));
-            case ':':
-                return new Token(reader.consume().toString(), TokenType.TYPE, new Position(reader.getLine(), reader.getIndex()));
-            case '[':
-                return new Token(reader.consume().toString(), TokenType.LIST_BEGIN, new Position(reader.getLine(), reader.getIndex()));
-            case ']':
-                return new Token(reader.consume().toString(), TokenType.LIST_END, new Position(reader.getLine(), reader.getIndex()));
-        }
+                        literalMatch("num", TokenType.NUM_TYPE),
+                        literalMatch("int", TokenType.INT_TYPE),
+                        literalMatch("bool", TokenType.BOOL_TYPE),
+                        literalMatch("str", TokenType.STRING_TYPE),
+                        literalMatch("fun", TokenType.FUN_TYPE),
+                        literalMatch("list", TokenType.LIST_TYPE),
 
+                        literalMatch("if", TokenType.IF),
+                        literalMatch("else", TokenType.ELSE),
 
+                        Case($(), s -> new Token(s, TokenType.IDENTIFIER, reader.getPosition()))
+                ))
+        );
+    }
+
+    private String parseWord() {
         StringBuilder token = new StringBuilder();
         while (!reader.current().isEOF() && !isSyntaxSignificant(reader.current().getCharacter())) {
             Char c = reader.consume();
             if (c.isWhitespace()) break;
             token.append(c);
         }
+        return token.toString();
+    }
 
-        String tokenString = token.toString();
+    private Token parseNumber() {
+        StringBuilder num = new StringBuilder();
+        while (!reader.current().isEOF() && isNumberLike()) {
+            num.append(reader.consume());
+        }
+        String number = num.toString();
+        if (number.contains(".")) {
+            return new Token(num.toString(), TokenType.NUMBER, new Position(reader.getLine(), reader.getIndex()));
+        } else {
+            return new Token(num.toString(), TokenType.INT, new Position(reader.getLine(), reader.getIndex()));
+        }
+    }
 
-        if (tokenString.equals("true")) {
-            return new Token(tokenString, TokenType.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
+    private Token parseString() {
+        reader.consume(); // Consume first quote
+        StringBuilder string = new StringBuilder();
+        boolean ignoreNext = false;
+        while ((!reader.current().is('"')) || ignoreNext) {
+            if (reader.current().is('\\') && !ignoreNext) {
+                ignoreNext = true;
+                reader.consume();
+                continue;
+            } else ignoreNext = false;
+            if (reader.current().isEOF())
+                throw new FormatException("No end of string literal found. ", new Position(reader.getLine(), reader.getIndex()));
+            string.append(reader.consume());
         }
-        if (tokenString.equals("false")) {
-            return new Token(tokenString, TokenType.BOOLEAN, new Position(reader.getLine(), reader.getIndex()));
-        }
+        reader.consume(); // Consume last quote
 
-        if (tokenString.equals("return")) {
-            return new Token(tokenString, TokenType.RETURN, new Position(reader.getLine(), reader.getIndex()));
-        }
-
-        if (tokenString.equals("num")) {
-            return new Token(tokenString, TokenType.NUM_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("int")) {
-            return new Token(tokenString, TokenType.INT_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("bool")) {
-            return new Token(tokenString, TokenType.BOOL_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("str")) {
-            return new Token(tokenString, TokenType.STRING_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("fun")) {
-            return new Token(tokenString, TokenType.FUN_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("list")) {
-            return new Token(tokenString, TokenType.LIST_TYPE, new Position(reader.getLine(), reader.getIndex()));
-        }
-
-        if (tokenString.equals("if")) {
-            return new Token(tokenString, TokenType.IF, new Position(reader.getLine(), reader.getIndex()));
-        }
-        if (tokenString.equals("else")) {
-            return new Token(tokenString, TokenType.ELSE, new Position(reader.getLine(), reader.getIndex()));
-        }
-
-
-        return new Token(tokenString, TokenType.IDENTIFIER, new Position(reader.getLine(), reader.getIndex()));
+        return new Token(string.toString(), TokenType.STRING, new Position(reader.getLine(), reader.getIndex()));
     }
 
     private boolean isNumberLike() {

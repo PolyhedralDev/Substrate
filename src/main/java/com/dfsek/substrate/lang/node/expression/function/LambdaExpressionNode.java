@@ -2,25 +2,34 @@ package com.dfsek.substrate.lang.node.expression.function;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.ThisReferenceValue;
-import com.dfsek.substrate.lang.node.expression.BlockNode;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.Pair;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
+import io.vavr.control.Either;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final List<Pair<String, Signature>> types;
+    private final List<Tuple2<String, Signature>> types;
     private final Set<String> closureIDs;
     private final Position start;
     private final Signature parameters;
@@ -30,23 +39,23 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Signature ref;
 
     private String self;
-    
-    private final Set<String> argRefs = new HashSet<>();
 
-    public LambdaExpressionNode(ExpressionNode content, List<Pair<String, Signature>> types, Position start, Signature returnType) {
+    private final Set<String> argRefs;
+
+    public LambdaExpressionNode(ExpressionNode content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
         this.content = content;
         this.types = types;
         this.start = start;
         this.returnType = returnType;
-        Signature signature = Signature.empty();
+        this.argRefs = argRefs;
 
-        this.closureIDs = new HashSet<>();
-        for (Pair<String, Signature> type : types) {
-            signature = signature.and(type.getRight());
-            closureIDs.add(type.getLeft());
-        }
-
-        this.parameters = signature;
+        Tuple2<HashSet<String>, Signature> parameterData = types
+                .foldLeft(
+                        new Tuple2<>(HashSet.empty(),
+                                Signature.empty()), (t, type) -> new Tuple2<>(t._1.add(type._1), t._2.and(type._2))
+                );
+        this.closureIDs = parameterData._1;
+        this.parameters = parameterData._2;
 
         this.ref = Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, parameters);
     }
@@ -56,86 +65,66 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        BuildData closureFinder = data.sub();
-
-        for (Pair<String, Signature> type : types) {
-            Signature signature = type.getRight();
-            closureFinder.registerUnchecked(type.getLeft(), new PrimitiveValue(signature, closureFinder.getOffset()));
-        }
-
-        List<Pair<String, Signature>> closureTypes = new ArrayList<>();
-
-        content.streamContents()
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        Stream<Tuple2<String, Signature>> closureTypes = content
+                .streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
                 .map(node -> (ValueReferenceNode) node)
-                .forEach(valueReferenceNode -> {
+                .flatMap(valueReferenceNode -> {
                     String id = valueReferenceNode.getId().getContent();
                     boolean isArg = argRefs.contains(id);
-                    if(!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
+                    if (!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
-                            closureTypes.add(
-                                    Pair.of(valueReferenceNode.getId().getContent(),
-                                            valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
-                            );
                             closureIDs.add(id);
+                            return List.of(new Tuple2<>(valueReferenceNode.getId().getContent(),
+                                    valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
+                            );
                         }
                     }
+                    return List.empty();
                 });
 
-        Signature closure = Signature.empty();
-        for (Pair<String, Signature> type : closureTypes) {
-            closure = closure.and(type.getRight());
-        }
+        Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
 
+        return data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
+                    BuildData delegate = data.sub(clazz);
 
-        String lambda = data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, methodBuilder -> {
-            BuildData delegate = data.sub(methodBuilder.classWriter());
+                    closureTypes.zipWithIndex()
+                            .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
+                            .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, delegate.offsetInc(argument._2().frames())))))
+                            .forEach(v -> delegate.registerUnchecked(v._1, v._2));
 
-            for (int i = 0; i < closureTypes.size(); i++) {
-                Pair<String, Signature> pair = closureTypes.get(i);
-                delegate.registerUnchecked(pair.getLeft(), new ShadowValue(pair.getRight(), i));
-            }
-            for (Pair<String, Signature> argument : types) {
-                delegate.registerUnchecked(argument.getLeft(), new PrimitiveValue(argument.getRight(), delegate.getOffset()));
-                delegate.offsetInc(argument.getRight().frames());
-            }
+                    if (self != null) {
+                        delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
+                    }
 
-            if (self != null) {
-                delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
-            }
-
-            ParserUtil.checkReferenceType(content, returnType).simplify().apply(methodBuilder, delegate);
-            if (!(content instanceof BlockNode)) {
-                if (returnType.isSimple()) {
-                    methodBuilder.insn(returnType.getType(0).returnInsn());
-                } else if (returnType.size() > 1) {
-                    methodBuilder.refReturn();
-                }
-            }
-        }).getName();
-
-        builder.newInsn(lambda)
-                .dup();
-
-        for (Pair<String, Signature> pair : closureTypes) {
-            if (pair.getLeft().equals(self)) continue; // dont load self into closure.
-            data.getValue(pair.getLeft()).load(builder, data);
-        }
-
-        builder.invokeSpecial(CompilerUtil.internalName(lambda),
-                "<init>",
-                "(" + closure.internalDescriptor() + ")V");
+                    return ParserUtil.checkReferenceType(content, returnType).simplify().apply(delegate)
+                            .append(returnType.retInsn()
+                                    .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
+                                    .map(Op::insnUnwrapped));
+                })
+                .apply((errors, clazz) -> errors
+                        .map((Function<CompileError, Either<CompileError, Op>>) Either::left)
+                        .append(Op.newInsn(clazz.getName()))
+                        .append(Op.dup())
+                        .appendAll(closureTypes
+                                .toStream()
+                                .flatMap(pair -> {
+                                    if (pair._1.equals(self))
+                                        return List.empty(); // dont load self into closure.
+                                    return data.getValue(pair._1).load(data);
+                                })
+                                .collect(Collectors.toList()))
+                        .append(Op.invokeSpecial(CompilerUtil.internalName(clazz.getName()),
+                                "<init>",
+                                "(" + closure.internalDescriptor() + ")V"))
+                );
     }
 
     @Override
     public Position getPosition() {
         return start;
-    }
-
-    public void addArgumentReference(String node) {
-        argRefs.add(node);
     }
 
     @Override

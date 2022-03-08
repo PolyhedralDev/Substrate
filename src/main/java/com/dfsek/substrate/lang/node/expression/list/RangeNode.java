@@ -2,11 +2,14 @@ package com.dfsek.substrate.lang.node.expression.list;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 
 import java.util.Arrays;
@@ -25,50 +28,48 @@ public class RangeNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        upper.simplify().apply(builder, data);
-
-        lower.simplify().apply(builder, data);
-        builder.dup();
-
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         int lowerRef = data.getOffset();
         data.offsetInc(1);
-        builder.iStore(lowerRef)
-                .iSub()
-                .dup();
+
         int totalRef = data.getOffset();
         data.offsetInc(1);
-
-        builder.iStore(totalRef);
-
-        builder.newArray(T_INT) // [ARef]
-                .pushInt(0); // [ARef, i]
 
         Label start = new Label();
         Label end = new Label();
 
-        builder.label(start)
+        return upper.simplify().apply(data)
+                .appendAll(lower.simplify().apply(data))
+                .append(Op.dup())
+                .append(Op.iStore(lowerRef))
+                .append(Op.iSub())
+                .append(Op.dup())
+                .append(Op.iStore(totalRef))
+                .append(Op.newArray(T_INT)) // [ARef]
+                .append(Op.pushInt(0)) // [ARef, i]
 
-                .dup() // [ARef, i, i]
-                .iLoad(totalRef)
-                .ifICmpGE(end) // [ARef, i]
+                // loop
+                .append(Op.label(start))
 
-                .dup2() // [ARef, i, ARef, i]
-                .dup() // [ARef, i, ARef, i, i]
+                .append(Op.dup()) // [ARef, i, i]
+                .append(Op.iLoad(totalRef))
+                .append(Op.ifICmpGE(end)) // [ARef, i]
 
-                .iLoad(lowerRef) // [ARef, i, ARef, i, i, size]
-                .iAdd() // [ARef, i, ARef, i, n]
+                .append(Op.dup2()) // [ARef, i, ARef, i]
+                .append(Op.dup()) // [ARef, i, ARef, i, i]
 
-                .iastore() // [ARef, i]
+                .append(Op.iLoad(lowerRef)) // [ARef, i, ARef, i, i, size]
+                .append(Op.iAdd()) // [ARef, i, ARef, i, n]
 
-                .pushInt(1) // [ARef, i, 1]
-                .iAdd() // [ARef, i]
+                .append(Op.iaStore()) // [Aref, i]
 
+                .append(Op.pushInt(1)) // [ARef, i, 1]
+                .append(Op.iAdd()) // [ARef, i]
 
-                .goTo(start)
+                .append(Op.goTo(start))
 
-                .label(end)
-                .pop(); // [ARef]
+                .append(Op.label(end))
+                .append(Op.pop());
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
-import com.dfsek.substrate.lang.std.function.Curry;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
@@ -83,7 +82,6 @@ public class Parser {
         lexer = new Lexer(data);
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
-        registerMacro("curry", new Curry());
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);
 

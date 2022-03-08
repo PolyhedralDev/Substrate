@@ -1,49 +1,46 @@
 package com.dfsek.substrate.lang.node.expression.list;
 
+import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.read.Position;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
-import java.util.List;
+import java.util.Collection;
+
 
 public class ListNode extends ExpressionNode {
-    private final List<ExpressionNode> elements;
+    private final List<Tuple2<ExpressionNode, Integer>> elements;
     private final Position position;
 
     public ListNode(List<ExpressionNode> elements, Position position) {
-        this.elements = elements;
+        this.elements = elements.zipWithIndex();
         this.position = position;
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        Signature signature = elements.get(0).reference();
-        elements.forEach(element -> ParserUtil.checkReferenceType(element, signature));
+    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        Signature signature = elements.get(0)._1.reference();
+        elements.forEach(element -> ParserUtil.checkReferenceType(element._1, signature));
 
-        builder.pushInt(elements.size());
-        Signature elementSignature = elements.get(0).reference();
-        if (elementSignature.isSimple()) {
-            elementSignature.getType(0).applyNewArray(builder, elementSignature);
-        } else {
-            builder.aNewArray(CompilerUtil.internalName(Tuple.class));
-        }
-
-        for (int i = 0; i < elements.size(); i++) {
-            builder.dup(); // duplicate reference for all elements.
-            builder.pushInt(i); // push index
-            elements.get(i).apply(builder, data); // apply value
-            if (elementSignature.isSimple()) {
-                builder.insn(elementSignature.getType(0).arrayStoreInsn());
-            } else {
-                builder.aastore();
-            }
-        }
+        return List.of(Op.pushInt(elements.size()))
+                .append(signature.newArrayInsn(position))
+                .appendAll(elements.flatMap(element ->
+                        List.of(Op.dup())
+                                .append(Op.pushInt(element._2))
+                                .appendAll(element._1.apply(data))
+                                .append(element._1.reference().arrayStoreInsn().bimap(
+                                        s -> Op.errorUnwrapped(s, element._1.getPosition()),
+                                        Op::insnUnwrapped
+                                )))
+                );
     }
 
     @Override
@@ -53,11 +50,11 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return Signature.list().applyGenericReturn(0, elements.get(0).reference());
+        return Signature.list().applyGenericReturn(0, elements.get(0)._1.reference());
     }
 
     @Override
-    public List<ExpressionNode> contents() {
-        return elements;
+    public Collection<? extends Node> contents() {
+        return elements.map(Tuple2::_1).asJava();
     }
 }

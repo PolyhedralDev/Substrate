@@ -1,11 +1,13 @@
 package com.dfsek.substrate.lang.compiler.type;
 
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
+import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
 public enum DataType implements Opcodes {
@@ -45,8 +47,8 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.newArray(T_INT);
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
+            return Op.newArray(T_INT);
         }
     },
     NUM {
@@ -85,8 +87,8 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.newArray(T_DOUBLE);
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
+            return Op.newArray(T_DOUBLE);
         }
     },
     STR {
@@ -101,8 +103,8 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.aNewArray("java/lang/String");
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
+            return Op.aNewArray("java/lang/String");
         }
     },
     BOOL {
@@ -141,8 +143,8 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.newArray(T_BOOLEAN);
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
+            return Op.newArray(T_BOOLEAN);
         }
     },
     FUN {
@@ -157,8 +159,8 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
-            visitor.aNewArray(CompilerUtil.internalName(Lambda.class));
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
+            return Op.aNewArray(CompilerUtil.internalName(Lambda.class));
         }
     },
     LIST {
@@ -173,10 +175,10 @@ public enum DataType implements Opcodes {
         }
 
         @Override
-        public void applyNewArray(MethodBuilder visitor, Signature generic) {
+        public Either<CompileError, Op> applyNewArray(Signature generic) {
             StringBuilder arr = new StringBuilder("[");
             nestArray(arr, generic);
-            visitor.aNewArray(arr.toString());
+            return Op.aNewArray(arr.toString());
         }
 
         private void nestArray(StringBuilder arr, Signature generic) {
@@ -245,5 +247,5 @@ public enum DataType implements Opcodes {
         return AALOAD;
     }
 
-    public abstract void applyNewArray(MethodBuilder visitor, Signature generic);
+    public abstract Either<CompileError, Op> applyNewArray(Signature generic);
 }

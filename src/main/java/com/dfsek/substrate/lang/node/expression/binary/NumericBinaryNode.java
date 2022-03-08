@@ -2,13 +2,16 @@ package com.dfsek.substrate.lang.node.expression.binary;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 public abstract class NumericBinaryNode extends BinaryOperationNode {
     public NumericBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
@@ -17,15 +20,17 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
 
 
     @Override
-    public void applyOp(MethodBuilder visitor, BuildData data) {
+    public List<Either<CompileError, Op>> applyOp(BuildData data) {
         Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal()).reference();
         ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal()).reference();
 
         ParserUtil.checkReturnType(right, leftType);
         if (leftType.equals(Signature.integer())) {
-            visitor.insn(intOp());
+            return List.of(Op.insn(intOp()));
         } else if (leftType.equals(Signature.decimal())) {
-            visitor.insn(doubleOp());
+            return List.of(Op.insn(doubleOp()));
+        } else {
+            throw new IllegalStateException("Non integer/decimal values in NumericBinaryNode");
         }
     }
 

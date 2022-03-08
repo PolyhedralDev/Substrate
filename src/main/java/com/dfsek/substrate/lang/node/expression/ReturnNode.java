@@ -2,10 +2,13 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,13 +24,15 @@ public class ReturnNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
-        if (value == null) builder.voidReturn();
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        if (value == null) return List.empty();
         else {
-            value.simplify().apply(builder, data);
             Signature ret = value.reference();
-            if (ret.size() == 1) builder.insn(ret.getType(0).returnInsn());
-            else builder.refReturn();
+            return value.simplify().apply(data)
+                    .append(ret
+                            .retInsn()
+                            .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))
+                            .map(Op::insnUnwrapped));
         }
     }
 

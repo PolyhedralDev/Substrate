@@ -7,39 +7,43 @@ import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.util.Pair;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
-public class ScriptBuilder {
+public class ScriptBuilder implements Opcodes {
     public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
     private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
     private static int builds = 0;
-    private final List<Node> ops = new ArrayList<>();
+    private List<Node> ops = List.empty();
 
     private final Map<String, Macro> macros = new HashMap<>();
 
-    private final List<Pair<String, Function>> functions = new ArrayList<>();
+    private List<Tuple2<String, Function>> functions = List.empty();
 
     public void addOperation(Node op) {
-        ops.add(op);
+        this.ops = ops.append(op); // todo: bad
     }
 
     public Script build(ParseData parseData) throws ParseException {
@@ -67,61 +71,78 @@ public class ScriptBuilder {
 
         // prepare functions.
 
-        MethodBuilder staticInitializer = builder.method("<clinit>", "()V")
-                .access(MethodBuilder.Access.PUBLIC)
-                .access(MethodBuilder.Access.STATIC);
+        MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
+        staticInitializer.visitCode();
 
+        for (Tuple2<String, Function> stringFunctionPair : functions) {
+            Function function = stringFunctionPair._2;
+            String functionName = "wrap$" + stringFunctionPair._1;
 
-        for (Pair<String, Function> stringFunctionPair : functions) {
-            Function function = stringFunctionPair.getRight();
-            String functionName = "wrap$" + stringFunctionPair.getLeft();
-
-            data.registerValue(stringFunctionPair.getLeft(), new FunctionValue(function, implementationClassName, functionName, () -> {
+            data.registerValue(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
                 BuildData separate = data.sub();
                 Signature ref = function.reference();
 
-                String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), (method) -> {
-                    function.prepare(method);
+                String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), clazz -> {
+                    List<Either<CompileError, Op>> ops = function.prepare();
                     Signature args = function.arguments();
                     int frame = 2;
                     for (int arg = 0; arg < args.size(); arg++) {
-                        method.varInsn(args.getType(arg).loadInsn(), frame);
+                        ops = ops.append(Op.varInsn(args.getType(arg).loadInsn(), frame));
                         frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
                     }
-                    function.invoke(method, separate, args);
                     Signature functionReturn = function.reference().getGenericReturn(0);
-                    if(functionReturn.equals(Signature.empty())) {
-                        method.voidReturn();
-                    } else {
-                        method.insn(functionReturn.getType(0).returnInsn());
-                    }
-                }).getName();
+                    return ops.appendAll(function.invoke(separate, args))
+                            .append(functionReturn.retInsn()
+                                    .mapLeft(m -> Op.errorUnwrapped(m, Position.getNull()))
+                                    .map(Op::insnUnwrapped));
+                })._2.getName();
 
                 builder.field(functionName,
                         "L" + delegate + ";",
-                        MethodBuilder.Access.PUBLIC, MethodBuilder.Access.STATIC, MethodBuilder.Access.STATIC);
+                        Access.PUBLIC, Access.STATIC, Access.STATIC);
 
-                staticInitializer.newInsn(delegate)
-                        .dup()
-                        .invokeSpecial(delegate, "<init>", "()V")
-                        .putStatic(implementationClassName, functionName, "L" + delegate + ";");
+                staticInitializer.visitTypeInsn(NEW, delegate);
+                staticInitializer.visitInsn(DUP);
+                staticInitializer.visitMethodInsn(INVOKESPECIAL, delegate, "<init>", "()V", false);
+                staticInitializer.visitFieldInsn(PUTSTATIC, implementationClassName, functionName, "L" + delegate + ";");
 
                 return delegate;
             }));
         }
 
 
-        MethodBuilder absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V").access(MethodBuilder.Access.PUBLIC);
-
+        MethodVisitor absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V", Access.PUBLIC);
+        absMethod.visitCode();
         macros.forEach(data::registerMacro);
 
-        ops.forEach(op -> op.simplify().apply(absMethod, data));
+        List<CompileError> errors = ops
+                .flatMap(node -> node
+                        .apply(data)
+                        .flatMap(result -> result
+                                .fold(List::of, op -> {
+                                    op.apply(absMethod);
+                                    return List.empty();
+                                })));
+        absMethod.visitInsn(RETURN);
+        absMethod.visitMaxs(0, 0);
+        absMethod.visitEnd();
+
+
+        if (!errors.isEmpty()) {
+            throw new IllegalStateException(errors.toString()); // todo: actual exception
+        }
+
 
         parseData
                 .getAssertions()
                 .forEach(consumer -> consumer.accept(data)); // perform assertions
 
         data.lambdaFactory().buildAll();
+
+        staticInitializer.visitInsn(RETURN);
+        staticInitializer.visitMaxs(0, 0);
+        staticInitializer.visitEnd();
+
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
 
         if (zipOutputStream != null) {
@@ -142,7 +163,7 @@ public class ScriptBuilder {
     }
 
     public void registerFunction(String id, Function function) {
-        functions.add(Pair.of(id, function));
+        functions = functions.append(new Tuple2<>(id, function)); // todo: bad
     }
 
     public void registerMacro(String id, Macro macro) {

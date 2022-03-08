@@ -2,14 +2,16 @@ package com.dfsek.substrate.lang.node.expression;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import com.dfsek.substrate.lexer.read.Position;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.Collection;
-import java.util.List;
 
 public class BlockNode extends ExpressionNode {
     private final List<Node> contents;
@@ -24,9 +26,9 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public void apply(MethodBuilder builder, BuildData data) throws ParseException {
+    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         BuildData scope = data.sub();
-        contents.forEach(node -> node.simplify().apply(builder, scope));
+        return contents.flatMap(node -> node.simplify().apply(scope));
     }
 
     @Override
@@ -44,6 +46,6 @@ public class BlockNode extends ExpressionNode {
 
     @Override
     public Collection<Node> contents() {
-        return contents;
+        return contents.asJava();
     }
 }

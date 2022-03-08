@@ -9,12 +9,13 @@ import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.lang.node.expression.constant.StringNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lang.rules.value.ValueAssignmentRule;
+import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
-import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.lexer.Lexer;
+
+import static io.vavr.API.*;
 
 public class BasicExpressionRule implements Rule {
     private static final BasicExpressionRule INSTANCE = new BasicExpressionRule();
@@ -25,29 +26,37 @@ public class BasicExpressionRule implements Rule {
 
     @Override
     public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
-        ParserUtil.checkType(lexer.peek(), TokenType.IDENTIFIER, TokenType.STRING, TokenType.BOOLEAN, TokenType.NUMBER, TokenType.INT);
-        if (lexer.peek().getType() == TokenType.STRING) {
-            Token token = lexer.consume();
-            return new StringNode(token.getContent(), token.getPosition());
-        } else if (lexer.peek().getType() == TokenType.BOOLEAN) {
-            Token token = lexer.consume();
-            return new BooleanNode(Boolean.parseBoolean(token.getContent()), token.getPosition());
-        } else if (lexer.peek().getType() == TokenType.NUMBER) {
-            Token token = lexer.consume();
-            return new DecimalNode(Double.parseDouble(token.getContent()), token.getPosition());
-        } else if (lexer.peek().getType() == TokenType.INT) {
-            Token token = lexer.consume();
-            return new IntegerNode(Integer.parseInt(token.getContent()), token.getPosition());
-        } else {
-            ParserUtil.checkType(lexer.peek(), TokenType.IDENTIFIER);
-            if (lexer.peek(1).getType() == TokenType.ASSIGNMENT) {
-                return ValueAssignmentRule.getInstance().assemble(lexer, data, scope);
-            }
-            Token id = lexer.consume();
-            if (!scope.contains(id.getContent())) {
-                throw new ParseException("No such value: " + id.getContent(), id.getPosition());
-            }
-            return new ValueReferenceNode(id, scope.get(id.getContent()));
-        }
+        return Match(ParserUtil.checkType(lexer.peek(),
+                TokenType.IDENTIFIER,
+                TokenType.STRING,
+                TokenType.BOOLEAN,
+                TokenType.NUMBER,
+                TokenType.INT))
+                .of(Case($(token -> token.getType() == TokenType.STRING),
+                                token -> new StringNode(lexer.consume().getContent(), token.getPosition())),
+                        Case($(token -> token.getType() == TokenType.BOOLEAN),
+                                token -> new BooleanNode(
+                                        Try(() -> Boolean.parseBoolean(lexer.consume().getContent()))
+                                                .getOrElseThrow(() -> new ParseException("Malformed boolean literal", token.getPosition())),
+                                        token.getPosition())),
+                        Case($(token -> token.getType() == TokenType.NUMBER),
+                                token -> new DecimalNode(
+                                        Try(() -> Double.parseDouble(lexer.consume().getContent()))
+                                                .getOrElseThrow(() -> new ParseException("Malformed number literal", token.getPosition())),
+                                        token.getPosition())),
+                        Case($(token -> token.getType() == TokenType.INT),
+                                token -> new IntegerNode(
+                                        Try(() -> Integer.parseInt(lexer.consume().getContent()))
+                                                .getOrElseThrow(() -> new ParseException("Malformed integer literal", token.getPosition())),
+                                        token.getPosition())),
+                        Case($(token -> lexer.peek(1).getType() == TokenType.ASSIGNMENT),
+                                () -> ValueAssignmentRule.getInstance().assemble(lexer, data, scope)),
+                        Case($(),
+                                token -> new ValueReferenceNode(
+                                        ParserUtil.checkType(token, TokenType.IDENTIFIER),
+                                        Try(() -> scope.get(lexer.consume().getContent()))
+                                                .getOrElseThrow(() -> new ParseException("No such value: " + token.getContent(), token.getPosition()))
+                                ))
+                );
     }
 }

@@ -1,7 +1,7 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
+import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -37,7 +37,7 @@ public class TupleFactory {
 
             String endName = "TupleIM_" + args.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
-            classBuilder.inner(name, classBuilder.getName(), endName, MethodBuilder.Access.PRIVATE, MethodBuilder.Access.STATIC, MethodBuilder.Access.FINAL);
+            classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
             ClassWriter writer = CompilerUtil.generateClass(name, false, TUPLE_NAME);
 

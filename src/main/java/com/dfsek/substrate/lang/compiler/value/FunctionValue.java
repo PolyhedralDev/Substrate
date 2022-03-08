@@ -2,9 +2,12 @@ package com.dfsek.substrate.lang.compiler.value;
 
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.util.Lazy;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 
 import java.util.function.Supplier;
 
@@ -27,9 +30,9 @@ public class FunctionValue implements Value {
     }
 
     @Override
-    public void load(MethodBuilder visitor, BuildData data) {
-        visitor.getStatic(implementationClassName,
+    public List<Either<CompileError, Op>> load(BuildData data) {
+        return List.of(Op.getStatic(implementationClassName,
                 fieldName,
-                "L" + name.get() + ";");
+                "L" + name.get() + ";"));
     }
 }

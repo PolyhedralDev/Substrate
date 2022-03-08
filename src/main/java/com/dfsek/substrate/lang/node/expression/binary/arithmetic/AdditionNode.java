@@ -2,7 +2,8 @@ package com.dfsek.substrate.lang.node.expression.binary.arithmetic;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
-import com.dfsek.substrate.lang.compiler.codegen.ops.MethodBuilder;
+import com.dfsek.substrate.lang.compiler.codegen.CompileError;
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
@@ -10,6 +11,8 @@ import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.lexer.token.Token;
+import io.vavr.collection.List;
+import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
 public class AdditionNode extends NumericBinaryNode {
@@ -28,21 +31,22 @@ public class AdditionNode extends NumericBinaryNode {
     }
 
     @Override
-    public void applyOp(MethodBuilder visitor, BuildData data) {
+    public List<Either<CompileError, Op>> applyOp(BuildData data) {
         Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal(), Signature.string()).reference();
         ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal(), Signature.string()).reference();
 
         ParserUtil.checkReturnType(right, leftType);
 
         if (leftType.equals(Signature.integer())) {
-            visitor.iAdd();
+            return List.of(Op.iAdd());
         } else if (leftType.equals(Signature.decimal())) {
-            visitor.dAdd();
+            return List.of(Op.dAdd());
         } else if (leftType.equals(Signature.string())) {
-            visitor.invokeVirtual("java/lang/String",
+            return List.of(Op.invokeVirtual("java/lang/String",
                     "concat",
-                    "(Ljava/lang/String;)Ljava/lang/String;");
+                    "(Ljava/lang/String;)Ljava/lang/String;"));
         }
+        return List.of(Op.error("Unsupported type for addition operation: " + leftType, left.getPosition()));
     }
 
     @Override
