@@ -1,5 +1,5 @@
 package com.dfsek.substrate;
 
-public interface Script {
-    void execute(ImplementationArguments implementationArguments);
+public interface Script<P extends Record, R extends Record> {
+    R execute(P parameters, ImplementationArguments implementationArguments);
 }
