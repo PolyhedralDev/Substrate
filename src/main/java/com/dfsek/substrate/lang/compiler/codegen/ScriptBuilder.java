@@ -1,6 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
-import com.dfsek.substrate.ImplementationArguments;
+import com.dfsek.substrate.Environment;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Function;
@@ -34,7 +34,7 @@ import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder implements Opcodes {
     public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
-    private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(ImplementationArguments.class);
+    private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(Environment.class);
     private static int builds = 0;
     private final Map<String, Macro> macros = new HashMap<>();
     private List<Node> ops = List.empty();
