@@ -87,11 +87,11 @@ public class Parser {
         this.base = base;
     }
 
-    public Script parse() throws ParseException {
+    public <P extends Record, R extends Record> Script<P, R> parse(Class<P> parameters, Class<R> ret) throws ParseException {
         while (lexer.hasNext()) {
             builder.addOperation(base.assemble(lexer, data, scope));
         }
-        return builder.build(data);
+        return builder.build(data, parameters, ret);
     }
 
     public void registerMacro(String id, Macro macro) {

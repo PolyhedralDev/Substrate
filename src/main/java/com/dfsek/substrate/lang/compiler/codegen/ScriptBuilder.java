@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder implements Opcodes {
-    public static final String INTERFACE_CLASS_NAME = CompilerUtil.internalName(Script.class);
-    private static final String IMPL_ARG_CLASS_NAME = CompilerUtil.internalName(Environment.class);
     private static int builds = 0;
     private final Map<String, Macro> macros = new HashMap<>();
     private List<Node> ops = List.empty();
@@ -44,7 +42,7 @@ public class ScriptBuilder implements Opcodes {
         this.ops = ops.append(op); // todo: bad
     }
 
-    public Script build(ParseData parseData) throws ParseException {
+    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Class<P> parameters, Class<R> ret) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         ZipOutputStream zipOutputStream;
         if ("true".equals(System.getProperty("substrate.Dump"))) {
@@ -61,9 +59,9 @@ public class ScriptBuilder implements Opcodes {
         } else {
             zipOutputStream = null;
         }
-        String implementationClassName = INTERFACE_CLASS_NAME + "IMPL_" + builds;
+        String implementationClassName = Classes.SCRIPT + "IMPL_" + builds;
 
-        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), INTERFACE_CLASS_NAME).defaultConstructor();
+        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
 
         BuildData data = new BuildData(classLoader, builder, zipOutputStream);
 
@@ -109,7 +107,7 @@ public class ScriptBuilder implements Opcodes {
         }
 
 
-        MethodVisitor absMethod = builder.method("execute", "(L" + IMPL_ARG_CLASS_NAME + ";)V", Access.PUBLIC);
+        MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
         absMethod.visitCode();
         macros.forEach(data::registerMacro);
 
