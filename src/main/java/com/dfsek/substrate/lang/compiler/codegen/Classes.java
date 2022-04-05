@@ -14,5 +14,6 @@ public class Classes {
     public static final String LAMBDA = internalName(Lambda.class);
     public static final String TUPLE = internalName(Tuple.class);
     public static final String SCRIPT = internalName(Script.class);
-    public static final String ENVIRONMENT = CompilerUtil.internalName(Environment.class);
+    public static final String ENVIRONMENT = internalName(Environment.class);
+    public static final String OBJECT = internalName(Object.class);
 }

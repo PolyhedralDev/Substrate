@@ -119,7 +119,7 @@ public class ScriptBuilder implements Opcodes {
                                     op.apply(absMethod);
                                     return List.empty();
                                 })));
-        absMethod.visitInsn(RETURN);
+        absMethod.visitInsn(ARETURN);
         absMethod.visitMaxs(0, 0);
         absMethod.visitEnd();
 

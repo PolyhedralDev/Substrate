@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen.ops;
 
+import com.dfsek.substrate.lang.compiler.codegen.Classes;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import org.objectweb.asm.ClassWriter;
@@ -27,7 +28,7 @@ public class ClassBuilder implements Opcodes {
     }
 
     public ClassBuilder(String name, boolean iface, String... interfaces) {
-        this.classWriter = CompilerUtil.generateClass(name, iface, interfaces);
+        this.classWriter = CompilerUtil.generateClass(name, Classes.OBJECT, iface, interfaces);
         this.name = name;
     }
 
