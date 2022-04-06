@@ -1,7 +1,6 @@
 package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.Script;
-import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.api.MathUtils;

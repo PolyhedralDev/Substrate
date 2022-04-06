@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.rules;
 
-import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.ReturnNode;
