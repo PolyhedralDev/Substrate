@@ -11,8 +11,7 @@ import com.dfsek.substrate.parser.DynamicClassLoader;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
 import io.vavr.control.Either;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 
 import java.lang.reflect.RecordComponent;
 import java.util.Arrays;
@@ -61,6 +60,7 @@ public class TupleFactory {
             classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
             ClassWriter writer = CompilerUtil.generateClass(name, Classes.RECORD, false, TUPLE_NAME);
+            generateRecordBoilerplate(writer);
 
             String constructorSig = "(" + args.internalDescriptor() + ")V";
 
@@ -125,6 +125,36 @@ public class TupleFactory {
             CompilerUtil.dump(name, bytes, zipOutputStream);
             return new IntrinsifiedTuple(args, clazz, params);
         });
+    }
+
+    private static void generateRecordBoilerplate(ClassWriter writer) { // record intrinsic crap
+        writer.visitInnerClass("java/lang/invoke/MethodHandles$Lookup", "java/lang/invoke/MethodHandles", "Lookup", ACC_PUBLIC | ACC_FINAL | ACC_STATIC);
+
+        MethodVisitor toString = writer.visitMethod(ACC_PUBLIC | ACC_FINAL, "toString", "()Ljava/lang/String;", null, null);
+        toString.visitCode();
+        toString.visitVarInsn(ALOAD, 0);
+        toString.visitInvokeDynamicInsn("toString", "(Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;)Ljava/lang/String;", new Handle(Opcodes.H_INVOKESTATIC, "java/lang/runtime/ObjectMethods", "bootstrap", "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/TypeDescriptor;Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/invoke/MethodHandle;)Ljava/lang/Object;", false), new Object[]{Type.getType("Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;"), "signature;clazz;params", new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "signature", "Lcom/dfsek/substrate/lang/compiler/type/Signature;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "clazz", "Ljava/lang/Class;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "params", "Ljava/util/List;", false)});
+        toString.visitInsn(ARETURN);
+        toString.visitMaxs(0, 0);
+        toString.visitEnd();
+
+        MethodVisitor hashCode = writer.visitMethod(ACC_PUBLIC | ACC_FINAL, "hashCode", "()I", null, null);
+        hashCode.visitCode();
+        hashCode.visitVarInsn(ALOAD, 0);
+        hashCode.visitInvokeDynamicInsn("hashCode", "(Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;)I", new Handle(Opcodes.H_INVOKESTATIC, "java/lang/runtime/ObjectMethods", "bootstrap", "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/TypeDescriptor;Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/invoke/MethodHandle;)Ljava/lang/Object;", false), new Object[]{Type.getType("Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;"), "signature;clazz;params", new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "signature", "Lcom/dfsek/substrate/lang/compiler/type/Signature;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "clazz", "Ljava/lang/Class;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "params", "Ljava/util/List;", false)});
+        hashCode.visitInsn(IRETURN);
+        hashCode.visitMaxs(0, 0);
+        hashCode.visitEnd();
+
+        MethodVisitor equals = writer.visitMethod(ACC_PUBLIC | ACC_FINAL, "equals", "(Ljava/lang/Object;)Z", null, null);
+        equals.visitCode();
+        equals.visitVarInsn(ALOAD, 0);
+        equals.visitVarInsn(ALOAD, 1);
+        equals.visitInvokeDynamicInsn("equals", "(Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;Ljava/lang/Object;)Z", new Handle(Opcodes.H_INVOKESTATIC, "java/lang/runtime/ObjectMethods", "bootstrap", "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/TypeDescriptor;Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/invoke/MethodHandle;)Ljava/lang/Object;", false), new Object[]{Type.getType("Lcom/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple;"), "signature;clazz;params", new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "signature", "Lcom/dfsek/substrate/lang/compiler/type/Signature;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "clazz", "Ljava/lang/Class;", false), new Handle(Opcodes.H_GETFIELD, "com/dfsek/substrate/lang/compiler/codegen/TupleFactory$UsableTuple", "params", "Ljava/util/List;", false)});
+        equals.visitInsn(IRETURN);
+        equals.visitMaxs(0, 0);
+        equals.visitEnd();
+
     }
 
     public record IntrinsifiedTuple(Signature signature, Class<? extends Record> clazz, List<String> params) {
