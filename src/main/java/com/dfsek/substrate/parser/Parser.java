@@ -8,6 +8,7 @@ import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
+import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
@@ -72,24 +73,21 @@ public class Parser {
     }
 
     private final Lexer lexer;
-    private final Rule base;
     private final ScriptBuilder builder = new ScriptBuilder();
     private final ParserScope scope = new ParserScope();
     private final ParseData data = new ParseData();
 
-    public Parser(String data, Rule base) throws ParseException {
+    public Parser(String data) throws ParseException {
         lexer = new Lexer(data);
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);
-
-        this.base = base;
     }
 
     public <P extends Record, R extends Record> Script<P, R> parse(Class<P> parameters, Class<R> ret) throws ParseException {
         while (lexer.hasNext()) {
-            builder.addOperation(base.assemble(lexer, data, scope));
+            builder.addOperation(BaseRule.assemble(lexer, data, scope));
         }
         return builder.build(data, parameters, ret);
     }

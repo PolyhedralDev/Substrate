@@ -25,7 +25,7 @@ public class PerformanceTest {
     }
 
     public static void main(String... args) throws IOException {
-        Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance/performance.sbsc"), Charset.defaultCharset()), new BaseRule());
+        Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance/performance.sbsc"), Charset.defaultCharset()));
 
         parser.registerFunction("assert", new com.dfsek.substrate.lang.compiler.api.Function() {
             @Override

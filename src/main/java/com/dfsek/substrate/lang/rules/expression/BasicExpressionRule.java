@@ -17,15 +17,8 @@ import com.dfsek.substrate.parser.exception.ParseException;
 
 import static io.vavr.API.*;
 
-public class BasicExpressionRule implements Rule {
-    private static final BasicExpressionRule INSTANCE = new BasicExpressionRule();
-
-    public static BasicExpressionRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class BasicExpressionRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         return Match(ParserUtil.checkType(lexer.peek(),
                 TokenType.IDENTIFIER,
                 TokenType.STRING,
@@ -50,7 +43,7 @@ public class BasicExpressionRule implements Rule {
                                                 .getOrElseThrow(() -> new ParseException("Malformed integer literal", token.getPosition())),
                                         token.getPosition())),
                         Case($(token -> lexer.peek(1).getType() == TokenType.ASSIGNMENT),
-                                () -> ValueAssignmentRule.getInstance().assemble(lexer, data, scope)),
+                                () -> ValueAssignmentRule.assemble(lexer, data, scope)),
                         Case($(),
                                 token -> new ValueReferenceNode(
                                         ParserUtil.checkType(token, TokenType.IDENTIFIER),

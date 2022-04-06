@@ -15,19 +15,17 @@ import io.vavr.collection.List;
 /**
  * The base rule of the parser.
  */
-public class BaseRule implements Rule {
-
-    @Override
-    public Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class BaseRule {
+    public static Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = List.empty();
 
         Position begin = lexer.peek().getPosition();
 
         while (lexer.hasNext()) {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
-                contents = contents.append(BlockRule.getInstance().assemble(lexer, data, scope));
+                contents = contents.append(BlockRule.assemble(lexer, data, scope));
             } else { // Parse a statement.
-                contents = contents.append(StatementRule.getInstance().assemble(lexer, data, scope));
+                contents = contents.append(StatementRule.assemble(lexer, data, scope));
             }
         }
 

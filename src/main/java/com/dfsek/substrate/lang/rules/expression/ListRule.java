@@ -12,21 +12,14 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 
-public class ListRule implements Rule {
-    private static final ListRule INSTANCE = new ListRule();
-
-    public static ListRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class ListRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token op = ParserUtil.checkType(lexer.consume(), TokenType.LIST_BEGIN);
 
         List<ExpressionNode> elements = List.empty();
 
         while (lexer.peek().getType() != TokenType.LIST_END) {
-            elements = elements.append(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            elements = elements.append(ExpressionRule.assemble(lexer, data, scope));
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.LIST_END, TokenType.STATEMENT_END, TokenType.GROUP_BEGIN).getType() == TokenType.SEPARATOR) {
                 lexer.consume(); // consume separator
             }

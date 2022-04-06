@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class SubstrateTests {
     private static final String property = "substrate.DisableOptimisation";
 
-    private static final boolean STACK_TRACES_FOR_INVALID = false;
+    private static final boolean STACK_TRACES_FOR_INVALID = true;
     private static final boolean DUMP_TO_JARS = true;
 
     static {
@@ -34,7 +34,7 @@ public class SubstrateTests {
     }
 
     private Parser createParser(String script) throws NoSuchMethodException {
-        Parser parser = new Parser(script, new BaseRule());
+        Parser parser = new Parser(script);
         parser.registerFunction("fail", new StaticFunction(SubstrateTests.class.getMethod("fail")));
         parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;

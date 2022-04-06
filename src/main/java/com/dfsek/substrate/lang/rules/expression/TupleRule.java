@@ -12,15 +12,8 @@ import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 
-public class TupleRule implements Rule {
-    private static final TupleRule INSTANCE = new TupleRule();
-
-    public static TupleRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class TupleRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN); // Tuples must start with (
 
         List<ExpressionNode> args = List.empty();
@@ -31,7 +24,7 @@ public class TupleRule implements Rule {
                 groups++;
                 lexer.consume();
             }
-            args = args.append(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            args = args.append(ExpressionRule.assemble(lexer, data, scope));
             while (lexer.peek().getType() == TokenType.GROUP_END) {
                 groups--;
                 if (groups < 0) {

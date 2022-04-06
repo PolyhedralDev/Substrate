@@ -12,18 +12,11 @@ import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 
-public class ValueAssignmentRule implements Rule {
-    private static final ValueAssignmentRule INSTANCE = new ValueAssignmentRule();
-
-    public static ValueAssignmentRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ValueAssignmentNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class ValueAssignmentRule {
+    public static ValueAssignmentNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token id = ParserUtil.checkType(lexer.consume(), TokenType.IDENTIFIER);
         ParserUtil.checkType(lexer.consume(), TokenType.ASSIGNMENT); // next token should be =
-        ExpressionNode value = ExpressionRule.getInstance().assemble(lexer, data, scope, id.getContent());
+        ExpressionNode value = ExpressionRule.assemble(lexer, data, scope, id.getContent());
         if (scope.contains(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }

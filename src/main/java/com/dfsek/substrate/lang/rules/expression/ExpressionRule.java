@@ -24,19 +24,12 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 
 
-public class ExpressionRule implements Rule {
-    private static final ExpressionRule INSTANCE = new ExpressionRule();
-
-    public static ExpressionRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class ExpressionRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         return assemble(lexer, data, scope, null);
     }
 
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
         ExpressionNode node = simple(lexer, data, scope, variableName);
         if (lexer.peek().isBinaryOperator()) {
             node = assembleBinaryOperator(node, lexer, data, scope, variableName);
@@ -44,7 +37,7 @@ public class ExpressionRule implements Rule {
         return node;
     }
 
-    private ExpressionNode simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+    private static ExpressionNode simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
         Token test = lexer.peek();
 
 
@@ -73,22 +66,22 @@ public class ExpressionRule implements Rule {
                 lexer.consume();
                 node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(lexer, data, scope));
             } else {
-                node = BasicExpressionRule.getInstance().assemble(lexer, data, scope);
+                node = BasicExpressionRule.assemble(lexer, data, scope);
             }
         } else if (test.isType()) {
-            node = CastRule.getInstance().assemble(lexer, data, scope);
+            node = CastRule.assemble(lexer, data, scope);
             possibleFunctionSite = false;
         } else if (test.getType() == TokenType.IF) {
-            node = IfExpressionRule.getInstance().assemble(lexer, data, scope);
+            node = IfExpressionRule.assemble(lexer, data, scope);
         } else if (test.getType() == TokenType.LIST_BEGIN) {
-            node = ListRule.getInstance().assemble(lexer, data, scope);
+            node = ListRule.assemble(lexer, data, scope);
             possibleFunctionSite = false;
         } else if ((lexer.peek(1).isIdentifier() && lexer.peek(2).getType() == TokenType.TYPE)
                 || lexer.peek(2).getType() == TokenType.ARROW
                 || lexer.peek(2).getType() == TokenType.TYPE) { // lambda or function
-            node = LambdaExpressionRule.getInstance().assemble(lexer, data, scope, variableName);
+            node = LambdaExpressionRule.assemble(lexer, data, scope, variableName);
         } else if (test.getType() == TokenType.GROUP_BEGIN) {
-            node = TupleRule.getInstance().assemble(lexer, data, scope);
+            node = TupleRule.assemble(lexer, data, scope);
             possibleFunctionSite = false;
         } else {
             throw new ParseException("Unexpected token: " + test, test.getPosition());
@@ -119,12 +112,12 @@ public class ExpressionRule implements Rule {
         return node;
     }
 
-    private List<ExpressionNode> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
+    private static List<ExpressionNode> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<ExpressionNode> args = List.empty();
         while (lexer.peek().getType() != TokenType.GROUP_END) {
-            args = args.append(ExpressionRule.getInstance().assemble(lexer, data, scope));
+            args = args.append(assemble(lexer, data, scope));
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
                 lexer.consume(); // consume separator
             }
@@ -133,7 +126,7 @@ public class ExpressionRule implements Rule {
         return args;
     }
 
-    private ExpressionNode assembleBinaryOperator(ExpressionNode left, Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+    private static ExpressionNode assembleBinaryOperator(ExpressionNode left, Lexer lexer, ParseData data, ParserScope scope, String variableName) {
         Token op = lexer.consume();
         ExpressionNode right = simple(lexer, data, scope, variableName);
 
@@ -149,7 +142,7 @@ public class ExpressionRule implements Rule {
         return join(left, op, right, data);
     }
 
-    private ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right, ParseData data) {
+    private static ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right, ParseData data) {
         if (op.getType() == TokenType.ADDITION_OPERATOR) {
             return new AdditionNode(
                     data.checkType(left, Signature.integer(), Signature.string(), Signature.decimal()),

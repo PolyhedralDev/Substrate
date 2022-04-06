@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.rules.expression;
 
-import com.dfsek.substrate.lang.Rule;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -20,14 +19,8 @@ import io.vavr.collection.List;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LambdaExpressionRule implements Rule {
-    private static final LambdaExpressionRule INSTANCE = new LambdaExpressionRule();
-
-    public static LambdaExpressionRule getInstance() {
-        return INSTANCE;
-    }
-
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+public class LambdaExpressionRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
         ParserScope lambda = scope.sub();
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
@@ -71,9 +64,9 @@ public class LambdaExpressionRule implements Rule {
 
         ExpressionNode expression;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-            expression = BlockRule.getInstance().assemble(lexer, data, lambda);
+            expression = BlockRule.assemble(lexer, data, lambda);
         } else {
-            expression = ExpressionRule.getInstance().assemble(lexer, data, lambda);
+            expression = ExpressionRule.assemble(lexer, data, lambda);
         }
 
         Set<String> locals = new HashSet<>();
@@ -102,7 +95,7 @@ public class LambdaExpressionRule implements Rule {
         );
     }
 
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         return assemble(lexer, data, scope, null);
     }
 }

@@ -15,16 +15,8 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 
 
-public class BlockRule implements Rule {
-
-    private static final BlockRule INSTANCE = new BlockRule();
-
-    public static BlockRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class BlockRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = List.empty();
 
         List<ReturnNode> ret = List.empty();
@@ -36,13 +28,13 @@ public class BlockRule implements Rule {
 
         while (lexer.peek().getType() != TokenType.BLOCK_END) {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
-                contents = contents.append(this.assemble(lexer, data, sub));
+                contents = contents.append(assemble(lexer, data, sub));
             } else if (lexer.peek().isIdentifier()
                     || lexer.peek().getType() == TokenType.GROUP_BEGIN
                     || lexer.peek().getType() == TokenType.IF) { // Parse a statement.
-                contents = contents.append(StatementRule.getInstance().assemble(lexer, data, sub));
+                contents = contents.append(StatementRule.assemble(lexer, data, sub));
             } else if (lexer.peek().getType() == TokenType.RETURN) { // Parse a return
-                ReturnNode returnNode = ReturnRule.getInstance().assemble(lexer, data, sub);
+                ReturnNode returnNode = ReturnRule.assemble(lexer, data, sub);
                 ret = ret.append(returnNode);
                 contents = contents.append(returnNode);
             } else {

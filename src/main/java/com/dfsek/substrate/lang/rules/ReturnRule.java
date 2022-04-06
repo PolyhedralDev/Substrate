@@ -12,22 +12,15 @@ import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 
-public class ReturnRule implements Rule {
-    private static final ReturnRule INSTANCE = new ReturnRule();
-
-    public static ReturnRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ReturnNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class ReturnRule {
+    public static ReturnNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token r = ParserUtil.checkType(lexer.consume(), TokenType.RETURN);
 
         ReturnNode node;
         if (lexer.peek().getType() == TokenType.STATEMENT_END) {
             node = new ReturnNode(r.getPosition(), null);
         } else {
-            ExpressionNode expressionNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
+            ExpressionNode expressionNode = ExpressionRule.assemble(lexer, data, scope);
             node = new ReturnNode(r.getPosition(), expressionNode);
         }
 

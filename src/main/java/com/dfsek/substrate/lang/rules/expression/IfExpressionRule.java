@@ -25,36 +25,29 @@ import io.vavr.control.Either;
 import java.util.Collection;
 import java.util.Collections;
 
-public class IfExpressionRule implements Rule {
-    private static final IfExpressionRule INSTANCE = new IfExpressionRule();
-
-    public static IfExpressionRule getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+public class IfExpressionRule {
+    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         ParserUtil.checkType(lexer.consume(), TokenType.IF);
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
-        ExpressionNode predicate = ExpressionRule.getInstance().assemble(lexer, data, scope);
+        ExpressionNode predicate = ExpressionRule.assemble(lexer, data, scope);
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_END);
 
         ExpressionNode caseTrueNode;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-            ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
+            ExpressionNode internal = BlockRule.assemble(lexer, data, scope);
             caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
         } else {
-            caseTrueNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
+            caseTrueNode = ExpressionRule.assemble(lexer, data, scope);
         }
 
         ExpressionNode caseFalseNode;
         if (lexer.peek().getType() == TokenType.ELSE) {
             lexer.consume();
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-                ExpressionNode internal = BlockRule.getInstance().assemble(lexer, data, scope);
+                ExpressionNode internal = BlockRule.assemble(lexer, data, scope);
                 caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
             } else {
-                caseFalseNode = ExpressionRule.getInstance().assemble(lexer, data, scope);
+                caseFalseNode = ExpressionRule.assemble(lexer, data, scope);
             }
         } else {
             caseFalseNode = new ExpressionNode() {
