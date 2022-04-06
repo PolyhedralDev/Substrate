@@ -7,9 +7,11 @@ import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
+import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static io.vavr.API.*;
@@ -293,5 +295,9 @@ public class Signature implements Opcodes {
         } else {
             throw new IllegalArgumentException("Illegal class: " + clazz);
         }
+    }
+
+    public static Signature fromRecord(Class<? extends Record> record) {
+        return Stream.ofAll(Arrays.stream(record.getRecordComponents())).foldLeft(Signature.empty(), (a, b) -> a.and(Signature.fromClass(b.getType())));
     }
 }

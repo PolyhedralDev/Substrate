@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
@@ -86,7 +87,7 @@ public class Parser {
 
     public <P extends Record, R extends Record> Script<P, R> parse(Class<P> parameters, Class<R> ret) throws ParseException {
         while (lexer.hasNext()) {
-            builder.addOperation(BaseRule.assemble(lexer, data, scope));
+            builder.addOperation(BaseRule.assemble(lexer, data, scope, Signature.fromRecord(parameters), Signature.fromRecord(ret)));
         }
         return builder.build(data, parameters, ret);
     }

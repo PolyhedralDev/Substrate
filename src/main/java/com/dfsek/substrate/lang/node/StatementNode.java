@@ -36,6 +36,10 @@ public class StatementNode extends NodeHolder {
         return position;
     }
 
+    public ExpressionNode getContent() {
+        return content;
+    }
+
     @Override
     protected Collection<? extends Node> contents() {
         return Collections.singleton(content);

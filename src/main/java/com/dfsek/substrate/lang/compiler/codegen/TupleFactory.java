@@ -40,7 +40,7 @@ public class TupleFactory {
 
     private static IntrinsifiedTuple intrinsify(Class<? extends Record> record) {
         return new IntrinsifiedTuple(
-                Stream.ofAll(Arrays.stream(record.getRecordComponents())).foldLeft(Signature.empty(), (a, b) -> a.and(Signature.fromClass(b.getType()))),
+                Signature.fromRecord(record),
                 record,
                 Stream.ofAll(Arrays.stream(record.getRecordComponents())).map(RecordComponent::getName).toList()
         );
