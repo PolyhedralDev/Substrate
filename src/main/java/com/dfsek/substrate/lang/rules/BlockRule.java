@@ -36,6 +36,7 @@ public class BlockRule {
                 ReturnNode returnNode = ReturnRule.assemble(lexer, data, sub);
                 ret = ret.append(returnNode);
                 contents = contents.append(returnNode);
+                ParserUtil.checkType(lexer.peek(), TokenType.BLOCK_END); // nothing after return.
             } else {
                 throw new ParseException("Unexpected token: " + lexer.peek(), lexer.consume().getPosition());
             }
