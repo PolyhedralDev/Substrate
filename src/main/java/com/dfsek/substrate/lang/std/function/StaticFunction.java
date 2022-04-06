@@ -25,34 +25,12 @@ public class StaticFunction implements Function {
         this.name = method.getName();
         Class<?> r = method.getReturnType();
 
-        if (r.equals(void.class)) {
-            this.ret = Signature.empty();
-        } else if (r.equals(String.class)) {
-            this.ret = Signature.string();
-        } else if (r.equals(int.class)) {
-            this.ret = Signature.integer();
-        } else if (r.equals(double.class)) {
-            this.ret = Signature.decimal();
-        } else if (r.equals(boolean.class)) {
-            this.ret = Signature.bool();
-        } else {
-            throw new IllegalArgumentException("Illegal return type: " + method);
-        }
+        this.ret = Signature.fromClass(r);
 
         Signature args = Signature.empty();
 
         for (Class<?> parameterType : method.getParameterTypes()) {
-            if (parameterType.equals(String.class)) {
-                args = args.and(Signature.string());
-            } else if (parameterType.equals(int.class)) {
-                args = args.and(Signature.integer());
-            } else if (parameterType.equals(double.class)) {
-                args = args.and(Signature.decimal());
-            } else if (parameterType.equals(boolean.class)) {
-                args = args.and(Signature.bool());
-            } else {
-                throw new IllegalArgumentException("Illegal parameter type: " + method);
-            }
+            args = args.and(Signature.fromClass(parameterType));
         }
         this.args = args;
     }

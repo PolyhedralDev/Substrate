@@ -54,9 +54,9 @@ public final class CompilerUtil implements Opcodes {
 
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType)) + ";";
+            else ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType).clazz()) + ";";
         } else if (!returnType.getSimpleReturn().isSimple()) {
-            ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.getSimpleReturn())) + ";";
+            ret = "L" + CompilerUtil.internalName(data.tupleFactory().generate(returnType.getSimpleReturn()).clazz()) + ";";
         }
         return ret;
     }
@@ -86,9 +86,7 @@ public final class CompilerUtil implements Opcodes {
             for (int i = 0; i < ref.size(); i++) {
                 list = list
                         .append(Op.aLoad(offset))
-                        .append(Op.invokeVirtual(CompilerUtil.internalName(data.tupleFactory().generate(ref)),
-                                "param" + i,
-                                "()" + ref.getType(i).descriptor()));
+                        .append(data.tupleFactory().get(ref, i));
             }
             return list;
         }

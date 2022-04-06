@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
+import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.type.DataType;
@@ -7,9 +8,14 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.parser.DynamicClassLoader;
+import io.vavr.collection.List;
+import io.vavr.collection.Stream;
+import io.vavr.control.Either;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
+import java.lang.reflect.RecordComponent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
@@ -21,20 +27,35 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class TupleFactory {
     private static final String TUPLE_NAME = CompilerUtil.internalName(Tuple.class);
-    private final Map<Signature, Class<?>> generated = new HashMap<>();
+    private final Map<Signature, IntrinsifiedTuple> generated = new HashMap<>();
     private final DynamicClassLoader classLoader;
     private final ClassBuilder classBuilder;
     private final ZipOutputStream zipOutputStream;
 
-    public TupleFactory(DynamicClassLoader classLoader, ClassBuilder classBuilder, ZipOutputStream zipOutputStream) {
+    public TupleFactory(DynamicClassLoader classLoader, ClassBuilder classBuilder, ZipOutputStream zipOutputStream, List<Class<? extends Record>> tuples) {
         this.classLoader = classLoader;
         this.classBuilder = classBuilder;
         this.zipOutputStream = zipOutputStream;
+        tuples.map(TupleFactory::intrinsify).forEach(tuple -> generated.put(tuple.signature(), tuple));
     }
 
-    public Class<?> generate(Signature args) {
-        return generated.computeIfAbsent(args, ignore -> {
+    private static IntrinsifiedTuple intrinsify(Class<? extends Record> record) {
+        return new IntrinsifiedTuple(
+                Stream.ofAll(Arrays.stream(record.getRecordComponents())).foldLeft(Signature.empty(), (a, b) -> a.and(Signature.fromClass(b.getType()))),
+                record,
+                Stream.ofAll(Arrays.stream(record.getRecordComponents())).map(RecordComponent::getName).toList()
+        );
+    }
 
+    public Either<CompileError, Op> get(Signature args, int index) {
+        IntrinsifiedTuple generate = generate(args);
+        return Op.invokeVirtual(CompilerUtil.internalName(generate.clazz()),
+                "param" + index,
+                "()" + args.getType(index).descriptor());
+    }
+
+    public IntrinsifiedTuple generate(Signature args) {
+        return generated.computeIfAbsent(args, ignore -> {
             String endName = "TupleIM_" + args.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
             classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
@@ -57,10 +78,15 @@ public class TupleFactory {
                     "()V",
                     false);
 
+            List<String> params = List.empty();
+
             int offset = 1;
             for (int i = 0; i < args.size(); i++) {
                 String param = "param" + i;
+                params = params.append(param);
                 DataType argType = args.getType(i);
+
+                writer.visitRecordComponent(param, argType.descriptor(), null).visitEnd();
 
                 writer.visitField(ACC_PRIVATE | ACC_FINAL,
                         param,
@@ -89,14 +115,19 @@ public class TupleFactory {
                 paramGetter.visitMaxs(0, 0);
             }
 
+
             constructor.visitInsn(RETURN); // Void return
             constructor.visitMaxs(0, 0); // Set stack and local variable size (bogus values; handled automatically by ASM)
 
 
             byte[] bytes = writer.toByteArray();
-            Class<?> clazz = classLoader.defineClass(name.replace('/', '.'), bytes);
+            Class<? extends Record> clazz = (Class<? extends Record>) classLoader.defineClass(name.replace('/', '.'), bytes);
             CompilerUtil.dump(name, bytes, zipOutputStream);
-            return clazz;
+            return new IntrinsifiedTuple(args, clazz, params);
         });
+    }
+
+    public record IntrinsifiedTuple(Signature signature, Class<? extends Record> clazz, List<String> params) {
+
     }
 }

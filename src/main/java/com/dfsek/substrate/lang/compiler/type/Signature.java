@@ -278,4 +278,20 @@ public class Signature implements Opcodes {
         }
         return sig.toString();
     }
+
+    public static Signature fromClass(Class<?> clazz) {
+        if (clazz.equals(void.class)) {
+            return Signature.empty();
+        } else if (clazz.equals(String.class)) {
+            return Signature.string();
+        } else if (clazz.equals(int.class)) {
+            return Signature.integer();
+        } else if (clazz.equals(double.class)) {
+            return Signature.decimal();
+        } else if (clazz.equals(boolean.class)) {
+            return Signature.bool();
+        } else {
+            throw new IllegalArgumentException("Illegal class: " + clazz);
+        }
+    }
 }

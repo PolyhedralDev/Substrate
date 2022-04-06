@@ -51,7 +51,7 @@ public class LambdaFactory implements Opcodes {
 
             if (!returnType.isSimple()) {
                 if (returnType.equals(Signature.empty())) ret = "V";
-                else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
+                else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType).clazz()) + ";";
             }
 
             builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, Access.PUBLIC, Access.ABSTRACT);
@@ -103,7 +103,7 @@ public class LambdaFactory implements Opcodes {
 
         if (!returnType.isSimple()) {
             if (returnType.equals(Signature.empty())) ret = "V";
-            else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType)) + ";";
+            else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType).clazz()) + ";";
         }
 
         MethodVisitor impl = builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, Access.PUBLIC);

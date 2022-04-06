@@ -26,7 +26,7 @@ public class TupleNode extends ExpressionNode {
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature signature = reference();
-        Class<?> tuple = data.tupleFactory().generate(signature);
+        Class<?> tuple = data.tupleFactory().generate(signature).clazz();
         String tupleName = CompilerUtil.internalName(tuple);
         return List(Op.newInsn(tupleName), Op.dup())
                 .appendAll(args.flatMap(arg -> arg.simplify().apply(data).appendAll(CompilerUtil.deconstructTuple(arg, data))))

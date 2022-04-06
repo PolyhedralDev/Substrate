@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import io.vavr.Tuple2;
+import io.vavr.collection.List;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +29,10 @@ public class BuildData {
     private final int implArgsOffset;
     private int offset;
 
-    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, ZipOutputStream zipOutputStream) {
+    public BuildData(DynamicClassLoader classLoader, ClassBuilder classWriter, ZipOutputStream zipOutputStream, List<Class<? extends Record>> tuples) {
         this.classLoader = classLoader;
         this.classWriter = classWriter;
-        tupleFactory = new TupleFactory(classLoader, classWriter, zipOutputStream);
+        tupleFactory = new TupleFactory(classLoader, classWriter, zipOutputStream, tuples);
         lambdaFactory = new LambdaFactory(classLoader, tupleFactory, classWriter, zipOutputStream);
         this.name = classWriter.getName();
         values = new HashMap<>();

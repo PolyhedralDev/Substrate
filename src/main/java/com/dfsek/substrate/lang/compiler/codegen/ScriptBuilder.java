@@ -63,7 +63,7 @@ public class ScriptBuilder implements Opcodes {
 
         ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
 
-        BuildData data = new BuildData(classLoader, builder, zipOutputStream);
+        BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parameters, ret));
 
         // prepare functions.
 
