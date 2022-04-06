@@ -9,3 +9,5 @@ e = [a, b];
 f = [c, d];
 
 g = [e, f]; // this should fail.
+
+return false;

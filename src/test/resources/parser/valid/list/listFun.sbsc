@@ -5,3 +5,5 @@ b = () -> {};
 d = [() -> {
     println("bazinga");
 }, b, () -> {}];
+
+return true;

@@ -2,3 +2,4 @@
 
 !(a: bool): bool -> a;
 
+return false;

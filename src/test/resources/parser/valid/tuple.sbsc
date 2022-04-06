@@ -9,3 +9,6 @@ bar2 = (2.4, "bazinga");
 
 
 baz = (1.2, false);
+
+
+return true;

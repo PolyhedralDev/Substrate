@@ -5,3 +5,5 @@ b = (2, "Leonard");
 c = (3, "Penny");
 
 d = [a, b, c];
+
+return true;

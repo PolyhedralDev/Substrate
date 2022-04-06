@@ -1,3 +1,5 @@
 // no end of type declaration
 
 a = (b: num, c: int,
+
+return false;

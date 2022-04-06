@@ -3,4 +3,4 @@
 a = "test";
 b = "test2";
 
-assert(a != b);
+return a != b;

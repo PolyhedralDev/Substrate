@@ -2,4 +2,4 @@
 
 a = 4 / 2;
 
-assert(a == 2);
+return a == 2;

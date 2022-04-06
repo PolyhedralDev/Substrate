@@ -7,3 +7,6 @@ test = (a: str) -> {
 
 
 test("bazinga");
+
+
+return true;

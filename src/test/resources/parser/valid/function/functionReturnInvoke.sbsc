@@ -9,3 +9,5 @@ result = a((b: int): int -> {
          })(0.5);
 
 println(str(result));
+
+return true;

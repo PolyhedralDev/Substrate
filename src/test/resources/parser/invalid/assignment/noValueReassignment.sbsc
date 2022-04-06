@@ -3,3 +3,5 @@
 a = "bazinga";
 
 a = "bazinga2";
+
+return false;

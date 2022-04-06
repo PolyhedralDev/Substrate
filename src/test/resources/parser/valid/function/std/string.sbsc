@@ -3,3 +3,5 @@ assert(upperCase("bazinga") == "BAZINGA");
 assert(lowerCase("BAZINGA") == "bazinga");
 assert(startsWith("bazinga", "baz"));
 assert(endsWith("bazinga", "ga"));
+
+return true;

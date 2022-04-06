@@ -15,3 +15,5 @@ b = if(false) {
 };
 
 assert(b == 4);
+
+return true;

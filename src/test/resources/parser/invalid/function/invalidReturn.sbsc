@@ -1,3 +1,5 @@
 test = (a: int): num -> {
     return "hello";
 };
+
+return false;

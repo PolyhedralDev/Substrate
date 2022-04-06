@@ -5,3 +5,5 @@ fib = (i: int): int -> {
 };
 
 println(str(fib(7)));
+
+return true;

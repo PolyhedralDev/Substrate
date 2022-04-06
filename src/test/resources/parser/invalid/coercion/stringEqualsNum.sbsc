@@ -4,3 +4,5 @@ a = "test";
 b = 2.3;
 
 println(if(a == b) "bazinga" else "not bazinga");
+
+return false;

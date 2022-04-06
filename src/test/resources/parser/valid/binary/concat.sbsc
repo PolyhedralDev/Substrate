@@ -4,4 +4,4 @@ a = "bazinga";
 
 b = "Sheldon says: " + a;
 
-assert(b == "Sheldon says: bazinga");
+return b == "Sheldon says: bazinga";

@@ -2,4 +2,4 @@
 
 a = 1 + 2;
 
-assert(a == 3);
+return a == 3;

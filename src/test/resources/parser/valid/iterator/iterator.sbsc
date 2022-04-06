@@ -3,3 +3,5 @@
 a = [1, 2, 3, 5];
 
 forEach(a, (b: int) -> println(str(b)));
+
+return true;

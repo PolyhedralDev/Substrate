@@ -9,3 +9,5 @@ c = 4;
 d = 4;
 
 assert(c <= d);
+
+return true;

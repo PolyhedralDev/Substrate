@@ -7,3 +7,5 @@ assert(false || true);
 
 a = false || false;
 assert(!a);
+
+return true;

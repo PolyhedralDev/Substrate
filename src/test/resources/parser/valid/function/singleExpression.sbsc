@@ -1,3 +1,5 @@
 add = (left: int): fun<int -> int> -> (right: int): int -> left + right;
 
 println(str(add(3)(4)));
+
+return true;

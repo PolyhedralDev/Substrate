@@ -3,3 +3,5 @@
 a = 5;
 
 println(str(a[3]));
+
+return false;

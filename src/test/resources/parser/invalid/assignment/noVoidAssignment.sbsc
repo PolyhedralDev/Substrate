@@ -1,3 +1,5 @@
 // parser should fail when trying to assign UNIT to a value.
 
 a = if(true) println("a");
+
+return false;

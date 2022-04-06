@@ -1,3 +1,5 @@
 // invoke a nonexistent function
 
 a(4);
+
+return false;

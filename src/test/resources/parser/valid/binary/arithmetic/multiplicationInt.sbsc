@@ -2,4 +2,4 @@
 
 a = 4 * 2;
 
-assert(a == 8);
+return a == 8;

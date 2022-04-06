@@ -16,3 +16,5 @@ test((a: list<int>, b: int): num, str -> {
     forEach(a, (i: int) -> println(str(i)));
     return (num(b + c), "bazinga");
 });
+
+return true;

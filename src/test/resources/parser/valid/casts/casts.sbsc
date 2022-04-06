@@ -11,3 +11,5 @@ d = str(a); // num -> str
 e = num(b); // int -> num
 
 f = str(false); // bool -> str
+
+return true;

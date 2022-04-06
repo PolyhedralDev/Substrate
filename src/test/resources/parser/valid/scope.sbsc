@@ -12,3 +12,5 @@ foo = "foo";
   bar = "bar2";
   println(bar);
 }
+
+return true;

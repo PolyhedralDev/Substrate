@@ -9,3 +9,5 @@ c = 3;
 test((a: int, b: int): num -> {
     return num(a + b + c);
 });
+
+return true;

@@ -4,3 +4,5 @@ test = (a: fun<int>, b: fun<int>) -> {
 };
 
 test((a: int) -> println(str(a)), (a: int) -> println(str(a)));
+
+return true;

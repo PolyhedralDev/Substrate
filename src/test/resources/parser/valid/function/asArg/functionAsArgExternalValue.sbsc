@@ -5,3 +5,5 @@ test = (a: fun<int>) -> {
 e = 4;
 
 test((a: int) -> println(str(a + e)));
+
+return true;

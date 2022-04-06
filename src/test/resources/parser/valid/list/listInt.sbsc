@@ -1,3 +1,5 @@
 // declare a list of ints
 
 a = [1, 2, 3];
+
+return true;

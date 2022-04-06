@@ -3,3 +3,5 @@ assert(!false);
 b = false;
 
 assert(!b);
+
+return true;

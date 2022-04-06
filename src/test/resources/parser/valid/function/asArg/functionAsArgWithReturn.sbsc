@@ -5,3 +5,5 @@ test = (a: fun<int -> num>) -> {
 test((a: int): num -> {
     return num(a);
 });
+
+return true;

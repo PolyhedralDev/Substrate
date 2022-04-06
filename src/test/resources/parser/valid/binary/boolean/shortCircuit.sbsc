@@ -4,3 +4,5 @@ a = (): bool -> {
 };
 
 b = false && a();
+
+return true;

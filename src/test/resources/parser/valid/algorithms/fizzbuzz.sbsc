@@ -9,3 +9,5 @@ fizzbuzz = (i: int) -> {
 };
 
 fizzbuzz(100);
+
+return true;

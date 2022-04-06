@@ -13,3 +13,5 @@ test = (e: int, f: int, g: num): int -> {
 };
 
 println(str(test(d)));
+
+return true;

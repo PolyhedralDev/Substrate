@@ -1,3 +1,5 @@
 // parser should error at invalid cast.
 
 println(str("test"));
+
+return false;

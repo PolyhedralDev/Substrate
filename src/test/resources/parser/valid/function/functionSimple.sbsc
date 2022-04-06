@@ -6,3 +6,5 @@ test = (a: str, b: num, c: bool, d: str) -> {
 };
 
 test("bazinga", 1.2, false, "bazinga2");
+
+return true;

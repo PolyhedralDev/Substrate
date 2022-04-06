@@ -6,3 +6,6 @@ test = (a: str): str -> {
 
 
 assert(test("bazinga") == "bazinga");
+
+
+return true;

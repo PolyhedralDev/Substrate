@@ -8,3 +8,5 @@ test = (a: str, b: num, c: bool, d: str) -> {
 tuple = ("bazinga", 1.2);
 
 test(tuple, false, "bazinga2");
+
+return true;

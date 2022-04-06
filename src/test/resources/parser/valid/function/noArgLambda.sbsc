@@ -4,3 +4,5 @@ test = () -> println("bazinga");
 
 
 test();
+
+return true;

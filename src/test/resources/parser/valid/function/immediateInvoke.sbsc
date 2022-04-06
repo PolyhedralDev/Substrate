@@ -1,3 +1,5 @@
 (a: int) -> {
     println(str(a));
 }(3);
+
+return true;

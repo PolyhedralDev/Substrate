@@ -1,3 +1,5 @@
 // mismatched if returns
 
 a = if(true) 4 else "hello";
+
+return false;

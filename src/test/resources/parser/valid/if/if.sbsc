@@ -7,3 +7,5 @@ assert(a == 5);
 b = if(false) 5 else 4;
 
 assert(b == 4);
+
+return true;

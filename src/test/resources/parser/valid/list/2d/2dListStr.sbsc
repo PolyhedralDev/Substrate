@@ -7,3 +7,5 @@ b = ["d", "e"];
 
 
 d = [a, b];
+
+return true;

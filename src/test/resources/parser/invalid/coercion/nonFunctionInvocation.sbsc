@@ -3,3 +3,5 @@
 a = 5;
 
 a();
+
+return false;

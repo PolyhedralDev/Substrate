@@ -3,3 +3,5 @@ a = if(true) {
 
     return 2;
 };
+
+return false;

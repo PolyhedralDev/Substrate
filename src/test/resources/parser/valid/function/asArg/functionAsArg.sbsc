@@ -3,3 +3,5 @@ test = (a: fun<int>) -> {
 };
 
 test((a: int) -> println(str(a)));
+
+return true;

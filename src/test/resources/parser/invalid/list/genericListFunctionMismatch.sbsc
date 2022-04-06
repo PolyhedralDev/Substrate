@@ -5,3 +5,5 @@ a = (q: num) -> {};
 b = (q: int) -> {};
 
 c = [a, b];
+
+return false;

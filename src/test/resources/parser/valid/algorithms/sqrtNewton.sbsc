@@ -17,4 +17,4 @@ epsilon = 0.001;
 assert(epsilonCompare(newtonSquareRoot(4.0, epsilon), 2.0, epsilon));
 assert(epsilonCompare(newtonSquareRoot(400.0, epsilon), 20.0, epsilon));
 assert(epsilonCompare(newtonSquareRoot(64.0, epsilon), 8.0, epsilon));
-assert(epsilonCompare(newtonSquareRoot(1233.0, epsilon), 35.1140997322, epsilon));
+return epsilonCompare(newtonSquareRoot(1233.0, epsilon), 35.1140997322, epsilon);

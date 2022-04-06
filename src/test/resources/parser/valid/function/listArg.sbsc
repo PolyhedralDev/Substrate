@@ -5,3 +5,5 @@ test = (a: list<int>) -> {
 };
 
 test([1, 2, 3, 5]);
+
+return true;

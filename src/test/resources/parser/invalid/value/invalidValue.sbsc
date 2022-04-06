@@ -5,3 +5,5 @@ a = "bazinga";
 println(a);
 
 println(b); // b does not exist
+
+return false;

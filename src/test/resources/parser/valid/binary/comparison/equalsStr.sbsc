@@ -3,4 +3,4 @@
 a = "test";
 b = "test";
 
-assert(a == b);
+return a == b;

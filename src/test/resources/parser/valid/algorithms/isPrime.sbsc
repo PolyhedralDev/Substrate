@@ -17,4 +17,5 @@ assert(!isPrime(207));
 assert(isPrime(2));
 assert(isPrime(3));
 assert(isPrime(29));
-assert(isPrime(277));
+
+return isPrime(277);

@@ -15,3 +15,5 @@ b = (test(a), "bazinga");
 c = (test(a), test2(b));
 
 test(c);
+
+return true;

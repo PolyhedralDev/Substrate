@@ -6,3 +6,5 @@ test = (function: fun<str>, a: str) -> {
 
 
 test(println, "bazinga");
+
+return true;
