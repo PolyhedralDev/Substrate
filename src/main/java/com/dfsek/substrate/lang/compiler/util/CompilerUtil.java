@@ -36,7 +36,7 @@ public final class CompilerUtil implements Opcodes {
         }
     }
 
-    public static ClassWriter generateClass(String superClass, String name, boolean iface, String... ifaces) {
+    public static ClassWriter generateClass(String name, String superClass, boolean iface, String... ifaces) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
 
         writer.visit(V1_8,
