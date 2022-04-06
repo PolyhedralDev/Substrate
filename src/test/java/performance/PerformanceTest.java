@@ -17,6 +17,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 public class PerformanceTest {
+
+    public record Input(boolean b) {
+    }
+
+    public record Output(boolean b) {
+    }
+
     public static void main(String... args) throws IOException {
         Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance/performance.sbsc"), Charset.defaultCharset()), new BaseRule());
 
@@ -41,12 +48,12 @@ public class PerformanceTest {
         });
 
 
-        Script script = parser.parse();
+        Script<Input, Output> script = parser.parse(Input.class, Output.class);
 
         for (int i = 0; i < 20; i++) {
             long s = System.nanoTime();
 
-            script.execute(null);
+            script.execute(new Input(false), null);
 
             long e = System.nanoTime();
             long d = e - s;

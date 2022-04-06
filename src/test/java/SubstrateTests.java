@@ -71,13 +71,19 @@ public class SubstrateTests {
         return createParserTest(path, false);
     }
 
+    public record Input(boolean b) {
+    }
+
+    public record Output(boolean b) {
+    }
+
     private Executable createParserTest(Path path, boolean optimised) {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser parser = createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
-                parser.parse().execute(null);
+                parser.parse(Input.class, Output.class).execute(new Input(true), null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -98,7 +104,7 @@ public class SubstrateTests {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser parser = createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
-                parser.parse().execute(null);
+                parser.parse(Input.class, Output.class).execute(new Input(true), null);
             } catch (ParseException e) {
                 if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return;
