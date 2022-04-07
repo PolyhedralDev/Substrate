@@ -335,6 +335,10 @@ public interface Op {
         return dup();
     }
 
+    static Either<CompileError, Op> aReturn() {
+        return insn(ARETURN);
+    }
+
     // type insns
     static Either<CompileError, Op> newInsn(String type) {
         return typeInsn(NEW, type);

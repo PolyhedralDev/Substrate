@@ -28,7 +28,7 @@ public class BaseRule {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
                 contents = contents.append(BlockRule.assemble(lexer, data, scope));
             } else if (lexer.peek().getType() == TokenType.RETURN) {
-                returnNode = ReturnRule.assemble(lexer, data, scope);
+                returnNode = ReturnRule.assemble(lexer, data, scope, data.getReturnType());
                 contents = contents.append(returnNode);
             } else { // Parse a statement.
                 contents = contents.append(StatementRule.assemble(lexer, data, scope));
