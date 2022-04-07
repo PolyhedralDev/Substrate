@@ -43,7 +43,8 @@ public class BaseRule {
                 } else {
                     node = ((StatementNode) contents.get(0)).getContent();
                 }
-                return new BlockNode(contents, List.of(new ReturnNode(Position.getNull(), node, data.getReturnType())), begin);
+                returnNode = new ReturnNode(Position.getNull(), node, data.getReturnType());
+                return new BlockNode(contents.append(returnNode), List.of(returnNode), begin);
             } else if (contents.size() == 0) {
                 throw new ParseException("Empty script.", Position.getNull());
             } else {
