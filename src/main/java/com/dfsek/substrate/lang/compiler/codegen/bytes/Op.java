@@ -344,6 +344,10 @@ public interface Op {
         return typeInsn(NEW, type);
     }
 
+    static Either<CompileError, Op> checkCast(String type) {
+        return typeInsn(CHECKCAST, type);
+    }
+
     static Either<CompileError, Op> newArray(int type) {
         return intInsn(NEWARRAY, type);
     }
