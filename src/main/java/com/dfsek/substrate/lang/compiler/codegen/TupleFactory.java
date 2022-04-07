@@ -141,7 +141,7 @@ public class TupleFactory {
 
     private static void generateRecordBoilerplate(ClassWriter writer, String name, List<Tuple2<String, String>> params) { // record intrinsic crap
         Object[] bootstrapArgs = List.of(Type.getType("L" + name + ";"),
-                        params.foldLeft("", (a, b) -> a + b._1)
+                        params.foldLeft("", (a, b) -> a + b._1 + ";")
                         )
                 .appendAll(params.map(t -> new Handle(
                         H_GETFIELD,
