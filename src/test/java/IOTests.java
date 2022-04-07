@@ -17,6 +17,10 @@ public class IOTests {
     private static final String returnTupleIntDoubleString = getScript("returnTupleIntDoubleString");
     private static final String inputClosureInt = getScript("inputClosureInt");
 
+    static {
+        System.setProperty("substrate.Dump", Boolean.toString(Utils.DUMP_TO_JARS));
+    }
+
     @Test
     public void singleBooleanRecordInput() throws NoSuchMethodException {
         assertTrue(Utils.createParser(returnInputScript, Records.BooleanInput.class, Records.BooleanInput.class).parse().execute(new Records.BooleanInput(true), null).input());
