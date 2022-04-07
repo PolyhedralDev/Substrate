@@ -138,7 +138,7 @@ public class ScriptBuilder implements Opcodes {
 
 
         if (!errors.isEmpty()) {
-            throw new IllegalStateException(errors.toString()); // todo: actual exception
+            throw new ParseException(errors.foldLeft(errors.size() + " error(s) present in script:\n\t", (s, e) -> s + e.message() + ": " + e.getPosition() + "\n\t"), errors.last().getPosition());
         }
 
 
