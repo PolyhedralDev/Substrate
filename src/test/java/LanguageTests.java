@@ -72,7 +72,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = Utils.createParser(data);
+                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
                 System.setProperty(property, Boolean.toString(optimised));
                 assertTrue(parser.parse().execute(new Input(true), null).b());
             } catch (Exception e) {
@@ -93,7 +93,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = Utils.createParser(data);
+                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
                 System.setProperty(property, Boolean.toString(optimised));
                 parser.parse().execute(new Input(true), null);
             } catch (ParseException e) {
