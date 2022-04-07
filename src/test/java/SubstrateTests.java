@@ -72,7 +72,7 @@ public class SubstrateTests {
         return createParserTest(path, false);
     }
 
-    public record Input(boolean b) {
+    public record Input(boolean booleanInput) {
     }
 
     public record Output(boolean b) {
