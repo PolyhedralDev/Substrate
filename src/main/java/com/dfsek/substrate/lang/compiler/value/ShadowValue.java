@@ -7,14 +7,10 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-public class ShadowValue implements Value {
-    private final Signature signature;
-    private final int field;
-
-    public ShadowValue(Signature signature, int field) {
-        this.signature = signature;
-        this.field = field;
-    }
+public record ShadowValue(
+        Signature signature,
+        int field
+) implements Value {
 
     @Override
     public List<Either<CompileError, Op>> load(BuildData data) {

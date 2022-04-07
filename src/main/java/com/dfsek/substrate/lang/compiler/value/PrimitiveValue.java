@@ -8,14 +8,10 @@ import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-public class PrimitiveValue implements Value {
-    private final Signature reference;
-    private final int offset;
-
-    public PrimitiveValue(Signature reference, int offset) {
-        this.reference = reference;
-        this.offset = offset;
-    }
+public record PrimitiveValue(
+        Signature reference,
+        int offset
+) implements Value {
 
     @Override
     public List<Either<CompileError, Op>> load(BuildData data) {
@@ -25,11 +21,6 @@ public class PrimitiveValue implements Value {
                         s -> Op.errorUnwrapped(s, Position.getNull()),
                         load -> Op.varInsnUnwrapped(load, offset)
                 ));
-    }
-
-    @Override
-    public Signature reference() {
-        return reference;
     }
 
 }

@@ -8,12 +8,9 @@ import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-public class BakedValue implements Value {
-    private final ConstantExpressionNode<?> value;
-
-    public BakedValue(ConstantExpressionNode<?> value) {
-        this.value = value;
-    }
+public record BakedValue(
+        ConstantExpressionNode<?> value
+) implements Value {
 
     @Override
     public Signature reference() {

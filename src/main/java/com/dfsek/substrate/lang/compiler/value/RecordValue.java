@@ -5,23 +5,17 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 /**
  * Value fetched from the record passed as input
  */
-public class RecordValue implements Value {
-    private final Signature ref;
-    private final Class<? extends Record> inputClass;
-    private final int index;
-
-    public RecordValue(Signature ref, Class<? extends Record> inputClass, int index) {
-        this.ref = ref;
-        this.inputClass = inputClass;
-        this.index = index;
-    }
+public record RecordValue(
+        Signature ref,
+        Class<? extends Record> inputClass,
+        int index
+) implements Value {
 
     @Override
     public Signature reference() {

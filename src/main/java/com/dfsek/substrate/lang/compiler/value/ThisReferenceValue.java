@@ -8,12 +8,9 @@ import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-public class ThisReferenceValue implements Value {
-    private final Signature ref;
-
-    public ThisReferenceValue(Signature ref) {
-        this.ref = ref;
-    }
+public record ThisReferenceValue(
+        Signature ref
+) implements Value {
 
     @Override
     public Signature reference() {
