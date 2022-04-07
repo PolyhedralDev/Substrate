@@ -13,6 +13,7 @@ import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
+import com.dfsek.substrate.lang.compiler.value.RecordValue;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -27,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.RecordComponent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
@@ -70,6 +72,12 @@ public class ScriptBuilder implements Opcodes {
         ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
 
         BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
+
+        RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
+        for (int i = 0; i < recordComponents.length; i++) {
+            RecordComponent recordComponent = recordComponents[i];
+            data.registerValue(recordComponent.getName(), new RecordValue(Signature.fromClass(recordComponent.getType()), parseData.getParameterClass(), i));
+        }
 
         // prepare functions.
 
