@@ -58,6 +58,7 @@ public class TupleFactory {
         Class<?> tuple = generate(argSignature).clazz();
         String tupleName = CompilerUtil.internalName(tuple);
         return List.of(Op.newInsn(tupleName))
+                .append(Op.dup())
                 .appendAll(args)
                 .append(Op.invokeSpecial(tupleName, "<init>", "(" + argSignature.internalDescriptor() + ")V"));
     }
