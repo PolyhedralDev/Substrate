@@ -83,7 +83,7 @@ public class TupleFactory {
             constructor.visitCode();
             constructor.visitVarInsn(ALOAD, 0); // Put this reference on stack
             constructor.visitMethodInsn(INVOKESPECIAL, // Invoke Object super constructor
-                    "java/lang/Object",
+                    Classes.RECORD,
                     "<init>",
                     "()V",
                     false);
