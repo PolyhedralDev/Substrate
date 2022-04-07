@@ -18,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class SubstrateTests {
     private static final String property = "substrate.DisableOptimisation";
 
@@ -82,7 +84,7 @@ public class SubstrateTests {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser<Input, Output> parser = createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
-                parser.parse().execute(new Input(true), null);
+                assertTrue(parser.parse().execute(new Input(true), null).b());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
