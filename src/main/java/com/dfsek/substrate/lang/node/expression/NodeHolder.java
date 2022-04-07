@@ -16,11 +16,11 @@ public abstract class NodeHolder implements Node {
 
     private Stream<? extends Node> streamContents(Node start) {
         if (start instanceof NodeHolder) {
-            return Stream.ofAll(((NodeHolder) start)
+            return Stream.concat(Stream.of(start), Stream.ofAll(((NodeHolder) start)
                             .cachedContents.get())
-                    .flatMap(node -> Stream.concat(Stream.of(node), streamContents(node)));
+                    .flatMap(node -> Stream.concat(Stream.of(node), streamContents(node))));
         } else {
-            return Stream.empty();
+            return Stream.of(start);
         }
     }
 }
