@@ -12,8 +12,6 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-import static io.vavr.API.List;
-
 public class TupleNode extends ExpressionNode {
     private final List<ExpressionNode> args;
     private final Position position;
@@ -25,12 +23,11 @@ public class TupleNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        Signature signature = reference();
-        Class<?> tuple = data.tupleFactory().generate(signature).clazz();
-        String tupleName = CompilerUtil.internalName(tuple);
-        return List(Op.newInsn(tupleName), Op.dup())
-                .appendAll(args.flatMap(arg -> arg.simplify().apply(data).appendAll(CompilerUtil.deconstructTuple(arg, data))))
-                .append(Op.invokeSpecial(tupleName, "<init>", "(" + signature.internalDescriptor() + ")V"));
+        return data.tupleFactory()
+                .construct(
+                        reference(),
+                        args.flatMap(arg -> arg.simplify().apply(data).appendAll(CompilerUtil.deconstructTuple(arg, data)))
+                );
     }
 
     @Override
