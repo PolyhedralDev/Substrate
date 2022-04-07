@@ -13,8 +13,6 @@ import io.vavr.control.Either;
 import java.util.Collection;
 import java.util.Collections;
 
-import static io.vavr.API.List;
-
 public class ReturnNode extends ExpressionNode {
     private final Position position;
 
@@ -32,7 +30,8 @@ public class ReturnNode extends ExpressionNode {
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         if (value == null) return List.empty();
         if (record != null && record.size() == 1) {
-            return List(record.equals(value.reference()) ? Op.nothing() : Op.error("Invalid return type: " + value.reference(), value.getPosition()))
+            return value.simplify().apply(data)
+                    .append(record.equals(value.reference()) ? Op.nothing() : Op.error("Invalid return type: " + value.reference(), value.getPosition()))
                     .append(record.storeInsn()
                             .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))
                             .map(insn -> Op.varInsnUnwrapped(insn, data.getOffset())))
