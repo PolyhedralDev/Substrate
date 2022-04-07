@@ -34,7 +34,7 @@ public class LanguageTests {
         Assertions.fail();
     }
 
-    private Parser<Input, Output> createParser(String script) throws NoSuchMethodException {
+    private static Parser<Input, Output> createParser(String script) throws NoSuchMethodException {
         Parser<Input, Output> parser = new Parser<>(script, Input.class, Output.class);
         parser.registerFunction("fail", new StaticFunction(LanguageTests.class.getMethod("fail")));
         parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
