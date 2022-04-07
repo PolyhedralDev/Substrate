@@ -31,6 +31,9 @@ public class RecordValue implements Value {
     @Override
     public List<Either<CompileError, Op>> load(BuildData data) {
         return List.of(Op.aLoad(1))
-                .append(Op.invokeVirtual(CompilerUtil.internalName(inputClass), inputClass.getRecordComponents()[index].getName(), ref.internalDescriptor()));
+                .append(Op.invokeVirtual(
+                        CompilerUtil.internalName(inputClass),
+                        inputClass.getRecordComponents()[index].getName(),
+                        "()" + ref.internalDescriptor()));
     }
 }
