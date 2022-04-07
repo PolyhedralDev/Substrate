@@ -38,8 +38,8 @@ public class BuildData {
         values = new HashMap<>();
         valueOffsets = new HashMap<>();
         parent = null;
-        this.offset = 2;
-        this.implArgsOffset = 1;
+        this.offset = 3;
+        this.implArgsOffset = 2;
         this.macros = new HashMap<>();
     }
 
