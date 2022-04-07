@@ -18,9 +18,12 @@ public class ReturnNode extends ExpressionNode {
 
     private final ExpressionNode value;
 
-    public ReturnNode(Position position, ExpressionNode value) {
+    private final Signature record;
+
+    public ReturnNode(Position position, ExpressionNode value, Signature record) {
         this.position = position;
         this.value = value;
+        this.record = record;
     }
 
     @Override

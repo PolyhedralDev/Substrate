@@ -2,7 +2,6 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.StatementNode;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -19,7 +18,7 @@ import io.vavr.collection.List;
  * The base rule of the parser.
  */
 public class BaseRule {
-    public static Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static <P extends Record, R extends Record> Node assemble(Lexer lexer, ParseData<P, R> data, ParserScope scope) throws ParseException {
         List<Node> contents = List.empty();
 
         Position begin = lexer.peek().getPosition();
@@ -44,7 +43,7 @@ public class BaseRule {
                 } else {
                     node = ((StatementNode) contents.get(0)).getContent();
                 }
-                return new BlockNode(contents, List.of(new ReturnNode(Position.getNull(), node)), begin);
+                return new BlockNode(contents, List.of(new ReturnNode(Position.getNull(), node, data.getReturnType())), begin);
             } else if (contents.size() == 0) {
                 throw new ParseException("Empty script.", Position.getNull());
             } else {
