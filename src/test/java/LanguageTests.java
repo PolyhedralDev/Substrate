@@ -46,19 +46,19 @@ public class LanguageTests {
         return Stream.of(
                 DynamicContainer.dynamicContainer("Parser Tests", Stream.of(
                         DynamicContainer.dynamicContainer("Optimised", Stream.of(
-                                        register("Valid Scripts", Paths.get("src", "test", "resources", "parser", "valid"), this::createParserTestOptimised),
-                                        register("Invalid Scripts", Paths.get("src", "test", "resources", "parser", "invalid"), this::createInvalidParserTestOptimised)
+                                        register("Valid Scripts", Paths.get("src", "test", "resources", "scripts/language/parser", "valid"), this::createParserTestOptimised),
+                                        register("Invalid Scripts", Paths.get("src", "test", "resources", "scripts/language/parser", "invalid"), this::createInvalidParserTestOptimised)
                                 ).sorted(Comparator.comparing(DynamicNode::getDisplayName))
                         ),
                         DynamicContainer.dynamicContainer("Unoptimised", Stream.of(
-                                        register("Valid Scripts", Paths.get("src", "test", "resources", "parser", "valid"), this::createParserTestUnoptimised),
-                                        register("Invalid Scripts", Paths.get("src", "test", "resources", "parser", "invalid"), this::createInvalidParserTestUnoptimised)
+                                        register("Valid Scripts", Paths.get("src", "test", "resources", "scripts/language/parser", "valid"), this::createParserTestUnoptimised),
+                                        register("Invalid Scripts", Paths.get("src", "test", "resources", "scripts/language/parser", "invalid"), this::createInvalidParserTestUnoptimised)
                                 ).sorted(Comparator.comparing(DynamicNode::getDisplayName))
                         )
                 )),
                 DynamicContainer.dynamicContainer("Tokenizer Tests", Stream.of(
-                        register("Invalid Scripts", Paths.get("src", "test", "resources", "tokenizer", "invalid"), this::createInvalidLexerTest),
-                        register("Valid Scripts", Paths.get("src", "test", "resources", "tokenizer", "valid"), this::createLexerTest)
+                        register("Invalid Scripts", Paths.get("src", "test", "resources", "scripts/language/tokenizer", "invalid"), this::createInvalidLexerTest),
+                        register("Valid Scripts", Paths.get("src", "test", "resources", "scripts/language/tokenizer", "valid"), this::createLexerTest)
                 ).sorted(Comparator.comparing(DynamicNode::getDisplayName)))
         ).sorted(Comparator.comparing(DynamicNode::getDisplayName));
     }
