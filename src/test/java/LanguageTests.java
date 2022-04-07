@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LanguageTests {
     private static final String property = "substrate.DisableOptimisation";
@@ -28,17 +29,6 @@ public class LanguageTests {
 
     static {
         System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));
-    }
-
-    public static void fail() {
-        Assertions.fail();
-    }
-
-    private static Parser<Input, Output> createParser(String script) throws NoSuchMethodException {
-        Parser<Input, Output> parser = new Parser<>(script, Input.class, Output.class);
-        parser.registerFunction("fail", new StaticFunction(LanguageTests.class.getMethod("fail")));
-        parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
-        return parser;
     }
 
     @TestFactory
@@ -82,7 +72,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = createParser(data);
+                Parser<Input, Output> parser = Utils.createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
                 assertTrue(parser.parse().execute(new Input(true), null).b());
             } catch (Exception e) {
@@ -103,7 +93,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = createParser(data);
+                Parser<Input, Output> parser = Utils.createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
                 parser.parse().execute(new Input(true), null);
             } catch (ParseException e) {
