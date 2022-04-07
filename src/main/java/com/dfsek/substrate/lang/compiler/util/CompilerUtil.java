@@ -10,6 +10,7 @@ import io.vavr.control.Either;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,7 +23,7 @@ public final class CompilerUtil implements Opcodes {
     }
 
     public static String internalName(Class<?> clazz) {
-        return internalName(clazz.getCanonicalName());
+        return Type.getInternalName(clazz);
     }
 
     public static void dump(String clazz, byte[] bytes, ZipOutputStream zipOutputStream) {
