@@ -1,4 +1,3 @@
-import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.parser.Parser;
@@ -22,13 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class LanguageTests {
-    private static final String property = "substrate.DisableOptimisation";
-
-    private static final boolean STACK_TRACES_FOR_INVALID = true;
-    private static final boolean DUMP_TO_JARS = true;
 
     static {
-        System.setProperty("substrate.Dump", Boolean.toString(DUMP_TO_JARS));
+        System.setProperty("substrate.Dump", Boolean.toString(Utils.DUMP_TO_JARS));
     }
 
     @TestFactory
@@ -73,7 +68,7 @@ public class LanguageTests {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
-                System.setProperty(property, Boolean.toString(optimised));
+                System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, Boolean.toString(optimised));
                 assertTrue(parser.parse().execute(new Input(true), null).b());
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -94,10 +89,10 @@ public class LanguageTests {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
-                System.setProperty(property, Boolean.toString(optimised));
+                System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, Boolean.toString(optimised));
                 parser.parse().execute(new Input(true), null);
             } catch (ParseException e) {
-                if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
+                if (Utils.STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -131,7 +126,7 @@ public class LanguageTests {
                     lexer.consume();
                 }
             } catch (TokenizerException e) {
-                if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
+                if (Utils.STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return; // These scripts should fail to parse
             } catch (IOException e) {
                 throw new RuntimeException(e);

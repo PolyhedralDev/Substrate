@@ -15,6 +15,7 @@ public class IOTests {
     private static final String returnInputScript = getScript("returnInput");
     private static final String compareInputsEquals = getScript("compareInputsEquals");
     private static final String returnTupleIntDoubleString = getScript("returnTupleIntDoubleString");
+    private static final String inputClosureInt = getScript("inputClosureInt");
 
     @Test
     public void singleBooleanRecordInput() throws NoSuchMethodException {
@@ -54,6 +55,13 @@ public class IOTests {
     @Test
     public void returnTupleIntDoubleString() throws NoSuchMethodException {
         assertEquals(new Records.IntDoubleString(5, 4.3, "bazinga"), Utils.createParser(returnTupleIntDoubleString, Records.Void.class, Records.IntDoubleString.class).parse().execute(new Records.Void(), null));
+    }
+
+    @Test
+    public void inputClosureInt() throws NoSuchMethodException {
+        System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, "true");
+        assertEquals(5, Utils.createParser(inputClosureInt, Records.IntInput.class, Records.IntInput.class).parse().execute(new Records.IntInput(5), null).input());
+        System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
     }
 
     private static String getScript(String script) {
