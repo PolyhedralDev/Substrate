@@ -15,3 +15,5 @@ newtonSquareRoot = (n: num, l: num): num -> {
 epsilon = 0.001;
 
 forEach(0..1000000, (i: int) -> assert(epsilonCompare(newtonSquareRoot(num(i), epsilon), sqrt(num(i)), epsilon)));
+
+return true;
