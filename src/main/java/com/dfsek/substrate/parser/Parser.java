@@ -7,6 +7,8 @@ import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
+import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.RecordValue;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
@@ -14,6 +16,7 @@ import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.parser.exception.ParseException;
 
+import java.lang.reflect.RecordComponent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -81,6 +84,10 @@ public class Parser<P extends Record, R extends Record> {
     public Parser(String data, Class<P> parameters, Class<R> ret) throws ParseException {
         lexer = new Lexer(data);
         this.data = new ParseData<>(parameters, ret);
+
+        for (RecordComponent recordComponent : parameters.getRecordComponents()) {
+            scope.register(recordComponent.getName(), Signature.fromClass(recordComponent.getType()));
+        }
 
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
