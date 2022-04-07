@@ -19,7 +19,7 @@ import io.vavr.collection.List;
  * The base rule of the parser.
  */
 public class BaseRule {
-    public static Node assemble(Lexer lexer, ParseData data, ParserScope scope, Signature args, Signature ret) throws ParseException {
+    public static Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = List.empty();
 
         Position begin = lexer.peek().getPosition();

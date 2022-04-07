@@ -6,7 +6,6 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.parser.Parser;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 public class PerformanceTest {
 
@@ -25,7 +25,7 @@ public class PerformanceTest {
     }
 
     public static void main(String... args) throws IOException {
-        Parser parser = new Parser(IOUtils.toString(PerformanceTest.class.getResource("/performance/performance.sbsc"), Charset.defaultCharset()));
+        Parser<Input, Output> parser = new Parser<>(IOUtils.toString(Objects.requireNonNull(PerformanceTest.class.getResource("/performance/performance.sbsc")), Charset.defaultCharset()), Input.class, Output.class);
 
         parser.registerFunction("assert", new com.dfsek.substrate.lang.compiler.api.Function() {
             @Override
@@ -48,7 +48,7 @@ public class PerformanceTest {
         });
 
 
-        Script<Input, Output> script = parser.parse(Input.class, Output.class);
+        Script<Input, Output> script = parser.parse();
 
         for (int i = 0; i < 20; i++) {
             long s = System.nanoTime();

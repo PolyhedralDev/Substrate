@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
@@ -18,7 +17,7 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Parser {
+public class Parser<P extends Record, R extends Record> {
     private static final Map<String, StaticFunction> STATIC_FUNCTIONS = new LinkedHashMap<>();
 
     static {
@@ -75,21 +74,25 @@ public class Parser {
     private final Lexer lexer;
     private final ScriptBuilder builder = new ScriptBuilder();
     private final ParserScope scope = new ParserScope();
-    private final ParseData data = new ParseData();
+    private final ParseData<P, R> data;
 
-    public Parser(String data) throws ParseException {
+
+
+    public Parser(String data, Class<P> parameters, Class<R> ret) throws ParseException {
         lexer = new Lexer(data);
+        this.data = new ParseData<>(parameters, ret);
+
         registerFunction("println", new Println());
         registerMacro("forEach", new ForEach());
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);
     }
 
-    public <P extends Record, R extends Record> Script<P, R> parse(Class<P> parameters, Class<R> ret) throws ParseException {
+    public Script<P, R> parse() throws ParseException {
         while (lexer.hasNext()) {
-            builder.addOperation(BaseRule.assemble(lexer, data, scope, Signature.fromRecord(parameters), Signature.fromRecord(ret)));
+            builder.addOperation(BaseRule.assemble(lexer, data, scope));
         }
-        return builder.build(data, parameters, ret);
+        return builder.build(data);
     }
 
     public void registerMacro(String id, Macro macro) {

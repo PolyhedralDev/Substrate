@@ -1,6 +1,5 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
-import com.dfsek.substrate.Environment;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Function;
@@ -42,16 +41,23 @@ public class ScriptBuilder implements Opcodes {
         this.ops = ops.append(op); // todo: bad
     }
 
-    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Class<P> parameters, Class<R> ret) throws ParseException {
+    public <P extends Record, R extends Record> Script<P, R> build(ParseData<P, R> parseData) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         ZipOutputStream zipOutputStream;
         if ("true".equals(System.getProperty("substrate.Dump"))) {
             try {
                 File out = new File(".substrate/dumps/" + builds + ".jar");
                 System.out.println("Dumping to " + out.getAbsolutePath());
-                if (out.exists()) out.delete();
+
+                if (out.exists()) {
+                    // noinspection ResultOfMethodCallIgnored
+                    out.delete();
+                }
+                // noinspection ResultOfMethodCallIgnored
                 out.getParentFile().mkdirs();
+                // noinspection ResultOfMethodCallIgnored
                 out.createNewFile();
+
                 zipOutputStream = new ZipOutputStream(new FileOutputStream(out));
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -63,7 +69,7 @@ public class ScriptBuilder implements Opcodes {
 
         ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
 
-        BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parameters, ret));
+        BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
 
         // prepare functions.
 
@@ -119,7 +125,6 @@ public class ScriptBuilder implements Opcodes {
                                     op.apply(absMethod);
                                     return List.empty();
                                 })));
-        absMethod.visitInsn(ARETURN);
         absMethod.visitMaxs(0, 0);
         absMethod.visitEnd();
 
@@ -152,7 +157,8 @@ public class ScriptBuilder implements Opcodes {
         builds++;
         try {
             Object instance = clazz.getDeclaredConstructor().newInstance();
-            return (Script) instance;
+            //noinspection unchecked
+            return (Script<P, R>) instance;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }

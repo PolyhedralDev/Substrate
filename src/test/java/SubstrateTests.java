@@ -1,4 +1,3 @@
-import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
@@ -33,8 +32,8 @@ public class SubstrateTests {
         Assertions.fail();
     }
 
-    private Parser createParser(String script) throws NoSuchMethodException {
-        Parser parser = new Parser(script);
+    private Parser<Input, Output> createParser(String script) throws NoSuchMethodException {
+        Parser<Input, Output> parser = new Parser<>(script, Input.class, Output.class);
         parser.registerFunction("fail", new StaticFunction(SubstrateTests.class.getMethod("fail")));
         parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;
@@ -81,9 +80,9 @@ public class SubstrateTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = createParser(data);
+                Parser<Input, Output> parser = createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
-                parser.parse(Input.class, Output.class).execute(new Input(true), null);
+                parser.parse().execute(new Input(true), null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -102,9 +101,9 @@ public class SubstrateTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser parser = createParser(data);
+                Parser<Input, Output> parser = createParser(data);
                 System.setProperty(property, Boolean.toString(optimised));
-                parser.parse(Input.class, Output.class).execute(new Input(true), null);
+                parser.parse().execute(new Input(true), null);
             } catch (ParseException e) {
                 if (STACK_TRACES_FOR_INVALID) e.printStackTrace();
                 return;
