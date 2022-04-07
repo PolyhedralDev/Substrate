@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SubstrateTests {
+public class LanguageTests {
     private static final String property = "substrate.DisableOptimisation";
 
     private static final boolean STACK_TRACES_FOR_INVALID = true;
@@ -36,7 +36,7 @@ public class SubstrateTests {
 
     private Parser<Input, Output> createParser(String script) throws NoSuchMethodException {
         Parser<Input, Output> parser = new Parser<>(script, Input.class, Output.class);
-        parser.registerFunction("fail", new StaticFunction(SubstrateTests.class.getMethod("fail")));
+        parser.registerFunction("fail", new StaticFunction(LanguageTests.class.getMethod("fail")));
         parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;
     }
