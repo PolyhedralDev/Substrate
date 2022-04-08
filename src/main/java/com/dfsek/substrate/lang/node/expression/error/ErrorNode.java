@@ -25,7 +25,7 @@ public class ErrorNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        throw new ParseException(message, position);
+        return List.of(Op.error(message, position));
     }
 
     @Override
