@@ -17,10 +17,18 @@ import java.util.Collections;
 public class ErrorNode extends ExpressionNode {
     private final Position position;
     private final String message;
+    private final Signature signature;
+
+    public ErrorNode(Position position, String message, Signature signature) {
+        this.position = position;
+        this.message = message;
+        this.signature = signature;
+    }
 
     public ErrorNode(Position position, String message) {
         this.position = position;
         this.message = message;
+        this.signature = Signature.empty();
     }
 
     @Override
@@ -30,7 +38,7 @@ public class ErrorNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return Signature.empty();
+        return signature;
     }
 
     @Override
