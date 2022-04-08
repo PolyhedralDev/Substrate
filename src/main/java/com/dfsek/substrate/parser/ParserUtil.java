@@ -4,10 +4,13 @@ import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Typed;
 import com.dfsek.substrate.lexer.Lexer;
+import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.read.Positioned;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.Tuple2;
+import io.vavr.control.Either;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +48,11 @@ public final class ParserUtil {
     public static Token checkType(Token token, TokenType... expected) throws ParseException {
         for (TokenType type : expected) if (token.getType().equals(type)) return token;
         throw new ParseException("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition());
+    }
+
+    public static Either<Tuple2<String, Position>, Token> checkTypeFunctional(Token token, TokenType... expected) throws ParseException {
+        for (TokenType type : expected) if (token.getType().equals(type)) return Either.right(token);
+        return Either.left(new Tuple2<>("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition()));
     }
 
     public static <T extends Typed & Positioned> T checkReturnType(T typed, Signature... expected) throws ParseException {
