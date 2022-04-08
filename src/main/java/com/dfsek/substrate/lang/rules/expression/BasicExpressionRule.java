@@ -27,32 +27,45 @@ public class BasicExpressionRule {
                         TokenType.NUMBER,
                         TokenType.INT)
                 .fold(ErrorNode::new, token -> Match(token.getType())
-                        .of(Case($(TokenType.STRING),
+                        .of(
+                                Case($(TokenType.STRING),
                                         () -> new StringNode(lexer.consume().getContent(), token.getPosition())),
                                 Case($(TokenType.BOOLEAN), () ->
                                         Try(() -> (ExpressionNode) new BooleanNode(
                                                 Boolean.parseBoolean(lexer.consume().getContent()),
                                                 token.getPosition()
-                                        )).getOrElse(new ErrorNode(token.getPosition(), "Malformed boolean literal", Signature.bool()))),
+                                        )).getOrElse(new ErrorNode(
+                                                token.getPosition(),
+                                                "Malformed boolean literal",
+                                                Signature.bool()
+                                        ))),
                                 Case($(TokenType.NUMBER), () ->
                                         Try(() -> (ExpressionNode) new DecimalNode(
                                                 Double.parseDouble(lexer.consume().getContent()),
                                                 token.getPosition()
-                                        )).getOrElse(new ErrorNode(token.getPosition(), "Malformed decimal literal", Signature.decimal()))),
+                                        )).getOrElse(new ErrorNode(
+                                                token.getPosition(),
+                                                "Malformed decimal literal",
+                                                Signature.decimal()
+                                        ))),
                                 Case($(TokenType.INT), () ->
                                         Try(() -> (ExpressionNode) new IntegerNode(
                                                 Integer.parseInt(lexer.consume().getContent()),
                                                 token.getPosition()
-                                        )).getOrElse(new ErrorNode(token.getPosition(), "Malformed integer literal", Signature.integer()))),
+                                        )).getOrElse(new ErrorNode(
+                                                token.getPosition(),
+                                                "Malformed integer literal",
+                                                Signature.integer()
+                                        ))),
                                 Case($(t -> lexer.peek(1).getType() == TokenType.ASSIGNMENT),
                                         () -> ValueAssignmentRule.assemble(lexer, data, scope)),
                                 Case($(), () -> ParserUtil.checkTypeFunctional(token, TokenType.IDENTIFIER)
                                         .fold(ErrorNode::new, id ->
-                                                new ValueReferenceNode(
+                                                Try(() -> (ExpressionNode) new ValueReferenceNode(
                                                         id,
-                                                        Try(() -> scope.get(lexer.consume().getContent()))
-                                                                .getOrElseThrow(() -> new ParseException("No such value: " + token.getContent(), token.getPosition()))
-                                                )))
+                                                        scope.get(lexer.consume().getContent())
+                                                )).getOrElse(() -> new ErrorNode(token.getPosition(), "No such value: " + token.getContent()))
+                                        ))
                         ));
     }
 }
