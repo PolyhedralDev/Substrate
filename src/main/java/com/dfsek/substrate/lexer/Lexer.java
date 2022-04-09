@@ -5,7 +5,7 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.Stream;
 
 public class Lexer {
-    private Stream<Token> tokens;
+    private Stream<Token> tokens; // todo: make not bad
     private Token last;
 
     public Lexer(String data) throws ParseException {
