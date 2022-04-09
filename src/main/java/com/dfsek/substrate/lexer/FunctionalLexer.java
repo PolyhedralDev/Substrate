@@ -2,7 +2,6 @@ package com.dfsek.substrate.lexer;
 
 
 import com.dfsek.substrate.lexer.exceptions.EOFException;
-import com.dfsek.substrate.lexer.exceptions.FormatException;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.lexer.read.Char;
 import com.dfsek.substrate.lexer.read.Position;
@@ -86,6 +85,12 @@ public class FunctionalLexer {
         return Option.of(new Tuple2<>(new Token(str.map(Char::getCharacter).toCharSeq().mkString(), TokenType.STRING, new Position(chars.get().getLine(), chars.get().getIndex())), remaining.tail()));
     }
 
+    private static Option<Tuple2<? extends Token, ? extends Stream<Char>>> consumeBlockCommentAndFetch(Stream<Char> chars) {
+        int index = chars.map(Char::getCharacter).indexOfSlice(CharSeq("*/"));
+        if(index == -1) throw new EOFException("No end of string literal", chars.get().getPosition()); // TODO return error token
+        return fetch(chars.subSequence(index).drop(2));
+    }
+
     private static boolean isNumberLike(Stream<Char> chars) {
         if (chars.get().is('.') && chars.get(1).is('.')) return false; // range
         return chars.get().isDigit()
@@ -102,7 +107,7 @@ public class FunctionalLexer {
                 Case($(Stream::isEmpty), c -> Option.none()),
                 Case($(c -> c.get().isEOF()), c -> Option.none()),
                 Case(startsWith("//"), d -> fetch(d.dropUntil(c -> c.getCharacter() == '\n').tail())),
-                Case(startsWith("/*"), d -> fetch(d.subSequence(d.map(Char::getCharacter).indexOfSlice(CharSeq("*/"))).drop(2))),
+                Case(startsWith("/*"), FunctionalLexer::consumeBlockCommentAndFetch),
                 Case($(FunctionalLexer::isNumberStart), FunctionalLexer::parseNumber),
                 Case($(c -> c.get().is('"')), FunctionalLexer::parseString),
                 match("->", TokenType.ARROW),
