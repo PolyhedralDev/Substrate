@@ -6,10 +6,12 @@ import com.dfsek.substrate.lexer.read.Char;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import io.vavr.Function1;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
-import io.vavr.collection.*;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 
 import static io.vavr.API.*;
@@ -50,9 +52,9 @@ public class FunctionalLexer {
                 Option.of(new Tuple2<>(new Token("" + c.get().getCharacter(), tokenType, c.get().getPosition()), c.tail())));
     }
 
-    private static Match.Case<Stream<Char>, Option<Tuple2<Token, Stream<Char>>>> literalMatch(String literal, TokenType tokenType) {
-        return Case($(c -> c.map(Char::getCharacter).startsWith(CharSeq(literal))), c ->
-                Option.of(new Tuple2<>(new Token(literal, tokenType, c.get().getPosition()), c.drop(literal.length()))));
+    private static Match.Case<String, Option<Tuple2<Token, Stream<Char>>>> literalMatch(Stream<Char> chars, String literal, TokenType tokenType) {
+        return Case($(c -> c.equals(literal)), c ->
+                Option.of(new Tuple2<>(new Token(literal, tokenType, chars.get().getPosition()), chars.drop(literal.length()))));
     }
 
     private static String parseWord(Stream<Char> chars) {
@@ -139,25 +141,24 @@ public class FunctionalLexer {
 
                 charMatch('=', TokenType.ASSIGNMENT),
                 charMatch(':', TokenType.TYPE),
-                literalMatch("false", TokenType.BOOLEAN),
-                literalMatch("true", TokenType.BOOLEAN),
+                Case($(), c -> Match(parseWord(c)).of(
+                                literalMatch(c, "false", TokenType.BOOLEAN),
+                                literalMatch(c, "true", TokenType.BOOLEAN),
 
-                literalMatch("return", TokenType.RETURN),
+                                literalMatch(c, "return", TokenType.RETURN),
 
-                literalMatch("num", TokenType.NUM_TYPE),
-                literalMatch("int", TokenType.INT_TYPE),
-                literalMatch("bool", TokenType.BOOL_TYPE),
-                literalMatch("str", TokenType.STRING_TYPE),
-                literalMatch("fun", TokenType.FUN_TYPE),
-                literalMatch("list", TokenType.LIST_TYPE),
+                                literalMatch(c, "num", TokenType.NUM_TYPE),
+                                literalMatch(c, "int", TokenType.INT_TYPE),
+                                literalMatch(c, "bool", TokenType.BOOL_TYPE),
+                                literalMatch(c, "str", TokenType.STRING_TYPE),
+                                literalMatch(c, "fun", TokenType.FUN_TYPE),
+                                literalMatch(c, "list", TokenType.LIST_TYPE),
 
-                literalMatch("if", TokenType.IF),
-                literalMatch("else", TokenType.ELSE),
+                                literalMatch(c, "if", TokenType.IF),
+                                literalMatch(c, "else", TokenType.ELSE),
 
-                Case($(), c -> {
-                    String word = parseWord(c);
-                    return Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, c.get().getPosition()), c.drop(word.length())));
-                })
-        ));
+                                Case($(), word -> Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, c.get().getPosition()), c.drop(word.length()))))
+                        )
+                )));
     }
 }
