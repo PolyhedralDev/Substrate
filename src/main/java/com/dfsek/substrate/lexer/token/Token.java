@@ -3,7 +3,7 @@ package com.dfsek.substrate.lexer.token;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.read.Positioned;
 
-public class Token implements Positioned {
+public final class Token implements Positioned {
     private final String content;
     private final TokenType type;
     private final Position start;

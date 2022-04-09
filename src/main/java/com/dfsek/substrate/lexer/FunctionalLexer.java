@@ -9,37 +9,31 @@ import com.dfsek.substrate.lexer.token.TokenType;
 import io.vavr.Function1;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.List;
-import io.vavr.collection.Set;
-import io.vavr.collection.Stream;
+import io.vavr.collection.*;
+import io.vavr.control.Option;
 
 import static io.vavr.API.*;
 
 public class FunctionalLexer {
-    public static final Set<Character> syntaxSignificant = HashSet.of(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.', '$', '[', ']');
-    private final Stream<Char> data;
-    private final Token current;
+    private static final Set<Character> syntaxSignificant = HashSet.of(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.', '$', '[', ']');
 
-    public FunctionalLexer(String data) {
-        this(Function(() -> {
-            int line = 1;
-            int index = 0;
-            List<Char> chars = List();
-            for (char c : data.toCharArray()) {
-                if (c == '\n') {
-                    index = 0;
-                    line++;
-                }
-                index++;
-                chars = chars.append(new Char(c, index, line));
+    public static Stream<Token> stream(String data) {
+        int line = 1;
+        int index = 0;
+        List<Char> chars = List();
+        for (char c : data.toCharArray()) {
+            if (c == '\n') {
+                index = 0;
+                line++;
             }
-            return chars.toStream();
-        }).apply());
+            index++;
+            chars = chars.append(new Char(c, index, line));
+        }
+        return stream(chars.toStream());
     }
 
-    public FunctionalLexer(Stream<Char> data) {
-        Tuple2<Stream<Char>, Token> fetch = fetch(Match(data.dropWhile(
+    public static Stream<Token> stream(Stream<Char> data) {
+        return Stream.unfoldRight(data, (newData -> fetch(Match((newData).dropWhile(
                 Predicates.anyOf(
                         CharOperations::isEOF,
                         CharOperations::isWhitespace
@@ -48,36 +42,33 @@ public class FunctionalLexer {
                 Case(startsWith("//"), d -> d.dropWhile(c -> c.getCharacter() != '\n')),
                 Case(startsWith("/*"), d -> d.subSequence(d.map(Char::getCharacter).indexOfSlice(CharSeq("*/")))),
                 Case($(), Function1.identity())
-        ));
-        this.data = fetch._1;
-
-        this.current = fetch._2;
+        ))));
     }
 
     private static Match.Pattern0<Stream<Char>> startsWith(String start) {
         return $(s -> s.map(Char::getCharacter).startsWith(CharSeq(start)));
     }
 
-    private <T> Match.Case<T, Tuple2<Stream<Char>, Token>> match(Stream<Char> chars, String match, TokenType tokenType) {
+    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> match(Stream<Char> chars, String match, TokenType tokenType) {
         return Case($(c -> chars.map(Char::getCharacter).startsWith(CharSeq(match))), c ->
-                new Tuple2<>(chars.drop(match.length()), new Token(match, tokenType, chars.get().getPosition())));
+                Option.of(new Tuple2<>(new Token(match, tokenType, chars.get().getPosition()), chars.drop(match.length()))));
     }
 
-    private <T> Match.Case<T, Tuple2<Stream<Char>, Token>> charMatch(Stream<Char> chars, char match, TokenType tokenType) {
+    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> charMatch(Stream<Char> chars, char match, TokenType tokenType) {
         return Case($(c -> chars.get().getCharacter() == match), c ->
-                new Tuple2<>(chars.tail(), new Token("" + chars.get().getCharacter(), tokenType, chars.get().getPosition())));
+                Option.of(new Tuple2<>(new Token("" + chars.get().getCharacter(), tokenType, chars.get().getPosition()), chars.tail())));
     }
 
-    private <T> Match.Case<T, Tuple2<Stream<Char>, Token>> literalMatch(Stream<Char> chars, String literal, TokenType tokenType) {
+    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> literalMatch(Stream<Char> chars, String literal, TokenType tokenType) {
         return Case($(t -> chars.map(Char::getCharacter).startsWith(CharSeq(literal))), s ->
-                new Tuple2<>(chars.drop(literal.length()), new Token(literal, tokenType, chars.get().getPosition())));
+                Option.of(new Tuple2<>(new Token(literal, tokenType, chars.get().getPosition()), chars.drop(literal.length()))));
     }
 
-    private String parseWord(Stream<Char> chars) {
+    private static String parseWord(Stream<Char> chars) {
         return chars.takeUntil(Predicates.anyOf(Char::isEOF, Char::isWhitespace, c -> syntaxSignificant.contains(c.getCharacter()))).map(Char::getCharacter).toCharSeq().mkString();
     }
 
-    private Tuple2<Stream<Char>, Token> parseNumber(Stream<Char> chars) {
+    private static Option<Tuple2<Token, Stream<Char>>> parseNumber(Stream<Char> chars) {
         Stream<Char> numbers = chars;
 
         StringBuilder num = new StringBuilder();
@@ -87,34 +78,35 @@ public class FunctionalLexer {
         }
         String number = num.toString();
         if (number.contains(".")) {
-            return new Tuple2<>(numbers, new Token(num.toString(), TokenType.NUMBER, new Position(chars.get().getLine(), chars.get().getIndex())));
+            return Option.of(new Tuple2<>(new Token(num.toString(), TokenType.NUMBER, new Position(chars.get().getLine(), chars.get().getIndex())), numbers));
         } else {
-            return new Tuple2<>(numbers, new Token(num.toString(), TokenType.INT, new Position(chars.get().getLine(), chars.get().getIndex())));
+            return Option.of(new Tuple2<>(new Token(num.toString(), TokenType.INT, new Position(chars.get().getLine(), chars.get().getIndex())), numbers));
         }
     }
 
-    private Tuple2<Stream<Char>, Token> parseString(Stream<Char> chars) {
+    private static Option<Tuple2<Token, Stream<Char>>> parseString(Stream<Char> chars) {
         Stream<Char> str = chars.tail().takeUntil(c -> c.is('"', '\\'));
         Stream<Char> remaining = chars.drop(str.length() + 2);
-        return new Tuple2<>(remaining, new Token(str.map(Char::getCharacter).toCharSeq().mkString(), TokenType.STRING, new Position(chars.get().getLine(), chars.get().getIndex())));
+        return Option.of(new Tuple2<>(new Token(str.map(Char::getCharacter).toCharSeq().mkString(), TokenType.STRING, new Position(chars.get().getLine(), chars.get().getIndex())), remaining));
     }
 
-    private boolean isNumberLike(Stream<Char> chars) {
+    private static boolean isNumberLike(Stream<Char> chars) {
         if (chars.get().is('.') && chars.get(1).is('.')) return false; // range
         return chars.get().isDigit()
                 || chars.get().is('_', '.', 'E');
     }
 
-    private boolean isNumberStart(Stream<Char> chars) {
+    private static boolean isNumberStart(Stream<Char> chars) {
         return chars.get().isDigit()
                 || chars.get().is('.') && chars.get(1).isDigit();
     }
 
-    private Tuple2<Stream<Char>, Token> fetch(Stream<Char> chars) throws TokenizerException {
-        return Match(chars).of(
-                Case($(c -> c.get().isEOF()), c -> null),
-                Case($(this::isNumberStart), this::parseNumber),
-                Case($(c -> c.get().is('"')), this::parseString),
+    private static Option<Tuple2<? extends Token, ? extends Stream<Char>>> fetch(Stream<Char> chars) throws TokenizerException {
+        return Option.narrow(Match(chars).of(
+                Case($(Stream::isEmpty), c -> Option.none()),
+                Case($(c -> c.get().isEOF()), c -> Option.none()),
+                Case($(FunctionalLexer::isNumberStart), FunctionalLexer::parseNumber),
+                Case($(c -> c.get().is('"')), FunctionalLexer::parseString),
                 match(chars, "->", TokenType.ARROW),
                 match(chars, "..", TokenType.RANGE),
 
@@ -166,16 +158,8 @@ public class FunctionalLexer {
 
                 Case($(), () -> {
                     String word = parseWord(chars);
-                    return new Tuple2<>(chars.drop(word.length()), new Token(word, TokenType.IDENTIFIER, chars.get().getPosition()));
+                    return Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, chars.get().getPosition()), chars.drop(word.length())));
                 })
-        );
-    }
-
-    public FunctionalLexer next() {
-        return new FunctionalLexer(data);
-    }
-
-    public Token current() {
-        return current;
+        ));
     }
 }

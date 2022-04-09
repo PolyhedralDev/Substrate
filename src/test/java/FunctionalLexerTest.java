@@ -2,7 +2,7 @@ import com.dfsek.substrate.lexer.FunctionalLexer;
 
 public class FunctionalLexerTest {
     public static void main(String... args) {
-        FunctionalLexer lexer = new FunctionalLexer("""
+        FunctionalLexer.stream("""
                 fizzbuzz = (i: int) -> {
                     if(i >= 1) {
                         fizzbuzz(i-1);
@@ -16,11 +16,6 @@ public class FunctionalLexerTest {
                 fizzbuzz(100);
                                 
                 return true;
-                """);
-
-        while (true) {
-            System.out.println(lexer.current());
-            lexer = lexer.next();
-        }
+                """).forEach(System.out::println);
     }
 }
