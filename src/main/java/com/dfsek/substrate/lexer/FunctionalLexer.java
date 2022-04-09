@@ -73,8 +73,8 @@ public class FunctionalLexer {
 
         StringBuilder num = new StringBuilder();
         while (!chars.get().isEOF() && isNumberLike(numbers)) {
-            numbers = numbers.tail();
             num.append(numbers.get());
+            numbers = numbers.tail();
         }
         String number = num.toString();
         if (number.contains(".")) {
