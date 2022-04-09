@@ -1,6 +1,8 @@
 package com.dfsek.substrate.lexer;
 
 
+import com.dfsek.substrate.lexer.exceptions.EOFException;
+import com.dfsek.substrate.lexer.exceptions.FormatException;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.lexer.read.Char;
 import com.dfsek.substrate.lexer.read.Position;
@@ -79,8 +81,9 @@ public class FunctionalLexer {
 
     private static Option<Tuple2<Token, Stream<Char>>> parseString(Stream<Char> chars) {
         Stream<Char> str = chars.tail().takeUntil(c -> c.is('"', '\\'));
-        Stream<Char> remaining = chars.drop(str.length() + 2);
-        return Option.of(new Tuple2<>(new Token(str.map(Char::getCharacter).toCharSeq().mkString(), TokenType.STRING, new Position(chars.get().getLine(), chars.get().getIndex())), remaining));
+        Stream<Char> remaining = chars.drop(str.length() + 1);
+        if(remaining.size() == 0 || remaining.get().getCharacter() != '\"') throw new EOFException("No end of string literal", chars.get().getPosition()); // TODO return error token
+        return Option.of(new Tuple2<>(new Token(str.map(Char::getCharacter).toCharSeq().mkString(), TokenType.STRING, new Position(chars.get().getLine(), chars.get().getIndex())), remaining.tail()));
     }
 
     private static boolean isNumberLike(Stream<Char> chars) {
