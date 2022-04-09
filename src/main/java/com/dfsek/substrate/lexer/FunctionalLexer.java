@@ -95,12 +95,7 @@ public class FunctionalLexer {
     }
 
     private static Option<Tuple2<? extends Token, ? extends Stream<Char>>> fetch(Stream<Char> chars) throws TokenizerException {
-        return Option.narrow(Match(chars.dropWhile(
-                Predicates.anyOf(
-                        CharOperations::isEOF,
-                        CharOperations::isWhitespace
-                )
-        )).of(
+        return Option.narrow(Match(chars.dropWhile(Predicates.anyOf(Char::isEOF, Char::isWhitespace))).of(
                 Case($(Stream::isEmpty), c -> Option.none()),
                 Case($(c -> c.get().isEOF()), c -> Option.none()),
                 Case(startsWith("//"), d -> fetch(d.dropUntil(c -> c.getCharacter() == '\n').tail())),
