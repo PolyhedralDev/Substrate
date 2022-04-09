@@ -33,35 +33,26 @@ public class FunctionalLexer {
     }
 
     public static Stream<Token> stream(Stream<Char> data) {
-        return Stream.unfoldRight(data, (newData -> fetch(Match((newData).dropWhile(
-                Predicates.anyOf(
-                        CharOperations::isEOF,
-                        CharOperations::isWhitespace
-                )
-        )).of(
-                Case(startsWith("//"), d -> d.dropWhile(c -> c.getCharacter() != '\n')),
-                Case(startsWith("/*"), d -> d.subSequence(d.map(Char::getCharacter).indexOfSlice(CharSeq("*/")))),
-                Case($(), Function1.identity())
-        ))));
+        return Stream.unfoldRight(data, FunctionalLexer::fetch);
     }
 
     private static Match.Pattern0<Stream<Char>> startsWith(String start) {
         return $(s -> s.map(Char::getCharacter).startsWith(CharSeq(start)));
     }
 
-    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> match(Stream<Char> chars, String match, TokenType tokenType) {
-        return Case($(c -> chars.map(Char::getCharacter).startsWith(CharSeq(match))), c ->
-                Option.of(new Tuple2<>(new Token(match, tokenType, chars.get().getPosition()), chars.drop(match.length()))));
+    private static Match.Case<Stream<Char>, Option<Tuple2<Token, Stream<Char>>>> match(String match, TokenType tokenType) {
+        return Case($(c -> c.map(Char::getCharacter).startsWith(CharSeq(match))), c ->
+                Option.of(new Tuple2<>(new Token(match, tokenType, c.get().getPosition()), c.drop(match.length()))));
     }
 
-    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> charMatch(Stream<Char> chars, char match, TokenType tokenType) {
-        return Case($(c -> chars.get().getCharacter() == match), c ->
-                Option.of(new Tuple2<>(new Token("" + chars.get().getCharacter(), tokenType, chars.get().getPosition()), chars.tail())));
+    private static Match.Case<Stream<Char>, Option<Tuple2<Token, Stream<Char>>>> charMatch(char match, TokenType tokenType) {
+        return Case($(c -> c.get().getCharacter() == match), c ->
+                Option.of(new Tuple2<>(new Token("" + c.get().getCharacter(), tokenType, c.get().getPosition()), c.tail())));
     }
 
-    private static <T> Match.Case<T, Option<Tuple2<Token, Stream<Char>>>> literalMatch(Stream<Char> chars, String literal, TokenType tokenType) {
-        return Case($(t -> chars.map(Char::getCharacter).startsWith(CharSeq(literal))), s ->
-                Option.of(new Tuple2<>(new Token(literal, tokenType, chars.get().getPosition()), chars.drop(literal.length()))));
+    private static Match.Case<Stream<Char>, Option<Tuple2<Token, Stream<Char>>>> literalMatch(String literal, TokenType tokenType) {
+        return Case($(c -> c.map(Char::getCharacter).startsWith(CharSeq(literal))), c ->
+                Option.of(new Tuple2<>(new Token(literal, tokenType, c.get().getPosition()), c.drop(literal.length()))));
     }
 
     private static String parseWord(Stream<Char> chars) {
@@ -102,63 +93,70 @@ public class FunctionalLexer {
     }
 
     private static Option<Tuple2<? extends Token, ? extends Stream<Char>>> fetch(Stream<Char> chars) throws TokenizerException {
-        return Option.narrow(Match(chars).of(
+        return Option.narrow(Match(chars.dropWhile(
+                Predicates.anyOf(
+                        CharOperations::isEOF,
+                        CharOperations::isWhitespace
+                )
+        )).of(
                 Case($(Stream::isEmpty), c -> Option.none()),
                 Case($(c -> c.get().isEOF()), c -> Option.none()),
+                Case(startsWith("//"), d -> fetch(d.dropUntil(c -> c.getCharacter() == '\n').tail())),
+                Case(startsWith("/*"), d -> fetch(d.subSequence(d.map(Char::getCharacter).indexOfSlice(CharSeq("*/"))).drop(2))),
                 Case($(FunctionalLexer::isNumberStart), FunctionalLexer::parseNumber),
                 Case($(c -> c.get().is('"')), FunctionalLexer::parseString),
-                match(chars, "->", TokenType.ARROW),
-                match(chars, "..", TokenType.RANGE),
+                match("->", TokenType.ARROW),
+                match("..", TokenType.RANGE),
 
-                match(chars, "==", TokenType.EQUALS_OPERATOR),
-                match(chars, "!=", TokenType.NOT_EQUALS_OPERATOR),
-                match(chars, ">=", TokenType.GREATER_THAN_OR_EQUALS_OPERATOR),
-                match(chars, "<=", TokenType.LESS_THAN_OR_EQUALS_OPERATOR),
-                charMatch(chars, '>', TokenType.GREATER_THAN_OPERATOR),
-                charMatch(chars, '<', TokenType.LESS_THAN_OPERATOR),
+                match("==", TokenType.EQUALS_OPERATOR),
+                match("!=", TokenType.NOT_EQUALS_OPERATOR),
+                match(">=", TokenType.GREATER_THAN_OR_EQUALS_OPERATOR),
+                match("<=", TokenType.LESS_THAN_OR_EQUALS_OPERATOR),
+                charMatch('>', TokenType.GREATER_THAN_OPERATOR),
+                charMatch('<', TokenType.LESS_THAN_OPERATOR),
 
-                match(chars, "||", TokenType.BOOLEAN_OR),
-                match(chars, "&&", TokenType.BOOLEAN_AND),
-                match(chars, "!", TokenType.BOOLEAN_NOT),
+                match("||", TokenType.BOOLEAN_OR),
+                match("&&", TokenType.BOOLEAN_AND),
+                match("!", TokenType.BOOLEAN_NOT),
 
-                charMatch(chars, '+', TokenType.ADDITION_OPERATOR),
-                charMatch(chars, '-', TokenType.SUBTRACTION_OPERATOR),
-                charMatch(chars, '/', TokenType.DIVISION_OPERATOR),
-                charMatch(chars, '*', TokenType.MULTIPLICATION_OPERATOR),
-                charMatch(chars, '%', TokenType.MODULO_OPERATOR),
+                charMatch('+', TokenType.ADDITION_OPERATOR),
+                charMatch('-', TokenType.SUBTRACTION_OPERATOR),
+                charMatch('/', TokenType.DIVISION_OPERATOR),
+                charMatch('*', TokenType.MULTIPLICATION_OPERATOR),
+                charMatch('%', TokenType.MODULO_OPERATOR),
 
-                charMatch(chars, '(', TokenType.GROUP_BEGIN),
-                charMatch(chars, ')', TokenType.GROUP_END),
+                charMatch('(', TokenType.GROUP_BEGIN),
+                charMatch(')', TokenType.GROUP_END),
 
-                charMatch(chars, '[', TokenType.LIST_BEGIN),
-                charMatch(chars, ']', TokenType.LIST_END),
+                charMatch('[', TokenType.LIST_BEGIN),
+                charMatch(']', TokenType.LIST_END),
 
-                charMatch(chars, '{', TokenType.BLOCK_BEGIN),
-                charMatch(chars, '}', TokenType.BLOCK_END),
+                charMatch('{', TokenType.BLOCK_BEGIN),
+                charMatch('}', TokenType.BLOCK_END),
 
-                charMatch(chars, ';', TokenType.STATEMENT_END),
-                charMatch(chars, ',', TokenType.SEPARATOR),
+                charMatch(';', TokenType.STATEMENT_END),
+                charMatch(',', TokenType.SEPARATOR),
 
-                charMatch(chars, '=', TokenType.ASSIGNMENT),
-                charMatch(chars, ':', TokenType.TYPE),
-                literalMatch(chars, "false", TokenType.BOOLEAN),
-                literalMatch(chars, "true", TokenType.BOOLEAN),
+                charMatch('=', TokenType.ASSIGNMENT),
+                charMatch(':', TokenType.TYPE),
+                literalMatch("false", TokenType.BOOLEAN),
+                literalMatch("true", TokenType.BOOLEAN),
 
-                literalMatch(chars, "return", TokenType.RETURN),
+                literalMatch("return", TokenType.RETURN),
 
-                literalMatch(chars, "num", TokenType.NUM_TYPE),
-                literalMatch(chars, "int", TokenType.INT_TYPE),
-                literalMatch(chars, "bool", TokenType.BOOL_TYPE),
-                literalMatch(chars, "str", TokenType.STRING_TYPE),
-                literalMatch(chars, "fun", TokenType.FUN_TYPE),
-                literalMatch(chars, "list", TokenType.LIST_TYPE),
+                literalMatch("num", TokenType.NUM_TYPE),
+                literalMatch("int", TokenType.INT_TYPE),
+                literalMatch("bool", TokenType.BOOL_TYPE),
+                literalMatch("str", TokenType.STRING_TYPE),
+                literalMatch("fun", TokenType.FUN_TYPE),
+                literalMatch("list", TokenType.LIST_TYPE),
 
-                literalMatch(chars, "if", TokenType.IF),
-                literalMatch(chars, "else", TokenType.ELSE),
+                literalMatch("if", TokenType.IF),
+                literalMatch("else", TokenType.ELSE),
 
-                Case($(), () -> {
-                    String word = parseWord(chars);
-                    return Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, chars.get().getPosition()), chars.drop(word.length())));
+                Case($(), c -> {
+                    String word = parseWord(c);
+                    return Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, c.get().getPosition()), c.drop(word.length())));
                 })
         ));
     }

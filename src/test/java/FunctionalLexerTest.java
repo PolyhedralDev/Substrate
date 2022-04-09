@@ -3,6 +3,8 @@ import com.dfsek.substrate.lexer.FunctionalLexer;
 public class FunctionalLexerTest {
     public static void main(String... args) {
         FunctionalLexer.stream("""
+                // amogus
+                
                 fizzbuzz = (i: int) -> {
                     if(i >= 1) {
                         fizzbuzz(i-1);
