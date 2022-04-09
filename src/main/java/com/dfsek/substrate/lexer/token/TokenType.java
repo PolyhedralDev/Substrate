@@ -2,6 +2,10 @@ package com.dfsek.substrate.lexer.token;
 
 public enum TokenType {
     /**
+     * Tokenizer error
+     */
+    ERROR,
+    /**
      * Value identifier
      */
     IDENTIFIER,
