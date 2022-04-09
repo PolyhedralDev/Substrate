@@ -19,7 +19,7 @@ public class Lexer {
      * @throws ParseException If token does not exist
      */
     public Token peek() throws ParseException {
-        return tokens.get();
+        return tokens.headOption().getOrElseThrow(() -> new ParseException("Unexpected end of input", last.getPosition()));
     }
 
     public Token peek(int n) throws ParseException {
@@ -34,6 +34,7 @@ public class Lexer {
      */
     public Token consume() throws ParseException {
         Token token = tokens.get();
+        last = token;
         tokens = tokens.tail();
         return token;
     }
