@@ -18,7 +18,7 @@ public class FunctionalLexer {
     private static final Set<Character> syntaxSignificant = HashSet.of(';', '(', ')', '"', ',', '\\', '=', '{', '}', '+', '-', '*', '/', '>', '<', '!', ':', '.', '$', '[', ']');
 
     public static Stream<Token> stream(String data) {
-        int line = 1;
+        int line = 0;
         int index = 0;
         List<Char> chars = List();
         for (char c : data.toCharArray()) {

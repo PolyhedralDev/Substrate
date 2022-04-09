@@ -28,7 +28,7 @@ public final class Token implements Positioned {
 
     @Override
     public String toString() {
-        return type + ": '" + content + "'";
+        return type + ": '" + content + "': " + start;
     }
 
     public boolean isConstant() {
