@@ -39,6 +39,10 @@ public class Lexer {
         return token;
     }
 
+    public Stream<Token> getTokens() {
+        return tokens;
+    }
+
     /**
      * Whether this {@code Tokenizer} contains additional tokens.
      *
