@@ -2,6 +2,7 @@ package com.dfsek.substrate;
 
 import com.dfsek.substrate.parser.Parser;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -10,7 +11,6 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 public class SubscriptTest {
-
     public record Input(double input) {
     }
 
@@ -49,7 +49,7 @@ public class SubscriptTest {
     public void subscriptDynamicValue(SubscriptState state, Blackhole blackhole) {
         double result = state.script.execute(new Input(state.value), null).out;
 
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value), 0.001)) {
+        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
             throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
         }
     }

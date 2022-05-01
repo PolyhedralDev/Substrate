@@ -39,7 +39,6 @@ public class NashornTest {
     @State(Scope.Benchmark)
     public static class NashornStaticState {
         private CompiledScript script;
-        private ScriptEngine engine;
 
         @Param({"4", "800", "3343"})
         public double value;
@@ -52,7 +51,6 @@ public class NashornTest {
                 String script = IOUtils.toString(NashornTest.class.getResource("/nashorn.js"), StandardCharsets.UTF_8);
 
                 this.script = ((Compilable) engine).compile(script);
-                this.engine = engine;
 
             } catch (IOException | ScriptException e) {
                 throw new RuntimeException(e);
@@ -67,7 +65,7 @@ public class NashornTest {
 
         double result = (Double) state.script.eval(bindings);
 
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value), 0.001)) {
+        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
             throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
         }
     }
@@ -76,7 +74,7 @@ public class NashornTest {
     public void nashornStaticValue(NashornStaticState state, Blackhole blackhole) throws ScriptException {
         double result = (Double) state.script.eval();
 
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value), 0.001)) {
+        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
             throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
         }
     }
