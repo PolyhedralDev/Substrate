@@ -44,7 +44,7 @@ public class BaseRule {
                     node = ((StatementNode) contents.get(0)).getContent();
                 }
                 returnNode = new ReturnNode(Position.getNull(), node, data.getReturnType());
-                return new BlockNode(contents.append(returnNode), List.of(returnNode), begin);
+                return new BlockNode(List.of(returnNode), List.of(returnNode), begin);
             } else if (contents.size() == 0) {
                 throw new ParseException("Empty script.", Position.getNull());
             } else {
