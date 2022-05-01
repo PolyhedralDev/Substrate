@@ -36,7 +36,8 @@ public class Parser<P extends Record, R extends Record> {
             STATIC_FUNCTIONS.put("ln", new StaticFunction(Math.class.getMethod("log", double.class)));
             STATIC_FUNCTIONS.put("log", new StaticFunction(Math.class.getMethod("log10", double.class)));
 
-            STATIC_FUNCTIONS.put("abs", new StaticFunction(Math.class.getMethod("abs", int.class)));
+            STATIC_FUNCTIONS.put("absInt", new StaticFunction(Math.class.getMethod("abs", int.class)));
+            STATIC_FUNCTIONS.put("absNum", new StaticFunction(Math.class.getMethod("abs", double.class)));
 
             STATIC_FUNCTIONS.put("sin", new StaticFunction(Math.class.getMethod("sin", double.class)));
             STATIC_FUNCTIONS.put("cos", new StaticFunction(Math.class.getMethod("cos", double.class)));
