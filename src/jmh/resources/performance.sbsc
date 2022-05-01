@@ -10,3 +10,4 @@ newtonSquareRoot = (n: num, l: num): num -> {
 };
 
 return newtonSquareRoot(input, 0.001);
+
