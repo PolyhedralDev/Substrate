@@ -1,0 +1,12 @@
+// find the square root of a number using Newton's root finding approximation
+
+
+newtonSquareRoot = (n: num, l: num): num -> {
+    approx = (x: num): num -> {
+        calc = 0.5 * (x + n / x);
+        return if(absNum(calc - x) < l) calc else approx(calc);
+    };
+    return approx(n);
+};
+
+return newtonSquareRoot(input, 0.001);

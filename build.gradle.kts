@@ -1,13 +1,13 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow").version("6.1.0")
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("me.champeau.jmh") version "0.6.6"
 }
 
 group = "com.dfsek"
 version = "0.5.1"
 
 repositories {
-    maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     mavenCentral()
 }
 
@@ -19,6 +19,8 @@ dependencies {
     implementation("org.ow2.asm:asm:9.2")
 
     implementation("io.vavr:vavr:0.10.4")
+
+    jmh("org.openjdk.nashorn:nashorn-core:15.3")
 }
 
 java {
