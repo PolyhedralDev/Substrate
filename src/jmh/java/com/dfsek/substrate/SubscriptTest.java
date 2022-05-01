@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-public class PerformanceTest {
+public class SubscriptTest {
 
     public record Input(double input) {
     }
@@ -27,7 +27,7 @@ public class PerformanceTest {
                 script = new Parser<>(
                         IOUtils.toString(
                                 Objects.requireNonNull(
-                                        PerformanceTest.class.getResource(
+                                        SubscriptTest.class.getResource(
                                                 "/performance.sbsc"
                                         )
                                 ),
