@@ -46,7 +46,7 @@ public class SubscriptTest {
     }
 
     @Benchmark
-    public void bench(SubscriptState state, Blackhole blackhole) {
+    public void subscriptDynamicValue(SubscriptState state, Blackhole blackhole) {
         double result = state.script.execute(new Input(state.value), null).out;
 
         if (!Util.epsilonCompare(result, Math.sqrt(state.value), 0.001)) {
