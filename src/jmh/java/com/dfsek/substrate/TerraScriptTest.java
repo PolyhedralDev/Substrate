@@ -110,7 +110,7 @@ public class TerraScriptTest {
     }
 
     @Benchmark
-    public void subscriptDynamicValue(TerraScriptState state, Blackhole blackhole) {
+    public void terraScriptDynamicValue(TerraScriptState state, Blackhole blackhole) {
         Environment environment = new Environment(state.value);
         state.script.apply(environment);
         blackhole.consume(environment.getResult());
