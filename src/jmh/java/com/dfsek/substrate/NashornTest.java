@@ -9,6 +9,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import javax.script.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class NashornTest {
 
@@ -17,8 +18,10 @@ public class NashornTest {
         private CompiledScript script;
         private ScriptEngine engine;
 
+        @Param({"4", "800", "3343"})
+        public double value;
         @Setup
-        public void setup() {
+        public void setup() throws ScriptException {
             try {
                 ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
 
@@ -30,10 +33,17 @@ public class NashornTest {
             } catch (IOException | ScriptException e) {
                 throw new RuntimeException(e);
             }
-        }
 
-        @Param({"4", "800", "3343"})
-        public double value;
+            Bindings bindings = engine.createBindings();
+            bindings.put("input", value);
+
+            double result = (Double) script.eval(bindings);
+            double actual = Math.sqrt(value);
+
+            if (!Util.epsilonCompare(result, actual)) {
+                throw new IllegalStateException("Expected " + actual + ", got " + result);
+            }
+        }
     }
 
     @State(Scope.Benchmark)
@@ -48,13 +58,20 @@ public class NashornTest {
                 ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
 
                 engine.getContext().setAttribute("input", value, ScriptContext.ENGINE_SCOPE);
-                String script = IOUtils.toString(NashornTest.class.getResource("/nashorn.js"), StandardCharsets.UTF_8);
+                String script = IOUtils.toString(Objects.requireNonNull(NashornTest.class.getResource("/nashorn.js")), StandardCharsets.UTF_8);
 
                 this.script = ((Compilable) engine).compile(script);
 
+                double result = (Double) this.script.eval();
+                double actual = Math.sqrt(value);
+
+                if (!Util.epsilonCompare(result, actual)) {
+                    throw new IllegalStateException("Expected " + actual + ", got " + result);
+                }
             } catch (IOException | ScriptException e) {
                 throw new RuntimeException(e);
             }
+
         }
     }
 
@@ -63,19 +80,11 @@ public class NashornTest {
         Bindings bindings = state.engine.createBindings();
         bindings.put("input", state.value);
 
-        double result = (Double) state.script.eval(bindings);
-
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
-            throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
-        }
+        blackhole.consume(state.script.eval(bindings));
     }
 
     @Benchmark
     public void nashornStaticValue(NashornStaticState state, Blackhole blackhole) throws ScriptException {
-        double result = (Double) state.script.eval();
-
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
-            throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
-        }
+        blackhole.consume(((Double) state.script.eval()).doubleValue());
     }
 }

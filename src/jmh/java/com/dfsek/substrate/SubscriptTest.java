@@ -21,6 +21,9 @@ public class SubscriptTest {
     public static class SubscriptState {
         private Script<Input, Output> script;
 
+        @Param({"4", "800", "3343"})
+        public double value;
+
         @Setup
         public void setup() {
             try {
@@ -39,18 +42,17 @@ public class SubscriptTest {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+            double result = script.execute(new Input(value), null).out;
+            double actual = Math.sqrt(value);
 
-        @Param({"4", "800", "3343"})
-        public double value;
+            if (!Util.epsilonCompare(result, actual)) {
+                throw new IllegalStateException("Expected " + actual + ", got " + result);
+            }
+        }
     }
 
     @Benchmark
     public void subscriptDynamicValue(SubscriptState state, Blackhole blackhole) {
-        double result = state.script.execute(new Input(state.value), null).out;
-
-        if (!Util.epsilonCompare(result, Math.sqrt(state.value))) {
-            throw new IllegalStateException("Expected " + Math.sqrt(state.value) + ", got " + result);
-        }
+        blackhole.consume(state.script.execute(new Input(state.value), null).out);
     }
 }
