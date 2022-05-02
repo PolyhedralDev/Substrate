@@ -9,6 +9,10 @@ version = "0.5.1"
 
 repositories {
     mavenCentral()
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.org/repository/maven-public/")
+    }
 }
 
 dependencies {
@@ -21,6 +25,8 @@ dependencies {
     implementation("io.vavr:vavr:0.10.4")
 
     jmh("org.openjdk.nashorn:nashorn-core:15.3")
+    jmh("com.dfsek.terra:structure-terrascript-loader:0.1.0-BETA+21136f4c3")
+    jmh("com.google.guava:guava:30.0-jre")
 }
 
 java {

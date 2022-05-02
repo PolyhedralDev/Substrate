@@ -1,0 +1,22 @@
+num epsilon = 0.001;
+
+num n = getInput();
+
+num x = n;
+
+num root = 0;
+while(true) {
+    root = 0.5 * (x + (n / x));
+
+    num diff = root - x;
+    if(diff < 0) diff = -diff;
+
+    if(diff < epsilon) break;
+
+    x = root;
+}
+
+setResult(root); /* terrascript has no actual way to "return" a
+result from a script, as its scripts are designed to mutate, so
+this will have to do.
+*/
