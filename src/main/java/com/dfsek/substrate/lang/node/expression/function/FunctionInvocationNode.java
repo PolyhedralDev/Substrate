@@ -29,7 +29,7 @@ public class FunctionInvocationNode extends ExpressionNode {
         Signature argSignature = CompilerUtil.expandArguments(arguments);
 
         if (!function.reference().getGenericArguments(0).equals(argSignature)) {
-            throw new ParseException("Function argument mismatch, expected " + function.reference().getGenericArguments(0) + ", got " + argSignature, function.getPosition());
+            return List.of(Op.error("Function argument mismatch, expected " + function.reference().getGenericArguments(0) + ", got " + argSignature, function.getPosition()));
         }
 
         return function.apply(data)
