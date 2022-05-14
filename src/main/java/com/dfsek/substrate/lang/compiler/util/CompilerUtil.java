@@ -114,9 +114,13 @@ public final class CompilerUtil implements Opcodes {
 
     public static io.vavr.collection.List<Either<CompileError, Op>> unbox(Signature ref) {
         if(ref.equals(Signature.integer())) {
-            return List.of(Op.invokeVirtual(Classes.INTEGER, "intValue", "()I"));
+            return List.of(
+                    Op.checkCast(Classes.INTEGER),
+                    Op.invokeVirtual(Classes.INTEGER, "intValue", "()I"));
         } else if(ref.equals(Signature.decimal())) {
-            return List.of(Op.invokeVirtual(Classes.DOUBLE, "doubleValue", "()D"));
+            return List.of(
+                    Op.checkCast(Classes.DOUBLE),
+                    Op.invokeVirtual(Classes.DOUBLE, "doubleValue", "()D"));
         }
         else return List.empty();
     }
