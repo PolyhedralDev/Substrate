@@ -247,9 +247,6 @@ public class Signature implements Opcodes {
 
         for (int i = 0; i < types.size(); i++) {
             sig.append(types.get(i).descriptor());
-            if (types.get(i) == DataType.LIST) {
-                sig.append(getGenericReturn(i).internalDescriptor());
-            }
         }
         return sig.toString();
     }
