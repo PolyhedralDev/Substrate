@@ -33,7 +33,7 @@ public class ListIndexNode extends ExpressionNode {
                 .appendAll(ParserUtil.checkReturnType(index, Signature.integer())
                         .simplify().apply(data))
                 .append(Op.invokeInterface(Classes.LIST, "get", "(I)L" + Classes.OBJECT + ";"))
-                .appendAll(CompilerUtil.unbox(listReference.reference().getGenericArguments(0)));
+                .appendAll(CompilerUtil.unbox(listReference.reference().getGenericReturn(0)));
     }
 
     @Override
