@@ -1,13 +1,11 @@
 package com.dfsek.substrate.lang.compiler.type;
 
-import com.dfsek.substrate.lang.compiler.codegen.CompileError;
-import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.codegen.Classes;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
 public enum DataType implements Opcodes {
@@ -36,20 +34,6 @@ public enum DataType implements Opcodes {
             return IRETURN;
         }
 
-        @Override
-        public int arrayStoreInsn() {
-            return IASTORE;
-        }
-
-        @Override
-        public int arrayLoadInsn() {
-            return IALOAD;
-        }
-
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            return Op.newArray(T_INT);
-        }
     },
     NUM {
         @Override
@@ -76,20 +60,6 @@ public enum DataType implements Opcodes {
             return DRETURN;
         }
 
-        @Override
-        public int arrayStoreInsn() {
-            return DASTORE;
-        }
-
-        @Override
-        public int arrayLoadInsn() {
-            return DALOAD;
-        }
-
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            return Op.newArray(T_DOUBLE);
-        }
     },
     STR {
         @Override
@@ -102,10 +72,6 @@ public enum DataType implements Opcodes {
             return 'S';
         }
 
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            return Op.aNewArray("java/lang/String");
-        }
     },
     BOOL {
         @Override
@@ -132,25 +98,11 @@ public enum DataType implements Opcodes {
             return IRETURN;
         }
 
-        @Override
-        public int arrayStoreInsn() {
-            return BASTORE;
-        }
-
-        @Override
-        public int arrayLoadInsn() {
-            return BALOAD;
-        }
-
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            return Op.newArray(T_BOOLEAN);
-        }
     },
     FUN {
         @Override
         public String descriptor() {
-            return "L" + CompilerUtil.internalName(Lambda.class) + ";";
+            return "L" + Classes.LAMBDA + ";";
         }
 
         @Override
@@ -158,52 +110,18 @@ public enum DataType implements Opcodes {
             return 'F';
         }
 
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            return Op.aNewArray(CompilerUtil.internalName(Lambda.class));
-        }
     },
     LIST {
         @Override
         public String descriptor() {
-            return "[";
+            return "L" + Classes.LIST + ";";
         }
 
         @Override
         public char descriptorChar() {
-            return 'A';
+            return 'L';
         }
 
-        @Override
-        public Either<CompileError, Op> applyNewArray(Signature generic) {
-            StringBuilder arr = new StringBuilder("[");
-            nestArray(arr, generic);
-            return Op.aNewArray(arr.toString());
-        }
-
-        private void nestArray(StringBuilder arr, Signature generic) {
-            if (generic.isSimple()) {
-                if (generic.getType(0).equals(INT)) {
-                    arr.append('I');
-                } else if (generic.getType(0).equals(NUM)) {
-                    arr.append('D');
-                } else if (generic.getType(0).equals(BOOL)) {
-                    arr.append('Z');
-                } else if (generic.getType(0).equals(STR)) {
-                    arr.append("Ljava/lang/String;");
-                } else if (generic.getType(0).equals(FUN)) {
-                    arr.append('L').append(CompilerUtil.internalName(Lambda.class)).append(';');
-                } else if (generic.getType(0).equals(LIST)) {
-                    Signature nested = generic.getGenericReturn(0);
-                    nestArray(arr, nested);
-                }
-            } else {
-                if (generic.equals(Signature.empty())) {
-                    throw new IllegalArgumentException("Cannot construct array of VOID");
-                }
-                arr.append("L").append(CompilerUtil.internalName(Tuple.class)).append(";"); // It's a tuple.
-            }
-        }
     };
 
     public static DataType fromToken(Token token) {
@@ -239,13 +157,4 @@ public enum DataType implements Opcodes {
         return ARETURN;
     }
 
-    public int arrayStoreInsn() {
-        return AASTORE;
-    }
-
-    public int arrayLoadInsn() {
-        return AALOAD;
-    }
-
-    public abstract Either<CompileError, Op> applyNewArray(Signature generic);
 }
