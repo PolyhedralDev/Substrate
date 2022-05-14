@@ -2,9 +2,11 @@ package com.dfsek.substrate.lang.node.expression.list;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.Classes;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -30,10 +32,8 @@ public class ListIndexNode extends ExpressionNode {
                 .simplify().apply(data)
                 .appendAll(ParserUtil.checkReturnType(index, Signature.integer())
                         .simplify().apply(data))
-                .append(reference().arrayLoadInsn().bimap(
-                        s -> Op.errorUnwrapped(s, getPosition()),
-                        Op::insnUnwrapped
-                ));
+                .append(Op.invokeInterface(Classes.LIST, "get", "(I)L" + Classes.OBJECT + ";"))
+                .appendAll(CompilerUtil.unbox(listReference.reference().getGenericArguments(0)));
     }
 
     @Override

@@ -111,6 +111,10 @@ public interface Op {
         return invoke(Invoke.STATIC, owner, name, descriptor, false);
     }
 
+    static Either<CompileError, Op> invokeStaticInterface(String owner, String name, String descriptor) {
+        return invoke(Invoke.STATIC, owner, name, descriptor, true);
+    }
+
     static Either<CompileError, Op> invokeInterface(String owner, String name, String descriptor) {
         return invoke(Invoke.INTERFACE, owner, name, descriptor, true);
     }

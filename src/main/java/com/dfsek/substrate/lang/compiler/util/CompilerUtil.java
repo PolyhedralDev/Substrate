@@ -1,9 +1,11 @@
 package com.dfsek.substrate.lang.compiler.util;
 
 import com.dfsek.substrate.lang.compiler.build.BuildData;
+import com.dfsek.substrate.lang.compiler.codegen.Classes;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Typed;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -92,5 +94,30 @@ public final class CompilerUtil implements Opcodes {
             return list;
         }
         return io.vavr.collection.List.empty();
+    }
+
+    public static io.vavr.collection.List<Either<CompileError, Op>> box(Typed typed) {
+        return box(typed.reference());
+    }
+
+    public static io.vavr.collection.List<Either<CompileError, Op>> box(Signature ref) {
+        if(ref.equals(Signature.integer())) {
+            return List.of(Op.invokeStatic(Classes.INTEGER, "valueOf", "(I)L" + Classes.INTEGER + ";"));
+        } else if(ref.equals(Signature.decimal())) {
+            return List.of(Op.invokeStatic(Classes.DOUBLE, "valueOf", "(D)L" + Classes.DOUBLE + ";"));
+        }
+        else return List.empty();
+    }
+    public static io.vavr.collection.List<Either<CompileError, Op>> unbox(Typed typed) {
+        return unbox(typed.reference());
+    }
+
+    public static io.vavr.collection.List<Either<CompileError, Op>> unbox(Signature ref) {
+        if(ref.equals(Signature.integer())) {
+            return List.of(Op.invokeVirtual(Classes.INTEGER, "intValue", "()I"));
+        } else if(ref.equals(Signature.decimal())) {
+            return List.of(Op.invokeVirtual(Classes.DOUBLE, "doubleValue", "()D"));
+        }
+        else return List.empty();
     }
 }

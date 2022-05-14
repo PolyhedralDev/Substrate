@@ -1,5 +1,9 @@
-a = 3;
+// test a function that accepts a list as an argument
 
-forEach(a..a+3, (i: int) -> println(str(i)));
+test = (a: list<int>) -> {
+
+};
+
+test(1 .. 3);
 
 return true;

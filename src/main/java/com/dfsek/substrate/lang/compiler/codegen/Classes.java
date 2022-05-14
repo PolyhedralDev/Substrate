@@ -5,6 +5,7 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
+import io.vavr.collection.List;
 
 import static com.dfsek.substrate.lang.compiler.util.CompilerUtil.internalName;
 
@@ -16,4 +17,8 @@ public class Classes {
     public static final String SCRIPT = internalName(Script.class);
     public static final String ENVIRONMENT = internalName(Environment.class);
     public static final String OBJECT = internalName(Object.class);
+
+    public static final String LIST = internalName(List.class);
+    public static final String INTEGER = internalName(Integer.class);
+    public static final String DOUBLE = internalName(Double.class);
 }
