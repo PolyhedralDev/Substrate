@@ -125,8 +125,7 @@ public class Signature implements Opcodes {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Signature)) return false;
-        Signature that = (Signature) obj;
+        if (!(obj instanceof Signature that)) return false;
 
         if (this.size() != that.size()) return false;
 
