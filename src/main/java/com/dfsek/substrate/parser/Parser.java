@@ -8,9 +8,7 @@ import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.value.RecordValue;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.lang.std.function.ForEach;
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
@@ -91,7 +89,6 @@ public class Parser<P extends Record, R extends Record> {
         }
 
         registerFunction("println", new Println());
-        registerMacro("forEach", new ForEach());
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);
     }
