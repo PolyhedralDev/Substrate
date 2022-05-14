@@ -202,15 +202,6 @@ public class Signature implements Opcodes {
         );
     }
 
-    public Either<String, Integer> arrayStoreInsn() {
-        return Match(this).of(
-                Case($(decimal()), Either.right(Opcodes.DASTORE)),
-                Case($(integer()), Either.right(Opcodes.IASTORE)),
-                Case($(bool()), Either.right(Opcodes.BASTORE)),
-                Case($(empty()), Either.left("Cannot store empty expression")),
-                Case($(), Either.right(Opcodes.AASTORE))
-        );
-    }
 
     public Either<String, Integer> loadInsn() {
         return Match(this).of(
@@ -222,15 +213,6 @@ public class Signature implements Opcodes {
         );
     }
 
-    public Either<String, Integer> arrayLoadInsn() {
-        return Match(this).of(
-                Case($(decimal()), Either.right(Opcodes.DALOAD)),
-                Case($(integer()), Either.right(Opcodes.IALOAD)),
-                Case($(bool()), Either.right(Opcodes.BALOAD)),
-                Case($(empty()), Either.left("Cannot store empty expression")),
-                Case($(), Either.right(Opcodes.AALOAD))
-        );
-    }
 
     public Either<String, Integer> retInsn() {
         return Match(this).of(
@@ -240,14 +222,6 @@ public class Signature implements Opcodes {
                 Case($(empty()), Either.right(RETURN)),
                 Case($(), Either.right(ARETURN))
         );
-    }
-
-    public Either<CompileError, Op> newArrayInsn(Position position) {
-        if (isSimple()) {
-            return getType(0).applyNewArray(this);
-        } else {
-            return Op.aNewArray(CompilerUtil.internalName(Tuple.class));
-        }
     }
 
     public boolean isSimple() {
