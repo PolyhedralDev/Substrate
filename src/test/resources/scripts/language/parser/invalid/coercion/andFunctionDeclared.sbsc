@@ -1,5 +1,5 @@
 // should not be able to && a function
-
-false && (): bool -> false;
+a = (): bool -> false;
+false && a;
 
 return false;
