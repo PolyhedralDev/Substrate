@@ -50,7 +50,7 @@ public class LambdaInvocationNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return lambda.reference();
+        return lambda.reference().getGenericReturn(0);
     }
 
     @Override
