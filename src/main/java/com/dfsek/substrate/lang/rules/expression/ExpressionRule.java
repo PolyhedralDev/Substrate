@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.NumberInverseNode;
@@ -24,19 +25,19 @@ import io.vavr.collection.List;
 
 
 public class ExpressionRule {
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static Unchecked<? extends ExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         return assemble(lexer, data, scope, null);
     }
 
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
-        ExpressionNode node = simple(lexer, data, scope, variableName);
+    public static Unchecked<? extends ExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+        Unchecked<? extends ExpressionNode> node = simple(lexer, data, scope, variableName);
         if (lexer.peek().isBinaryOperator()) {
             node = assembleBinaryOperator(node, lexer, data, scope, variableName);
         }
         return node;
     }
 
-    private static ExpressionNode simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+    private static Unchecked<? extends ExpressionNode> simple(Lexer lexer, ParseData data, ParserScope scope, String variableName) {
         Token test = lexer.peek();
 
 
@@ -56,14 +57,14 @@ public class ExpressionRule {
             test = lexer.peek();
         }
 
-        ExpressionNode node;
+        Unchecked<? extends ExpressionNode> node;
 
         boolean possibleFunctionSite = true;
 
         if (test.isConstant() || test.isIdentifier()) { // simple expression
             if (test.isIdentifier() && data.hasMacro(test.getContent())) {
                 lexer.consume();
-                node = new MacroNode(data.getMacro(test.getContent()), test.getPosition(), parseArguments(lexer, data, scope));
+                node = MacroNode.of(data.getMacro(test.getContent()), test.getPosition(), parseArguments(lexer, data, scope));
             } else {
                 node = BasicExpressionRule.assemble(lexer, data, scope);
             }
@@ -89,32 +90,32 @@ public class ExpressionRule {
 
         if (lexer.peek().getType() == TokenType.RANGE) {
             Position pos = lexer.consume().getPosition();
-            node = new RangeNode(node, assemble(lexer, data, scope), pos);
+            node = RangeNode.of(node, assemble(lexer, data, scope), pos);
         }
 
         if (lexer.peek().getType() == TokenType.LIST_BEGIN) {
             lexer.consume();
 
-            ExpressionNode index = assemble(lexer, data, scope);
+            Unchecked<? extends ExpressionNode> index = assemble(lexer, data, scope);
 
-            node = new ListIndexNode(node, index);
+            node = ListIndexNode.of(node, index);
 
             ParserUtil.checkType(lexer.consume(), TokenType.LIST_END);
         }
 
         while (lexer.peek().getType() == TokenType.GROUP_BEGIN && possibleFunctionSite) {
-            node = new FunctionInvocationNode(node, parseArguments(lexer, data, scope));
+            node = FunctionInvocationNode.of(node, parseArguments(lexer, data, scope));
         }
 
-        if (invert) return new NumberInverseNode(numberInvert, node);
-        if (not) return new BooleanNotNode(booleanNot, node);
+        if (invert) return NumberInverseNode.of(numberInvert, node);
+        if (not) return BooleanNotNode.of(booleanNot, node);
         return node;
     }
 
-    private static List<ExpressionNode> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
+    private static List<Unchecked<? extends ExpressionNode>> parseArguments(Lexer lexer, ParseData data, ParserScope scope) {
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
-        List<ExpressionNode> args = List.empty();
+        List<Unchecked<? extends ExpressionNode>> args = List.empty();
         while (lexer.peek().getType() != TokenType.GROUP_END) {
             args = args.append(assemble(lexer, data, scope));
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
@@ -125,9 +126,9 @@ public class ExpressionRule {
         return args;
     }
 
-    private static ExpressionNode assembleBinaryOperator(ExpressionNode left, Lexer lexer, ParseData data, ParserScope scope, String variableName) {
+    private static Unchecked<? extends ExpressionNode> assembleBinaryOperator(Unchecked<? extends ExpressionNode> left, Lexer lexer, ParseData data, ParserScope scope, String variableName) {
         Token op = lexer.consume();
-        ExpressionNode right = simple(lexer, data, scope, variableName);
+        Unchecked<? extends ExpressionNode> right = simple(lexer, data, scope, variableName);
 
         Token next = lexer.peek();
         if (next.isBinaryOperator()) {
@@ -141,72 +142,33 @@ public class ExpressionRule {
         return join(left, op, right, data);
     }
 
-    private static ExpressionNode join(ExpressionNode left, Token op, ExpressionNode right, ParseData data) {
+    private static Unchecked<? extends ExpressionNode> join(Unchecked<? extends ExpressionNode> left, Token op, Unchecked<? extends ExpressionNode> right, ParseData data) {
         if (op.getType() == TokenType.ADDITION_OPERATOR) {
-            return new AdditionNode(
-                    data.checkType(left, Signature.integer(), Signature.string(), Signature.decimal()),
-                    data.assertEqual(right, left),
-                    op);
+            return AdditionNode.of(left, right, op);
         } else if (op.getType() == TokenType.SUBTRACTION_OPERATOR) {
-            return new SubtractionNode(
-                    data.checkType(left, Signature.integer(), Signature.decimal()),
-                    data.assertEqual(right, left),
-                    op);
+            return SubtractionNode.of(left, right, op);
         } else if (op.getType() == TokenType.MULTIPLICATION_OPERATOR) {
-            return new MultiplyNode(
-                    data.checkType(left, Signature.integer(), Signature.decimal()),
-                    data.assertEqual(right, left),
-                    op);
+            return MultiplyNode.of(left, right, op);
         } else if (op.getType() == TokenType.DIVISION_OPERATOR) {
-            return new DivisionNode(
-                    data.checkType(left, Signature.integer(), Signature.decimal()),
-                    data.assertEqual(right, left),
-                    op);
+            return DivisionNode.of(left, right, op);
         } else if (op.getType() == TokenType.MODULO_OPERATOR) {
-            return new ModulusNode(
-                    data.checkType(left, Signature.integer(), Signature.decimal()),
-                    data.assertEqual(right, left),
-                    op);
+            return ModulusNode.of(left, right, op);
         } else if (op.getType() == TokenType.EQUALS_OPERATOR) {
-            return new EqualsNode(
-                    left,
-                    data.assertEqual(right, left),
-                    op);
+            return EqualsNode.of(left, right, op);
         } else if (op.getType() == TokenType.NOT_EQUALS_OPERATOR) {
-            return new NotEqualsNode(
-                    left,
-                    data.assertEqual(right, left),
-                    op);
+            return NotEqualsNode.of(left, right, op);
         } else if (op.getType() == TokenType.GREATER_THAN_OPERATOR) {
-            return new GreaterThanNode(
-                    data.checkType(left, Signature.decimal(), Signature.integer()),
-                    data.assertEqual(right, left),
-                    op);
+            return GreaterThanNode.of(left, right, op);
         } else if (op.getType() == TokenType.LESS_THAN_OPERATOR) {
-            return new LessThanNode(
-                    data.checkType(left, Signature.decimal(), Signature.integer()),
-                    data.assertEqual(right, left),
-                    op);
+            return LessThanNode.of(left, right, op);
         } else if (op.getType() == TokenType.GREATER_THAN_OR_EQUALS_OPERATOR) {
-            return new GreaterThanOrEqualsNode(
-                    data.checkType(left, Signature.decimal(), Signature.integer()),
-                    data.assertEqual(right, left),
-                    op);
+            return GreaterThanOrEqualsNode.of(left, right, op);
         } else if (op.getType() == TokenType.LESS_THAN_OR_EQUALS_OPERATOR) {
-            return new LessThanOrEqualsNode(
-                    data.checkType(left, Signature.decimal(), Signature.integer()),
-                    data.assertEqual(right, left),
-                    op);
+            return LessThanOrEqualsNode.of(left, right, op);
         } else if (op.getType() == TokenType.BOOLEAN_AND) {
-            return new BooleanAndNode(
-                    data.checkType(left, Signature.bool()),
-                    data.assertEqual(right, left),
-                    op);
+            return BooleanAndNode.of(left, right, op);
         } else if (op.getType() == TokenType.BOOLEAN_OR) {
-            return new BooleanOrNode(
-                    data.checkType(left, Signature.bool()),
-                    data.assertEqual(right, left),
-                    op);
+            return BooleanOrNode.of(left, right, op);
         } else {
             throw new ParseException("Unexpected token: " + op, op.getPosition());
         }

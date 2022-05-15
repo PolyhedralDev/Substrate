@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.StatementNode;
 import com.dfsek.substrate.lang.node.expression.BlockNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
@@ -10,26 +11,30 @@ import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
+import io.vavr.control.Option;
 
 
 /**
  * The base rule of the parser.
  */
 public class BaseRule {
-    public static <P extends Record, R extends Record> Node assemble(Lexer lexer, ParseData<P, R> data, ParserScope scope) throws ParseException {
+    public static Node assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         List<Node> contents = List.empty();
 
         Position begin = lexer.peek().getPosition();
 
-        ReturnNode returnNode = null;
+        Unchecked<ReturnNode> returnNode = null;
         while (lexer.hasNext()) {
             if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) { // Parse a new block
-                contents = contents.append(BlockRule.assemble(lexer, data, scope));
+                contents = contents.append(BlockRule.assemble(lexer, data, scope).unchecked());
             } else if (lexer.peek().getType() == TokenType.RETURN) {
                 returnNode = ReturnRule.assemble(lexer, data, scope, data.getReturnType());
-                contents = contents.append(returnNode);
+                contents = contents.append(returnNode.unchecked());
+                if (lexer.hasNext())
+                    ParserUtil.checkType(lexer.peek(), TokenType.BLOCK_END); // nothing after return.
             } else { // Parse a statement.
                 contents = contents.append(StatementRule.assemble(lexer, data, scope));
             }
@@ -37,21 +42,21 @@ public class BaseRule {
 
         if (returnNode == null) {
             if (contents.size() == 1) {
-                ExpressionNode node;
+                Unchecked<ExpressionNode> node;
                 if (contents.get(0) instanceof ExpressionNode) {
-                    node = (ExpressionNode) contents.get(0);
+                    node = Unchecked.of((ExpressionNode) contents.get(0));
                 } else {
-                    node = ((StatementNode) contents.get(0)).getContent();
+                    node = Unchecked.of(((StatementNode) contents.get(0)).getContent());
                 }
-                returnNode = new ReturnNode(Position.getNull(), node, data.getReturnType());
-                return new BlockNode(List.of(returnNode), List.of(returnNode), begin);
+                returnNode = ReturnNode.of(Position.getNull(), node, data.getReturnType());
+                return BlockNode.of(List.of(returnNode.unchecked()), Option.of(returnNode.unchecked()), begin).get(data.getReturnType());
             } else if (contents.size() == 0) {
                 throw new ParseException("Empty script.", Position.getNull());
             } else {
                 throw new ParseException("Cannot infer return expression", contents.last().getPosition());
             }
         } else {
-            return new BlockNode(contents, List.of(returnNode), begin);
+            return BlockNode.of(contents, Option.of(returnNode.unchecked()), begin).get(data.getReturnType());
         }
     }
 }

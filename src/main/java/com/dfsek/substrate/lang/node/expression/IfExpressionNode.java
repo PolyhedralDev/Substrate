@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -21,13 +22,17 @@ public class IfExpressionNode extends ExpressionNode {
     private final ExpressionNode caseTrueNode;
     private final ExpressionNode caseFalseNode;
 
-    public IfExpressionNode(ExpressionNode predicate, ExpressionNode caseTrueNode, ExpressionNode caseFalseNode) {
-        this.predicate = predicate;
-        this.caseTrueNode = caseTrueNode;
-        this.caseFalseNode = caseFalseNode;
+    private IfExpressionNode(Unchecked<? extends ExpressionNode> predicate, Unchecked<? extends ExpressionNode> caseTrueNode, Unchecked<? extends ExpressionNode> caseFalseNode) {
+        this.predicate = predicate.get(Signature.bool());
+        this.caseTrueNode = caseTrueNode.unchecked();
+        this.caseFalseNode = caseFalseNode.get(caseTrueNode.reference());
     }
 
-    @Override
+    public static Unchecked<IfExpressionNode> of(Unchecked<? extends ExpressionNode> predicate, Unchecked<? extends ExpressionNode> caseTrueNode, Unchecked<? extends ExpressionNode> caseFalseNode) {
+        return Unchecked.of(new IfExpressionNode(predicate, caseTrueNode, caseFalseNode));
+    }
+
+        @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         ParserUtil.checkReturnType(predicate, Signature.bool());
         ParserUtil.checkReturnType(caseTrueNode, caseFalseNode.reference().getSimpleReturn());

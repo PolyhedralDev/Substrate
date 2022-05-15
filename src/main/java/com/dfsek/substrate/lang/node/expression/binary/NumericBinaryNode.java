@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
@@ -14,15 +15,14 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 public abstract class NumericBinaryNode extends BinaryOperationNode {
-    public NumericBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
+    protected NumericBinaryNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
         super(left, right, op);
     }
 
 
     @Override
     public List<Either<CompileError, Op>> applyOp(BuildData data) {
-        Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal()).reference();
-        ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal()).reference();
+        Signature leftType = left.reference();
 
         ParserUtil.checkReturnType(right, leftType);
         if (leftType.equals(Signature.integer())) {
@@ -32,6 +32,11 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
         } else {
             throw new IllegalStateException("Non integer/decimal values in NumericBinaryNode");
         }
+    }
+
+    @Override
+    protected ExpressionNode check(Unchecked<? extends ExpressionNode> unchecked) {
+        return unchecked.get(Signature.integer(), Signature.decimal());
     }
 
     protected abstract int intOp();
@@ -55,14 +60,14 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
     public ExpressionNode simplify() {
         if (Node.disableOptimisation()) return this;
         if (left instanceof DecimalNode && right instanceof DecimalNode) {
-            return new DecimalNode(
+            return DecimalNode.of(
                     apply(((DecimalNode) left).getValue(), ((DecimalNode) right).getValue()),
-                    left.getPosition());
+                    left.getPosition()).get(Signature.decimal());
         }
         if (left instanceof IntegerNode && right instanceof IntegerNode) {
-            return new IntegerNode(
+            return IntegerNode.of(
                     apply(((IntegerNode) left).getValue(), ((IntegerNode) right).getValue()),
-                    left.getPosition());
+                    left.getPosition()).get(Signature.integer());
         }
         return this;
     }

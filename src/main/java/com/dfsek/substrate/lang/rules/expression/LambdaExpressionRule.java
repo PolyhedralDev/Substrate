@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
@@ -20,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LambdaExpressionRule {
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
+    public static Unchecked<LambdaExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
         ParserScope lambda = scope.sub();
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
@@ -62,12 +63,14 @@ public class LambdaExpressionRule {
 
         ParserUtil.checkType(lexer.consume(), TokenType.ARROW);
 
-        ExpressionNode expression;
+        Unchecked<? extends ExpressionNode> uncheckedExpression;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-            expression = BlockRule.assemble(lexer, data, lambda);
+            uncheckedExpression = BlockRule.assemble(lexer, data, lambda);
         } else {
-            expression = ExpressionRule.assemble(lexer, data, lambda);
+            uncheckedExpression = ExpressionRule.assemble(lexer, data, lambda);
         }
+
+        ExpressionNode expression = uncheckedExpression.get(returnType);
 
         Set<String> locals = new HashSet<>();
         expression.streamContents()
@@ -79,8 +82,8 @@ public class LambdaExpressionRule {
                 .filter(node -> locals.contains(((ValueReferenceNode) node).getId().getContent()))
                 .forEach(node -> ((ValueReferenceNode) node).setLocal(true));
 
-        return new LambdaExpressionNode(
-                expression,
+        return LambdaExpressionNode.of(
+                uncheckedExpression,
                 types,
                 begin.getPosition(),
                 returnType,
@@ -95,7 +98,7 @@ public class LambdaExpressionRule {
         );
     }
 
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static Unchecked<LambdaExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         return assemble(lexer, data, scope, null);
     }
 }

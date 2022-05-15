@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
@@ -24,9 +25,13 @@ public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
     private final ExpressionNode value;
 
-    public ValueAssignmentNode(Token id, ExpressionNode value) {
+    private ValueAssignmentNode(Token id, ExpressionNode value) {
         this.id = id;
         this.value = value.simplify();
+    }
+
+    public static Unchecked<ValueAssignmentNode> of(Token id, Unchecked<? extends ExpressionNode> value) {
+        return Unchecked.of(new ValueAssignmentNode(id, value.unchecked()));
     }
 
     public Token getId() {

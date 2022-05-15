@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -18,10 +19,14 @@ public class MacroNode extends ExpressionNode {
     private final Position position;
     private final List<ExpressionNode> args;
 
-    public MacroNode(Macro macro, Position position, List<ExpressionNode> args) {
+    private MacroNode(Macro macro, Position position, List<ExpressionNode> args) {
         this.macro = macro;
         this.position = position;
         this.args = args;
+    }
+
+    public static Unchecked<MacroNode> of(Macro macro, Position position, List<Unchecked<? extends ExpressionNode>> args) {
+        return Unchecked.of(new MacroNode(macro, position, args.map(Unchecked::unchecked)));
     }
 
     @Override

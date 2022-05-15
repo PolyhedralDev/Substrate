@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -26,13 +27,25 @@ public class ErrorNode extends ExpressionNode {
         this.signature = signature;
     }
 
+    public static Unchecked<ErrorNode> of(Position position, String message, Signature signature) {
+        return Unchecked.of(new ErrorNode(position, message, signature));
+    }
+
+    public static Unchecked<ErrorNode> of(Position position, String message) {
+        return Unchecked.of(new ErrorNode(position, message));
+    }
+
+    public static Unchecked<ErrorNode> of(Tuple2<String, Position> tuple) {
+        return of(tuple._2, tuple._1);
+    }
+
     public ErrorNode(Position position, String message) {
         this.position = position;
         this.message = message;
         this.signature = Signature.empty();
     }
 
-    public ErrorNode(Tuple2<String, Position> tuple) {
+    private ErrorNode(Tuple2<String, Position> tuple) {
         this(tuple._2, tuple._1);
     }
 

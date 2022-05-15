@@ -4,4 +4,6 @@ import com.dfsek.substrate.lexer.read.Positioned;
 
 public interface CompileError extends Positioned {
     String message();
+
+    void dumpStack();
 }

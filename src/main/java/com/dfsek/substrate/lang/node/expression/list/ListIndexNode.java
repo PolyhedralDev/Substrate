@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.codegen.Classes;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -21,9 +22,13 @@ public class ListIndexNode extends ExpressionNode {
     private final ExpressionNode listReference;
     private final ExpressionNode index;
 
-    public ListIndexNode(ExpressionNode listReference, ExpressionNode index) {
-        this.listReference = listReference;
-        this.index = index;
+    private ListIndexNode(Unchecked<? extends ExpressionNode> listReference, Unchecked<? extends ExpressionNode> index) {
+        this.listReference = listReference.weak(Signature.list());
+        this.index = index.get(Signature.integer());
+    }
+
+    public static Unchecked<ListIndexNode> of(Unchecked<? extends ExpressionNode> listReference, Unchecked<? extends ExpressionNode> index) {
+        return Unchecked.of(new ListIndexNode(listReference, index));
     }
 
     @Override

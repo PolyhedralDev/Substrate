@@ -366,9 +366,15 @@ public interface Op {
 
     static CompileError errorUnwrapped(String message, Position position) {
         return new CompileError() {
+            private final Exception e = new Exception();
             @Override
             public String message() {
                 return message;
+            }
+
+            @Override
+            public void dumpStack() {
+                e.printStackTrace();
             }
 
             @Override

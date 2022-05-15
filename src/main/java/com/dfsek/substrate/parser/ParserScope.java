@@ -1,6 +1,7 @@
 package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import io.vavr.control.Option;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,8 @@ public class ParserScope {
         }
 
         @Override
-        public Signature get(String val) {
-            throw new IllegalArgumentException("No such value " + val);
+        public Option<Signature> get(String val) {
+            return Option.none();
         }
     };
     private final Map<String, Signature> values = new HashMap<>();
@@ -43,8 +44,8 @@ public class ParserScope {
         return values.containsKey(val) || parent.contains(val);
     }
 
-    public Signature get(String val) {
-        if (values.containsKey(val)) return values.get(val);
+    public Option<Signature> get(String val) {
+        if (values.containsKey(val)) return Option.of(values.get(val));
         return parent.get(val);
     }
 

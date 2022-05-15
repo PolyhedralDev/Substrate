@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.node.expression.binary.bool;
 
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -15,9 +16,9 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     protected ExpressionNode left;
     protected ExpressionNode right;
 
-    public BooleanOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
-        this.left = left.simplify();
-        this.right = right.simplify();
+    protected BooleanOperationNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
+        this.left = left.get(Signature.bool());
+        this.right = right.get(Signature.bool());
         this.op = op;
     }
 
@@ -25,7 +26,8 @@ public abstract class BooleanOperationNode extends ExpressionNode {
     public ExpressionNode simplify() {
         if (Node.disableOptimisation()) return this;
         if (left instanceof BooleanNode && right instanceof BooleanNode) {
-            return new BooleanNode(apply(((BooleanNode) left).getValue(), ((BooleanNode) right).getValue()), left.getPosition());
+            return BooleanNode.of(apply(((BooleanNode) left).getValue(), ((BooleanNode) right).getValue()), left.getPosition())
+                    .get(Signature.bool());
         }
 
         return this;

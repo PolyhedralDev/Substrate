@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
@@ -14,8 +15,12 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
-    public NumToIntCastNode(Token type, ExpressionNode value) {
-        super(type, value);
+    private NumToIntCastNode(Token type, Unchecked<? extends ExpressionNode> value) {
+        super(type, value.get(Signature.decimal()));
+    }
+
+    public static Unchecked<NumToIntCastNode> of(Token type, Unchecked<? extends ExpressionNode> value) {
+        return Unchecked.of(new NumToIntCastNode(type, value));
     }
 
     @Override
@@ -28,7 +33,8 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
     public ExpressionNode simplify() {
         if (Node.disableOptimisation()) return this;
         if (value instanceof DecimalNode) {
-            return new IntegerNode(((DecimalNode) value).getValue().intValue(), value.getPosition());
+            return IntegerNode.of(((DecimalNode) value).getValue().intValue(), value.getPosition())
+                    .get(Signature.integer());
         }
         return super.simplify();
     }

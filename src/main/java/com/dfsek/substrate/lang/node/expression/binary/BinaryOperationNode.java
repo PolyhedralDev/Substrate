@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
@@ -20,9 +21,9 @@ public abstract class BinaryOperationNode extends ExpressionNode {
 
     protected final Token op;
 
-    public BinaryOperationNode(ExpressionNode left, ExpressionNode right, Token op) {
-        this.left = left.simplify();
-        this.right = right.simplify();
+    protected BinaryOperationNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
+        this.left = check(left);
+        this.right = Unchecked.of(check(right)).get(left.reference());
         this.op = op;
     }
 
@@ -32,6 +33,8 @@ public abstract class BinaryOperationNode extends ExpressionNode {
                 .appendAll(right.apply(data))
                 .appendAll(applyOp(data));
     }
+
+    protected abstract ExpressionNode check(Unchecked<? extends ExpressionNode> unchecked);
 
     public abstract List<Either<CompileError, Op>> applyOp(BuildData data);
 

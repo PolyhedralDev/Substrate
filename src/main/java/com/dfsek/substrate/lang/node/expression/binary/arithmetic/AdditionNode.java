@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
@@ -16,8 +17,12 @@ import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
 public class AdditionNode extends NumericBinaryNode {
-    public AdditionNode(ExpressionNode left, ExpressionNode right, Token op) {
+    private AdditionNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
         super(left, right, op);
+    }
+
+    public static Unchecked<AdditionNode> of(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
+        return Unchecked.of(new AdditionNode(left, right, op));
     }
 
     @Override
@@ -28,6 +33,11 @@ public class AdditionNode extends NumericBinaryNode {
     @Override
     public int apply(int left, int right) {
         return left + right;
+    }
+
+    @Override
+    protected ExpressionNode check(Unchecked<? extends ExpressionNode> unchecked) {
+        return unchecked.get(Signature.decimal(), Signature.integer(), Signature.string());
     }
 
     @Override

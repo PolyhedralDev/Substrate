@@ -76,13 +76,13 @@ public class Parser<P extends Record, R extends Record> {
     private final Lexer lexer;
     private final ScriptBuilder builder = new ScriptBuilder();
     private final ParserScope scope = new ParserScope();
-    private final ParseData<P, R> data;
+    private final ParseData data;
 
 
 
     public Parser(String data, Class<P> parameters, Class<R> ret) throws ParseException {
         lexer = new Lexer(data);
-        this.data = new ParseData<>(parameters, ret);
+        this.data = new ParseData(parameters, ret);
 
         for (RecordComponent recordComponent : parameters.getRecordComponents()) {
             scope.register(recordComponent.getName(), Signature.fromClass(recordComponent.getType()));

@@ -4,14 +4,19 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 public class StringNode extends ConstantExpressionNode<String> {
-    public StringNode(String value, Position position) {
+    private StringNode(String value, Position position) {
         super(value, position);
+    }
+
+    public static Unchecked<StringNode> of(String value, Position position) {
+        return Unchecked.of(new StringNode(value, position));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.BinaryOperationNode;
 import com.dfsek.substrate.lexer.token.Token;
@@ -16,16 +17,19 @@ import org.objectweb.asm.Label;
 import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.*;
 
 public abstract class ComparisonBinaryNode extends BinaryOperationNode {
-    public ComparisonBinaryNode(ExpressionNode left, ExpressionNode right, Token op) {
+    protected ComparisonBinaryNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
         super(left, right, op);
     }
 
     @Override
+    protected ExpressionNode check(Unchecked<? extends ExpressionNode> unchecked) {
+        return unchecked.get(Signature.integer(), Signature.decimal(), Signature.string());
+    }
+
+    @Override
     public List<Either<CompileError, Op>> applyOp(BuildData data) {
-        Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal(), Signature.string())
-                .reference().getSimpleReturn();
-        Signature rightType = ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal(), Signature.string())
-                .reference().getSimpleReturn();
+        Signature leftType = left.reference().getSimpleReturn();
+        Signature rightType = right.reference().getSimpleReturn();
 
         ParserUtil.checkReturnType(left, rightType);
 

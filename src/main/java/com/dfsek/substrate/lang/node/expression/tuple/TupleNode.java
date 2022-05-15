@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -16,9 +17,13 @@ public class TupleNode extends ExpressionNode {
     private final List<ExpressionNode> args;
     private final Position position;
 
-    public TupleNode(List<ExpressionNode> args, Position position) {
+    private TupleNode(List<ExpressionNode> args, Position position) {
         this.args = args;
         this.position = position;
+    }
+
+    public static Unchecked<TupleNode> of(List<Unchecked<? extends ExpressionNode>> args, Position position) {
+        return Unchecked.of(new TupleNode(args.map(Unchecked::unchecked), position));
     }
 
     @Override

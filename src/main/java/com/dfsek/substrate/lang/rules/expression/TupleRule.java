@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.tuple.TupleNode;
 import com.dfsek.substrate.lexer.Lexer;
@@ -12,10 +13,10 @@ import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 
 public class TupleRule {
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static Unchecked<? extends ExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN); // Tuples must start with (
 
-        List<ExpressionNode> args = List.empty();
+        List<Unchecked<? extends ExpressionNode>> args = List.empty();
 
         int groups = 1;
         while (groups > 0) {
@@ -39,6 +40,6 @@ public class TupleRule {
         if (args.size() == 1) {
             return args.get(0); // expand out 1-tuples
         }
-        return new TupleNode(args, begin.getPosition());
+        return TupleNode.of(args, begin.getPosition());
     }
 }

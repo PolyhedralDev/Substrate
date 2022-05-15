@@ -43,7 +43,7 @@ public class ScriptBuilder implements Opcodes {
         this.ops = ops.append(op); // todo: bad
     }
 
-    public <P extends Record, R extends Record> Script<P, R> build(ParseData<P, R> parseData) throws ParseException {
+    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
         ZipOutputStream zipOutputStream;
         if ("true".equals(System.getProperty("substrate.Dump"))) {
@@ -133,13 +133,18 @@ public class ScriptBuilder implements Opcodes {
                                     op.apply(absMethod);
                                     return List.empty();
                                 })));
+        if (!errors.isEmpty()) {
+            throw new ParseException(errors.foldLeft(errors.size() + " error(s) present in script:\n\t", (s, e) -> {
+                e.dumpStack();
+                return s + e.message() + ": " + e.getPosition() + "\n\t";
+            }), errors.last().getPosition());
+        }
+
         absMethod.visitMaxs(0, 0);
         absMethod.visitEnd();
 
 
-        if (!errors.isEmpty()) {
-            throw new ParseException(errors.foldLeft(errors.size() + " error(s) present in script:\n\t", (s, e) -> s + e.message() + ": " + e.getPosition() + "\n\t"), errors.last().getPosition());
-        }
+
 
 
         parseData

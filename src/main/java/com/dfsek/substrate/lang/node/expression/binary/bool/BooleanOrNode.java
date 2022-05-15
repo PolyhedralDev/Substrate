@@ -5,7 +5,9 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.binary.comparison.EqualsNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -15,10 +17,13 @@ import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 
 public class BooleanOrNode extends BooleanOperationNode {
-    public BooleanOrNode(ExpressionNode left, ExpressionNode right, Token op) {
+    private BooleanOrNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
         super(left, right, op);
     }
 
+    public static Unchecked<BooleanOrNode> of(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
+        return Unchecked.of(new BooleanOrNode(left, right, op));
+    }
     @Override
     public boolean apply(boolean left, boolean right) {
         return left || right;

@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
@@ -19,10 +20,14 @@ import java.util.Collections;
  * immediately invokes a lambda
  */
 public class LambdaInvocationNode extends ExpressionNode {
-    private final LambdaExpressionNode lambda;
+    private final ExpressionNode lambda;
 
-    public LambdaInvocationNode(LambdaExpressionNode lambda) {
-        this.lambda = lambda;
+    private LambdaInvocationNode(Unchecked<? extends ExpressionNode> lambda) {
+        this.lambda = lambda.weak(Signature.fun());
+    }
+
+    public static Unchecked<LambdaInvocationNode> of(Unchecked<? extends ExpressionNode> lambda) {
+        return Unchecked.of(new LambdaInvocationNode(lambda));
     }
 
     @Override

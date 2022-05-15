@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -20,9 +21,13 @@ public class NumberInverseNode extends ExpressionNode {
     private final Position position;
     private final ExpressionNode node;
 
-    public NumberInverseNode(Position position, ExpressionNode node) {
+    private NumberInverseNode(Position position, ExpressionNode node) {
         this.position = position;
         this.node = node;
+    }
+
+    public static Unchecked<NumberInverseNode> of(Position position, Unchecked<? extends ExpressionNode> node) {
+        return Unchecked.of(new NumberInverseNode(position, node.get(Signature.decimal(), Signature.integer())));
     }
 
     @Override

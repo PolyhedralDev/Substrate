@@ -64,7 +64,7 @@ public final class CompilerUtil implements Opcodes {
         return ret;
     }
 
-    public static Signature expandArguments(List<ExpressionNode> arguments) {
+    public static Signature expandArguments(List<? extends Typed> arguments) {
         Signature argSignature;
         if (arguments.isEmpty()) {
             argSignature = Signature.empty();

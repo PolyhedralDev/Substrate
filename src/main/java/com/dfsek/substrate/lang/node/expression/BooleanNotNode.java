@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -21,6 +22,10 @@ public class BooleanNotNode extends ExpressionNode {
     public BooleanNotNode(Position position, ExpressionNode node) {
         this.position = position;
         this.node = node;
+    }
+
+    public static Unchecked<BooleanNotNode> of(Position position, Unchecked<? extends ExpressionNode> node) {
+        return Unchecked.of(new BooleanNotNode(position, node.get(Signature.bool())));
     }
 
     @Override

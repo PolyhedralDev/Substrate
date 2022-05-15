@@ -10,17 +10,17 @@ import io.vavr.Tuple2;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class ParseData<P extends Record, R extends Record> {
+public class ParseData {
     private final Map<String, Macro> macros = new HashMap<>();
     private final List<Consumer<BuildData>> assertions = new ArrayList<>();
 
     private final Signature returnType;
     private final io.vavr.collection.List<Tuple2<String, Signature>> args;
 
-    private final Class<P> parameters;
-    private final Class<R> ret;
+    private final Class<? extends Record> parameters;
+    private final Class<? extends Record> ret;
 
-    public ParseData(Class<P> parameters, Class<R> ret) {
+    public ParseData(Class<? extends Record> parameters, Class<? extends Record> ret) {
         this.parameters = parameters;
         this.ret = ret;
 
@@ -46,11 +46,11 @@ public class ParseData<P extends Record, R extends Record> {
         return returnType;
     }
 
-    public Class<P> getParameterClass() {
+    public Class<? extends Record> getParameterClass() {
         return parameters;
     }
 
-    public Class<R> getReturnClass() {
+    public Class<? extends Record> getReturnClass() {
         return ret;
     }
 

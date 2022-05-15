@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
@@ -16,8 +17,12 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 public class ToStringNode extends TypeCastNode<Object, String> {
-    public ToStringNode(Token type, ExpressionNode value) {
-        super(type, value);
+    private ToStringNode(Token type, Unchecked<? extends ExpressionNode> value) {
+        super(type, value.get(Signature.decimal(), Signature.integer(), Signature.bool()));
+    }
+
+    public static Unchecked<ToStringNode> of(Token type, Unchecked<? extends ExpressionNode> value) {
+        return Unchecked.of(new ToStringNode(type, value));
     }
 
     @Override
@@ -45,7 +50,8 @@ public class ToStringNode extends TypeCastNode<Object, String> {
     public ExpressionNode simplify() {
         if (Node.disableOptimisation()) return this;
         if (value instanceof DecimalNode || value instanceof IntegerNode) {
-            return new StringNode(((ConstantExpressionNode<?>) value).getValue().toString(), value.getPosition());
+            return StringNode.of(((ConstantExpressionNode<?>) value).getValue().toString(), value.getPosition())
+                    .get(Signature.string());
         }
         return super.simplify();
     }

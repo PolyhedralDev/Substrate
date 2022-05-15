@@ -2,30 +2,35 @@ package com.dfsek.substrate.lang.compiler.type;
 
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
-import io.vavr.control.Either;
+import com.dfsek.substrate.lexer.read.Position;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
-public final class Unchecked<T extends Typed> implements Typed{
+public final class Unchecked<T extends ExpressionNode> implements Typed {
     private Unchecked(T value) {
         this.value = value;
     }
 
-    public static <T1 extends Typed> Unchecked<T1> of(T1 value) {
+    public static <T1 extends ExpressionNode> Unchecked<T1> of(T1 value) {
         return new Unchecked<>(value);
     }
 
     private final T value;
 
-    public Either<String, T> get(Signature... expected) {
+    public ExpressionNode get(Signature... signatures) {
         Signature ref = value.reference();
-        for (Signature type : expected) if (ref.equals(type)) return Either.right(value);
-        return Either.left("Expected type(s) " + Arrays.toString(expected) + " but found " + ref);
+        for (Signature type : signatures) if (ref.equals(type)) return value;
+        return new ErrorNode(value.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
     }
 
-    public static <T extends ExpressionNode> Folded<T> fold(Unchecked<T> unchecked) {
-        return new Folded<>(unchecked);
+    public ExpressionNode weak(Signature... signatures) {
+        Signature ref = value.reference();
+        for (Signature type : signatures) if (ref.weakEquals(type)) return value;
+        return new ErrorNode(value.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
+    }
+
+    public T unchecked() {
+        return value;
     }
 
     @Override
@@ -33,24 +38,7 @@ public final class Unchecked<T extends Typed> implements Typed{
         return value.reference();
     }
 
-    public static final class Folded<T extends ExpressionNode> implements Typed {
-        private final Unchecked<T> value;
-
-        private Folded(Unchecked<T> value) {
-            this.value = value;
-        }
-
-        public ExpressionNode get(Signature... signatures) {
-            return value.get(signatures)
-                    .fold(
-                            err -> new ErrorNode(value.value.getPosition(), err),
-                            Function.identity()
-                    );
-        }
-
-        @Override
-        public Signature reference() {
-            return value.value.reference();
-        }
+    public Position getPosition() {
+        return value.getPosition();
     }
 }

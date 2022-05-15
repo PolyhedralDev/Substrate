@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
@@ -20,15 +21,18 @@ public class ReturnNode extends ExpressionNode {
 
     private final Signature record;
 
-    public ReturnNode(Position position, ExpressionNode value, Signature record) {
+    private ReturnNode(Position position, Unchecked<? extends ExpressionNode> value, Signature record) {
         this.position = position;
-        this.value = value;
+        this.value = value.unchecked();
         this.record = record;
+    }
+
+    public static Unchecked<ReturnNode> of(Position position, Unchecked<? extends ExpressionNode> value, Signature record) {
+        return Unchecked.of(new ReturnNode(position, value, record));
     }
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        if (value == null) return List.empty();
         if (record != null && record.size() == 1) {
             return List.of(record.equals(value.reference()) ? Op.nothing() : Op.error("Invalid return type: " + value.reference(), value.getPosition()))
                     .appendAll(data.tupleFactory().construct(record, value.simplify().apply(data)))

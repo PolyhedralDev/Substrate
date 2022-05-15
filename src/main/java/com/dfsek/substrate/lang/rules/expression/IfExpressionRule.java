@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.IfExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
@@ -25,54 +26,29 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class IfExpressionRule {
-    public static ExpressionNode assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
+    public static Unchecked<? extends ExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope) throws ParseException {
         ParserUtil.checkType(lexer.consume(), TokenType.IF);
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
-        ExpressionNode predicate = ExpressionRule.assemble(lexer, data, scope);
+        Unchecked<? extends ExpressionNode> predicate = ExpressionRule.assemble(lexer, data, scope);
         ParserUtil.checkType(lexer.consume(), TokenType.GROUP_END);
 
-        ExpressionNode caseTrueNode;
+        Unchecked<? extends ExpressionNode> caseTrueNode = parseIfBlock(lexer, data, scope);
+
+        ParserUtil.checkType(lexer.consume(), TokenType.ELSE);
+
+        Unchecked<? extends ExpressionNode> caseFalseNode = parseIfBlock(lexer, data, scope);
+
+        return IfExpressionNode.of(predicate, caseTrueNode, caseFalseNode);
+    }
+
+    private static Unchecked<? extends ExpressionNode> parseIfBlock(Lexer lexer, ParseData data, ParserScope scope) {
+        Unchecked<? extends ExpressionNode> caseFalseNode;
         if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-            ExpressionNode internal = BlockRule.assemble(lexer, data, scope);
-            caseTrueNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
+            Unchecked<? extends ExpressionNode> internal = BlockRule.assemble(lexer, data, scope);
+            caseFalseNode = LambdaInvocationNode.of(LambdaExpressionNode.of(internal, List.empty(), internal.unchecked().getPosition(), internal.reference(), HashSet.empty()));
         } else {
-            caseTrueNode = ExpressionRule.assemble(lexer, data, scope);
+            caseFalseNode = ExpressionRule.assemble(lexer, data, scope);
         }
-
-        ExpressionNode caseFalseNode;
-        if (lexer.peek().getType() == TokenType.ELSE) {
-            lexer.consume();
-            if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-                ExpressionNode internal = BlockRule.assemble(lexer, data, scope);
-                caseFalseNode = new LambdaInvocationNode(new LambdaExpressionNode(internal, List.empty(), internal.getPosition(), internal.reference(), HashSet.empty()));
-            } else {
-                caseFalseNode = ExpressionRule.assemble(lexer, data, scope);
-            }
-        } else {
-            caseFalseNode = new ExpressionNode() {
-
-                @Override
-                public Collection<? extends Node> contents() {
-                    return Collections.emptyList();
-                }
-
-                @Override
-                public Signature reference() {
-                    return Signature.empty();
-                }
-
-                @Override
-                public List<Either<CompileError, Op>> apply(BuildData buildData) throws ParseException {
-                    return List.empty();
-                }
-
-                @Override
-                public Position getPosition() {
-                    return predicate.getPosition();
-                }
-            };
-        }
-
-        return new IfExpressionNode(predicate, caseTrueNode, caseFalseNode);
+        return caseFalseNode;
     }
 }

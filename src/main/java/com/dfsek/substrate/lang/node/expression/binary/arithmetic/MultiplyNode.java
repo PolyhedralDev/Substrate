@@ -1,12 +1,17 @@
 package com.dfsek.substrate.lang.node.expression.binary.arithmetic;
 
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.NumericBinaryNode;
 import com.dfsek.substrate.lexer.token.Token;
 
 public class MultiplyNode extends NumericBinaryNode {
-    public MultiplyNode(ExpressionNode left, ExpressionNode right, Token op) {
+    private MultiplyNode(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
         super(left, right, op);
+    }
+
+    public static Unchecked<MultiplyNode> of(Unchecked<? extends ExpressionNode> left, Unchecked<? extends ExpressionNode> right, Token op) {
+        return Unchecked.of(new MultiplyNode(left, right, op));
     }
 
     @Override

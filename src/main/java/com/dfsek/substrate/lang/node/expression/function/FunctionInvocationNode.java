@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -17,9 +18,14 @@ public class FunctionInvocationNode extends ExpressionNode {
     private final List<ExpressionNode> arguments;
     private final ExpressionNode function;
 
-    public FunctionInvocationNode(ExpressionNode function, List<ExpressionNode> arguments) {
+    private FunctionInvocationNode(ExpressionNode function, List<ExpressionNode> arguments) {
         this.arguments = arguments;
         this.function = function;
+    }
+
+    public static Unchecked<FunctionInvocationNode> of(Unchecked<? extends ExpressionNode> function, List<Unchecked<? extends ExpressionNode>> arguments) {
+        ExpressionNode checkedFunction = function.weak(Signature.fun());
+        return Unchecked.of(new FunctionInvocationNode(checkedFunction, arguments.map(Unchecked::unchecked)));
     }
 
     @Override

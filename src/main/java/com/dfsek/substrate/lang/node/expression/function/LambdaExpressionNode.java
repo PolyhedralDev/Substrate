@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.ShadowValue;
@@ -40,8 +41,8 @@ public class LambdaExpressionNode extends ExpressionNode {
     private final Set<String> argRefs;
     private String self;
 
-    public LambdaExpressionNode(ExpressionNode content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
-        this.content = content;
+    private LambdaExpressionNode(Unchecked<? extends ExpressionNode> content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
+        this.content = content.get(returnType);
         this.types = types;
         this.start = start;
         this.returnType = returnType;
@@ -58,7 +59,12 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.ref = Signature.fun().applyGenericReturn(0, returnType).applyGenericArgument(0, parameters);
     }
 
-    public void setSelf(String self) {
+    public static Unchecked<LambdaExpressionNode> of(Unchecked<? extends ExpressionNode> content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
+        return Unchecked.of(new LambdaExpressionNode(content, types, start, returnType, argRefs));
+    }
+
+
+        public void setSelf(String self) {
         this.self = self;
     }
 
