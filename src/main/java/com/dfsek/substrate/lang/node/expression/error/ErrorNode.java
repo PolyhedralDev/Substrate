@@ -21,10 +21,13 @@ public class ErrorNode extends ExpressionNode {
     private final String message;
     private final Signature signature;
 
+    private final Exception e;
+
     public ErrorNode(Position position, String message, Signature signature) {
         this.position = position;
         this.message = message;
         this.signature = signature;
+        this.e = new Exception();
     }
 
     public static Unchecked<ErrorNode> of(Position position, String message, Signature signature) {
@@ -43,15 +46,12 @@ public class ErrorNode extends ExpressionNode {
         this.position = position;
         this.message = message;
         this.signature = Signature.empty();
-    }
-
-    private ErrorNode(Tuple2<String, Position> tuple) {
-        this(tuple._2, tuple._1);
+        this.e = new Exception();
     }
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        return List.of(Op.error(message, position));
+        return List.of(Op.error(message, position, e));
     }
 
     @Override

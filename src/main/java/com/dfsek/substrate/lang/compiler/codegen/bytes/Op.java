@@ -361,12 +361,15 @@ public interface Op {
     }
 
     static Either<CompileError, Op> error(String message, Position position) {
-        return Either.left(errorUnwrapped(message, position));
+        return Either.left(errorUnwrapped(message, position, new Exception()));
     }
 
-    static CompileError errorUnwrapped(String message, Position position) {
+    static Either<CompileError, Op> error(String message, Position position, Exception e) {
+        return Either.left(errorUnwrapped(message, position, e));
+    }
+
+    static CompileError errorUnwrapped(String message, Position position, Exception e) {
         return new CompileError() {
-            private final Exception e = new Exception();
             @Override
             public String message() {
                 return message;
@@ -382,6 +385,10 @@ public interface Op {
                 return position;
             }
         };
+    }
+
+    static CompileError errorUnwrapped(String message, Position position) {
+        return errorUnwrapped(message, position, new Exception());
     }
 
     static Either<CompileError, Op> nothing() {
