@@ -64,7 +64,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
 
-        public void setSelf(String self) {
+    public void setSelf(String self) {
         this.self = self;
     }
 
