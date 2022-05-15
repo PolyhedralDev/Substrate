@@ -1,0 +1,5 @@
+// this function returns type NUM, we should not be able to negate it
+
+-(): num -> 0.4;
+
+return false;

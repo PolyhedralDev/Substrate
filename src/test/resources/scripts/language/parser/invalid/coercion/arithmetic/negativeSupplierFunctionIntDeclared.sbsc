@@ -1,0 +1,6 @@
+// this function returns type NUM, we should not be able to negate it
+a = (): int -> 4;
+
+-a;
+
+return false;

@@ -1,0 +1,4 @@
+a = (): int -> 4;
+3 + a;
+
+return true;
