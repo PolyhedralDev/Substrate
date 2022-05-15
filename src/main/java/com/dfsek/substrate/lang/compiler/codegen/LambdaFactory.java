@@ -117,8 +117,10 @@ public class LambdaFactory implements Opcodes {
                         }
                 ));
 
-        impl.visitMaxs(0, 0);
-        impl.visitEnd();
+        if(errors.size() == 0) {
+            impl.visitMaxs(0, 0);
+            impl.visitEnd();
+        }
 
         implementations.add(builder);
         return new Tuple2<>(errors, builder);
