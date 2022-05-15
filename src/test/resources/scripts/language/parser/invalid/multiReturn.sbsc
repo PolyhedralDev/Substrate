@@ -1,0 +1,6 @@
+a = (b: bool): bool -> {
+    return true;
+    return b;
+};
+
+return false;
