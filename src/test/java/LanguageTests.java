@@ -68,7 +68,11 @@ public class LanguageTests {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
-                System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, Boolean.toString(optimised));
+                if(optimised) {
+                    System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
+                } else {
+                    System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, "true");
+                }
                 assertTrue(parser.parse().execute(new Input(true), null).b());
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -89,7 +93,11 @@ public class LanguageTests {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
                 Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
-                System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, Boolean.toString(optimised));
+                if(optimised) {
+                    System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
+                } else {
+                    System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, "true");
+                }
                 parser.parse().execute(new Input(true), null);
             } catch (ParseException e) {
                 if (Utils.STACK_TRACES_FOR_INVALID) e.printStackTrace();
