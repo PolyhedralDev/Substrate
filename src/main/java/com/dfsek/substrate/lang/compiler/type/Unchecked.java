@@ -18,15 +18,17 @@ public final class Unchecked<T extends ExpressionNode> implements Typed {
     private final T value;
 
     public ExpressionNode get(Signature... signatures) {
-        Signature ref = value.reference();
-        for (Signature type : signatures) if (ref.equals(type)) return value;
-        return new ErrorNode(value.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
+        ExpressionNode simplified = value.simplify();
+        Signature ref = simplified.reference();
+        for (Signature type : signatures) if (ref.equals(type)) return simplified;
+        return new ErrorNode(simplified.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
     }
 
     public ExpressionNode weak(Signature... signatures) {
-        Signature ref = value.reference();
-        for (Signature type : signatures) if (ref.weakEquals(type)) return value;
-        return new ErrorNode(value.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
+        ExpressionNode simplified = value.simplify();
+        Signature ref = simplified.reference();
+        for (Signature type : signatures) if (ref.weakEquals(type)) return simplified;
+        return new ErrorNode(simplified.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref);
     }
 
     public T unchecked() {
