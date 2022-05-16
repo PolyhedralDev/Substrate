@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.binary.comparison.EqualsNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
+import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -31,7 +32,7 @@ public class BooleanAndNode extends BooleanOperationNode {
 
     @Override
     public ExpressionNode simplify() {
-        if (Node.disableOptimisation()) return this;
+        if (Node.disableOptimisation() || left instanceof ErrorNode || right instanceof ErrorNode) return this;
         if (left instanceof BooleanNode) {
             if (((BooleanNode) left).getValue()) {
                 return right; // left does not matter.
