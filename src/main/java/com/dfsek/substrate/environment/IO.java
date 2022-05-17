@@ -1,5 +1,5 @@
 package com.dfsek.substrate.environment;
 
-public interface IO<T extends Environment> {
-    void apply(T env);
+public interface IO<V, T extends Environment> {
+    V apply(T env);
 }

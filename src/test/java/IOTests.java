@@ -80,14 +80,18 @@ public class IOTests {
         parser.parse().execute(new Records.Void(), environment).io().apply(environment);
     }
 
-    public static IO<Records.IOOut.BasicEnvironment> putLine(String in) {
-        return env -> env.getOut().println(in);
+    public static IO<Void, Records.IOOut.BasicEnvironment> putLine(String in) {
+        return env -> {
+            env.getOut().println(in);
+            return null;
+        };
     }
 
-    public static IO<Records.IOOut.BasicEnvironment> cheatBind(IO<Records.IOOut.BasicEnvironment> one, IO<Records.IOOut.BasicEnvironment> two) {
+    public static IO<Void, Records.IOOut.BasicEnvironment> cheatBind(IO<Void, Records.IOOut.BasicEnvironment> one, IO<Void, Records.IOOut.BasicEnvironment> two) {
         return env -> {
             one.apply(env);
             two.apply(env);
+            return null;
         };
     }
 
@@ -138,7 +142,7 @@ public class IOTests {
         public record Void() {
         }
 
-        public record IOOut(IO<BasicEnvironment> io) {
+        public record IOOut(IO<java.lang.Void, BasicEnvironment> io) {
             public static final class BasicEnvironment implements Environment {
                 public PrintStream getOut() {
                     return System.out;
