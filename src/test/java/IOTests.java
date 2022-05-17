@@ -75,8 +75,20 @@ public class IOTests {
         Parser<Records.Void, Records.IOOut> parser = Utils.createParser(basicMonadic, Records.Void.class, Records.IOOut.class, true);
 
         parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        parser.registerFunction("bind", new StaticFunction(IOTests.class.getMethod("cheatBind", IO.class, IO.class)));
 
         parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+    }
+
+    public static IO<Records.IOOut.BasicEnvironment> putLine(String in) {
+        return env -> env.getOut().println(in);
+    }
+
+    public static IO<Records.IOOut.BasicEnvironment> cheatBind(IO<Records.IOOut.BasicEnvironment> one, IO<Records.IOOut.BasicEnvironment> two) {
+        return env -> {
+            one.apply(env);
+            two.apply(env);
+        };
     }
 
     @Test
@@ -95,9 +107,7 @@ public class IOTests {
         }
     }
 
-    public static IO<Records.IOOut.BasicEnvironment> putLine(String in) {
-        return env -> env.getOut().println(in);
-    }
+
 
     public static class Records {
         public record BooleanInput(boolean input) {

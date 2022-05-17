@@ -1,1 +1,5 @@
-return putLine("hello");
+bind(
+    putLine("hello"),
+    putLine("world")
+);
+
