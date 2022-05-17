@@ -24,6 +24,7 @@ public class Signature implements Opcodes {
     private static final Signature IO = new Signature(DataType.IO);
 
     private static final Signature LIST = new Signature(DataType.LIST);
+    private static final Signature ANY = new Signature(DataType.ANY);
     private final List<DataType> types;
     private final List<Tuple2<Signature, Signature>> generic;
 
@@ -68,6 +69,9 @@ public class Signature implements Opcodes {
 
     public static Signature io() {
         return IO;
+    }
+    public static Signature any() {
+        return ANY;
     }
 
     public static Signature list() {

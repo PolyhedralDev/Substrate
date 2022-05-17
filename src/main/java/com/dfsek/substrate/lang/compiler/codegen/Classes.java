@@ -6,6 +6,8 @@ import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import io.vavr.collection.List;
 
+import java.util.function.Function;
+
 import static com.dfsek.substrate.lang.compiler.util.CompilerUtil.internalName;
 
 public class Classes {
@@ -21,4 +23,5 @@ public class Classes {
     public static final String INTEGER = internalName(Integer.class);
     public static final String DOUBLE = internalName(Double.class);
     public static final String IO = internalName(com.dfsek.substrate.environment.IO.class);
+    public static final String FUNCTION = internalName(Function.class);
 }

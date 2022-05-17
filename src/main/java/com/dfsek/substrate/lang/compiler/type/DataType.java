@@ -134,6 +134,18 @@ public enum DataType implements Opcodes {
         public char descriptorChar() {
             return 'E';
         }
+    },
+
+    ANY {
+        @Override
+        public String descriptor() {
+            throw new IllegalStateException("Cannot use ANY type in class.");
+        }
+
+        @Override
+        public char descriptorChar() {
+            return '*';
+        }
     };
 
     public static DataType fromToken(Token token) {
