@@ -92,20 +92,24 @@ public final class ParserUtil {
                     || other.weakEquals(Signature.bool())
                     || other.weakEquals(Signature.decimal())
                     || other.weakEquals(Signature.string()))) {
-                ParserUtil.checkType(lexer.consume(), TokenType.LESS_THAN_OPERATOR);
                 if (other.weakEquals(Signature.list())) {
+                    ParserUtil.checkType(lexer.consume(), TokenType.LESS_THAN_OPERATOR);
                     other = other.applyGenericReturn(0, parseSignatureNotation(lexer));
+                    ParserUtil.checkType(lexer.consume(), TokenType.GREATER_THAN_OPERATOR);
                 } else if (other.weakEquals(Signature.io()) && lexer.peek().getType() == TokenType.LESS_THAN_OPERATOR) {
+                    ParserUtil.checkType(lexer.consume(), TokenType.LESS_THAN_OPERATOR);
                     other = other.applyGenericReturn(0, parseSignatureNotation(lexer));
+                    ParserUtil.checkType(lexer.consume(), TokenType.GREATER_THAN_OPERATOR);
                 } else if (other.weakEquals(Signature.fun())) {
+                    ParserUtil.checkType(lexer.consume(), TokenType.LESS_THAN_OPERATOR);
                     other = other.applyGenericArgument(0, parseSignatureNotation(lexer));
                     if (lexer.peek().getType() == TokenType.ARROW) {
                         lexer.consume();
                         Signature ret = parseSignatureNotation(lexer);
                         other = other.applyGenericReturn(0, ret);
                     }
+                    ParserUtil.checkType(lexer.consume(), TokenType.GREATER_THAN_OPERATOR);
                 }
-                ParserUtil.checkType(lexer.consume(), TokenType.GREATER_THAN_OPERATOR);
             }
             signature = signature.and(other);
 
