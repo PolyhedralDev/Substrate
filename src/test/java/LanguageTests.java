@@ -67,7 +67,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
+                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class, true);
                 if(optimised) {
                     System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
                 } else {
@@ -92,7 +92,7 @@ public class LanguageTests {
         return () -> {
             try {
                 String data = IOUtils.toString(new FileInputStream(path.toFile()), StandardCharsets.UTF_8);
-                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class);
+                Parser<Input, Output> parser = Utils.createParser(data, Input.class, Output.class, true);
                 if(optimised) {
                     System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
                 } else {

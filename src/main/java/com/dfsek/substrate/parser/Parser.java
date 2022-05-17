@@ -88,8 +88,6 @@ public class Parser<P extends Record, R extends Record> {
             scope.register(recordComponent.getName(), Signature.fromClass(recordComponent.getType()));
         }
 
-        registerFunction("println", new Println());
-
         STATIC_FUNCTIONS.forEach(this::registerFunction);
     }
 
