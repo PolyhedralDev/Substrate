@@ -93,7 +93,7 @@ public final class ParserUtil {
                     || other.weakEquals(Signature.decimal())
                     || other.weakEquals(Signature.string()))) {
                 ParserUtil.checkType(lexer.consume(), TokenType.LESS_THAN_OPERATOR);
-                if (other.weakEquals(Signature.list())) {
+                if (other.weakEquals(Signature.list()) || other.weakEquals(Signature.io())) {
                     other = other.applyGenericReturn(0, parseSignatureNotation(lexer));
                 } else if (other.weakEquals(Signature.fun())) {
                     other = other.applyGenericArgument(0, parseSignatureNotation(lexer));
