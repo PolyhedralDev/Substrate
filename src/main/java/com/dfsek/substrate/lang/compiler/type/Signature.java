@@ -1,5 +1,6 @@
 package com.dfsek.substrate.lang.compiler.type;
 
+import com.dfsek.substrate.environment.IO;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
@@ -266,6 +267,8 @@ public class Signature implements Opcodes {
             return Signature.decimal();
         } else if (clazz.equals(boolean.class)) {
             return Signature.bool();
+        } else if (clazz.equals(com.dfsek.substrate.environment.IO.class)) {
+            return Signature.io();
         } else {
             throw new IllegalArgumentException("Illegal class: " + clazz);
         }
