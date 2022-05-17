@@ -41,7 +41,8 @@ public final class Token implements Positioned {
                 || type == TokenType.FUN_TYPE
                 || type == TokenType.INT_TYPE
                 || type == TokenType.BOOL_TYPE
-                || type == TokenType.LIST_TYPE;
+                || type == TokenType.LIST_TYPE
+                || type == TokenType.IO;
     }
 
     public boolean isBinaryOperator() {
