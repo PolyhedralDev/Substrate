@@ -23,8 +23,8 @@ public class Signature implements Opcodes {
     private static final Signature INT = new Signature(DataType.INT);
     private static final Signature DECIMAL = new Signature(DataType.NUM);
     private static final Signature STRING = new Signature(DataType.STR);
-
     private static final Signature FUN = new Signature(DataType.FUN);
+    private static final Signature IO = new Signature(DataType.IO);
 
     private static final Signature LIST = new Signature(DataType.LIST);
     private final List<DataType> types;
@@ -67,6 +67,10 @@ public class Signature implements Opcodes {
 
     public static Signature fun() {
         return FUN;
+    }
+
+    public static Signature io() {
+        return IO;
     }
 
     public static Signature list() {
