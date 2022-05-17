@@ -45,7 +45,18 @@ public class LambdaFactory implements Opcodes {
         return generated.computeIfAbsent(args, ignore -> new HashMap<>()).computeIfAbsent(returnType, ignore -> {
             String endName = "Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
-            ClassBuilder builder = new ClassBuilder(name, true, LAMBDA_NAME);
+
+            String[] ifaces;
+
+            if(args.size() == 1) {
+                ifaces = new String[] {LAMBDA_NAME, Classes.FUNCTION};
+            } else if (args.size() == 2) {
+                ifaces = new String[] {LAMBDA_NAME, Classes.BIFUNCTION};
+            } else {
+                ifaces = new String[] {LAMBDA_NAME};
+            }
+
+            ClassBuilder builder = new ClassBuilder(name, true, ifaces);
 
             String ret = returnType.internalDescriptor();
 
