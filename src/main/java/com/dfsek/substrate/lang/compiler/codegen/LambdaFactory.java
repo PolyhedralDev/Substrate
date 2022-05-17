@@ -46,17 +46,8 @@ public class LambdaFactory implements Opcodes {
             String endName = "Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
 
-            String[] ifaces;
 
-            if(args.size() == 1) {
-                ifaces = new String[] {LAMBDA_NAME, Classes.FUNCTION};
-            } else if (args.size() == 2) {
-                ifaces = new String[] {LAMBDA_NAME, Classes.BIFUNCTION};
-            } else {
-                ifaces = new String[] {LAMBDA_NAME};
-            }
-
-            ClassBuilder builder = new ClassBuilder(name, true, ifaces);
+            ClassBuilder builder = new ClassBuilder(name, true, LAMBDA_NAME);
 
             String ret = returnType.internalDescriptor();
 

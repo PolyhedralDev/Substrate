@@ -41,6 +41,6 @@ public class Bind implements Macro {
     @Override
     public List<Either<CompileError, Op>> invoke(BuildData data, Signature args, List<ExpressionNode> argNodes) {
         return argNodes.flatMap(arg -> arg.simplify().apply(data))
-                .append(Op.invokeStaticInterface(Classes.IO, "bind", "(L" + Classes.IO + ";L" + Classes.FUNCTION + ";)L" + Classes.IO + ";"));
+                .append(Op.invokeStaticInterface(Classes.IO, "bind", "(L" + Classes.IO + ";L" + Classes.IO_FUNCTION + ";)L" + Classes.IO + ";"));
     }
 }
