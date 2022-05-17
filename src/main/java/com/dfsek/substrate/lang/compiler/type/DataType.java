@@ -149,6 +149,8 @@ public enum DataType implements Opcodes {
             return FUN;
         } else if (token.getType() == TokenType.LIST_TYPE) {
             return LIST;
+        } else if (token.getType() == TokenType.IO) {
+            return IO;
         }
         throw new IllegalArgumentException("Invalid token: " + token);
     }
