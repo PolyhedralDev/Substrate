@@ -159,6 +159,10 @@ public enum TokenType {
      */
     LIST_TYPE,
     /**
+     * Special IO type
+     */
+    IO,
+    /**
      * If expression token "if"
      */
     IF,
