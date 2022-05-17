@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
+import com.dfsek.substrate.lang.compiler.type.DataType;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
@@ -46,8 +47,21 @@ public class LambdaFactory implements Opcodes {
             String endName = "Lambda" + args.classDescriptor() + "R" + returnType.classDescriptor();
             String name = classBuilder.getName() + "$" + endName;
 
+            String[] ifaces;
 
-            ClassBuilder builder = new ClassBuilder(name, true, LAMBDA_NAME);
+
+
+            if (args.size() == 1 && returnType.weakEquals(Signature.io())) {
+                ifaces = new String[]{LAMBDA_NAME, switch (args.getType(0)) {
+                    case INT -> Classes.IO_FUNCTION_INT;
+                    case NUM -> Classes.IO_FUNCTION_NUM;
+                    default -> Classes.IO_FUNCTION;
+                }};
+            } else {
+                ifaces = new String[]{LAMBDA_NAME};
+            }
+
+            ClassBuilder builder = new ClassBuilder(name, true, ifaces);
 
             String ret = returnType.internalDescriptor();
 
@@ -55,8 +69,35 @@ public class LambdaFactory implements Opcodes {
                 if (returnType.equals(Signature.empty())) ret = "V";
                 else ret = "L" + CompilerUtil.internalName(tupleFactory.generate(returnType).clazz()) + ";";
             }
+            String sig = "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret;
+            builder.method("apply", sig, Access.PUBLIC, Access.ABSTRACT);
 
-            builder.method("apply", "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret, Access.PUBLIC, Access.ABSTRACT);
+            if (args.size() == 1 && returnType.weakEquals(Signature.io())) {
+                DataType arg = args.getType(0);
+                MethodVisitor apply = builder.method("apply", "(L" + Classes.ENVIRONMENT + ";" +
+                        switch (arg) {
+                            case INT -> "I";
+                            case NUM -> "D";
+                            default -> "L" + Classes.OBJECT + ";";
+                        } + ")L" + Classes.OBJECT + ";", Access.PUBLIC);
+                apply.visitIntInsn(ALOAD, 0);
+                apply.visitIntInsn(ALOAD, 1);
+
+                apply.visitIntInsn(arg.loadInsn(), 2);
+                if(arg != DataType.NUM && arg != DataType.INT) {
+                    String type = arg.descriptor().substring(1);
+                    type = type.substring(0, type.length() - 1);
+                    apply.visitTypeInsn(CHECKCAST, type);
+                }
+
+
+                apply.visitMethodInsn(INVOKEINTERFACE, name, "apply", sig, true);
+
+                apply.visitInsn(ARETURN);
+                apply.visitMaxs(0, 0);
+            } else {
+                ifaces = new String[]{LAMBDA_NAME};
+            }
 
             classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);
 
@@ -119,7 +160,7 @@ public class LambdaFactory implements Opcodes {
                         }
                 ));
 
-        if(errors.size() == 0) {
+        if (errors.size() == 0) {
             impl.visitMaxs(0, 0);
             impl.visitEnd();
         }
