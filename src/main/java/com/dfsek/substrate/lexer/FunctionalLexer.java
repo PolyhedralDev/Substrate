@@ -156,6 +156,7 @@ public class FunctionalLexer {
                                 literalMatch(c, "str", TokenType.STRING_TYPE),
                                 literalMatch(c, "fun", TokenType.FUN_TYPE),
                                 literalMatch(c, "list", TokenType.LIST_TYPE),
+                                literalMatch(c, "io", TokenType.IO),
 
                                 literalMatch(c, "if", TokenType.IF),
                                 literalMatch(c, "else", TokenType.ELSE),
