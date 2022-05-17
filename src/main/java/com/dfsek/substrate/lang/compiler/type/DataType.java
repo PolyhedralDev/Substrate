@@ -122,6 +122,18 @@ public enum DataType implements Opcodes {
             return 'L';
         }
 
+    },
+
+    IO {
+        @Override
+        public String descriptor() {
+            return "L" + Classes.IO + ";";
+        }
+
+        @Override
+        public char descriptorChar() {
+            return 'E';
+        }
     };
 
     public static DataType fromToken(Token token) {

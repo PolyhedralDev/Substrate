@@ -2,6 +2,7 @@ package com.dfsek.substrate.lang.compiler.codegen;
 
 import com.dfsek.substrate.Environment;
 import com.dfsek.substrate.Script;
+import com.dfsek.substrate.lang.compiler.api.IO;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
@@ -21,4 +22,5 @@ public class Classes {
     public static final String LIST = internalName(List.class);
     public static final String INTEGER = internalName(Integer.class);
     public static final String DOUBLE = internalName(Double.class);
+    public static final String IO = internalName(com.dfsek.substrate.lang.compiler.api.IO.class);
 }
