@@ -1,0 +1,5 @@
+bind(
+    getInt(),
+    (i: int): io -> putLine("random input: " + str(i))
+);
+

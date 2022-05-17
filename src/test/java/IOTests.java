@@ -1,5 +1,6 @@
 import com.dfsek.substrate.environment.Environment;
 import com.dfsek.substrate.environment.IO;
+import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.parser.Parser;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,6 +26,7 @@ public class IOTests {
     private static final String inputClosureInt = getScript("inputClosureInt");
 
     private static final String basicMonadic = getScript("basicMonadic");
+    private static final String monadicInput = getScript("monadicInput");
 
     static {
         System.setProperty("substrate.Dump", Boolean.toString(Utils.DUMP_TO_JARS));
@@ -80,11 +83,28 @@ public class IOTests {
         parser.parse().execute(new Records.Void(), environment).io().apply(environment);
     }
 
+    @Test
+    public void monadicInput() throws NoSuchMethodException {
+        Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInput, Records.Void.class, Records.IOOut.class, true);
+
+        parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
+
+        parser.registerMacro("bind", new Bind());
+
+        parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+    }
+
     public static IO<Void, Records.IOOut.BasicEnvironment> putLine(String in) {
         return env -> {
             env.getOut().println(in);
             return null;
         };
+    }
+
+    public static IO<Integer, Records.IOOut.BasicEnvironment> getInt() {
+        return env -> ThreadLocalRandom.current().nextInt();
     }
 
     public static IO<Void, Records.IOOut.BasicEnvironment> cheatBind(IO<Void, Records.IOOut.BasicEnvironment> one, IO<Void, Records.IOOut.BasicEnvironment> two) {
