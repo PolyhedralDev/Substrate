@@ -1,6 +1,6 @@
 package com.dfsek.substrate.lang.compiler.codegen;
 
-import com.dfsek.substrate.Environment;
+import com.dfsek.substrate.environment.Environment;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
