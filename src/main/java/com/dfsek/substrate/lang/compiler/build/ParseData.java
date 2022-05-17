@@ -27,7 +27,7 @@ public class ParseData {
         this.returnType = Signature.fromRecord(ret);
         this.args = io.vavr.collection.List
                 .of(parameters.getRecordComponents())
-                .map(r -> new Tuple2<>(r.getName(), Signature.fromClass(r.getType())))
+                .map(r -> new Tuple2<>(r.getName(), Signature.fromType(r.getType())))
                 .toList();
     }
 

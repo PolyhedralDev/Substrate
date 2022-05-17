@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -85,7 +84,7 @@ public class Parser<P extends Record, R extends Record> {
         this.data = new ParseData(parameters, ret);
 
         for (RecordComponent recordComponent : parameters.getRecordComponents()) {
-            scope.register(recordComponent.getName(), Signature.fromClass(recordComponent.getType()));
+            scope.register(recordComponent.getName(), Signature.fromType(recordComponent.getType()));
         }
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);

@@ -76,7 +76,7 @@ public class ScriptBuilder implements Opcodes {
         RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
         for (int i = 0; i < recordComponents.length; i++) {
             RecordComponent recordComponent = recordComponents[i];
-            data.registerValue(recordComponent.getName(), new RecordValue(Signature.fromClass(recordComponent.getType()), parseData.getParameterClass(), i));
+            data.registerValue(recordComponent.getName(), new RecordValue(Signature.fromType(recordComponent.getType()), parseData.getParameterClass(), i));
         }
 
         // prepare functions.

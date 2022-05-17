@@ -25,12 +25,12 @@ public class StaticFunction implements Function {
         this.name = method.getName();
         Class<?> r = method.getReturnType();
 
-        this.ret = Signature.fromClass(r);
+        this.ret = Signature.fromType(r);
 
         Signature args = Signature.empty();
 
         for (Class<?> parameterType : method.getParameterTypes()) {
-            args = args.and(Signature.fromClass(parameterType));
+            args = args.and(Signature.fromType(parameterType));
         }
         this.args = args;
     }

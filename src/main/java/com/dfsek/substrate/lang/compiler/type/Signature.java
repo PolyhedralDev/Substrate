@@ -1,17 +1,12 @@
 package com.dfsek.substrate.lang.compiler.type;
 
-import com.dfsek.substrate.environment.IO;
-import com.dfsek.substrate.lang.compiler.codegen.CompileError;
-import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.internal.Tuple;
-import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 import org.objectweb.asm.Opcodes;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -256,7 +251,7 @@ public class Signature implements Opcodes {
         return sig.toString();
     }
 
-    public static Signature fromClass(Class<?> clazz) {
+    public static Signature fromType(Type clazz) {
         if (clazz.equals(void.class)) {
             return Signature.empty();
         } else if (clazz.equals(String.class)) {
@@ -275,6 +270,6 @@ public class Signature implements Opcodes {
     }
 
     public static Signature fromRecord(Class<? extends Record> record) {
-        return Stream.ofAll(Arrays.stream(record.getRecordComponents())).foldLeft(Signature.empty(), (a, b) -> a.and(Signature.fromClass(b.getType())));
+        return Stream.ofAll(Arrays.stream(record.getRecordComponents())).foldLeft(Signature.empty(), (a, b) -> a.and(Signature.fromType(b.getType())));
     }
 }
