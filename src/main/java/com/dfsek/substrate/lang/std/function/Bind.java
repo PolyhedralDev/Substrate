@@ -22,7 +22,7 @@ public class Bind implements Macro {
 
     @Override
     public boolean argsMatch(Signature attempt) {
-        return arguments().weakEquals(attempt);
+        return attempt.weakEquals(arguments());
     }
 
     @Override

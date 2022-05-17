@@ -70,6 +70,7 @@ public class Signature implements Opcodes {
     public static Signature io() {
         return IO;
     }
+
     public static Signature any() {
         return ANY;
     }
@@ -149,7 +150,15 @@ public class Signature implements Opcodes {
         if (this.size() != that.size()) return false;
 
         for (int i = 0; i < this.types.size(); i++) {
-            if (this.types.get(i) != that.types.get(i)) return false;
+            DataType thisType = this.types.get(i);
+            DataType thatType = that.types.get(i);
+
+            if (thisType == DataType.ANY || thatType == DataType.ANY) {
+                return true;
+            }
+            if (thisType != thatType) {
+                return false;
+            }
         }
 
         return true;
@@ -274,7 +283,7 @@ public class Signature implements Opcodes {
         } else if (clazz.equals(boolean.class)) {
             return Signature.bool();
         } else if (clazz.equals(com.dfsek.substrate.environment.IO.class)) {
-            if(clazz instanceof ParameterizedType parameterizedType) {
+            if (clazz instanceof ParameterizedType parameterizedType) {
                 return Signature.io().applyGenericReturn(0, fromTypeGeneric(parameterizedType.getActualTypeArguments()[0]));
             }
             return Signature.io();
