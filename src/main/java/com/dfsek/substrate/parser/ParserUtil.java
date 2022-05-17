@@ -86,7 +86,7 @@ public final class ParserUtil {
     public static Signature parseSignatureNotation(Lexer lexer) {
         Signature signature = Signature.empty();
         while (lexer.peek().isType()) {
-            Token type = checkType(lexer.consume(), TokenType.INT_TYPE, TokenType.NUM_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.FUN_TYPE, TokenType.LIST_TYPE);
+            Token type = checkType(lexer.consume(), TokenType.INT_TYPE, TokenType.NUM_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.FUN_TYPE, TokenType.LIST_TYPE, TokenType.IO);
             Signature other = new Signature(DataType.fromToken(type));
             if (!(other.weakEquals(Signature.integer())
                     || other.weakEquals(Signature.bool())
