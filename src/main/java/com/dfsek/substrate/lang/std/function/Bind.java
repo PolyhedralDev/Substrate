@@ -40,7 +40,14 @@ public class Bind implements Macro {
 
     @Override
     public List<Either<CompileError, Op>> invoke(BuildData data, Signature args, List<ExpressionNode> argNodes) {
-        return argNodes.flatMap(arg -> arg.simplify().apply(data))
-                .append(Op.invokeStaticInterface(Classes.IO, "bind", "(L" + Classes.IO + ";L" + Classes.IO_FUNCTION + ";)L" + Classes.IO + ";"));
+        String clazz = switch (args.get(1).getGenericArguments(0).getType(0)) {
+            case NUM -> Classes.IO_FUNCTION_NUM;
+            case INT -> Classes.IO_FUNCTION_INT;
+            default -> Classes.IO_FUNCTION;
+        };
+
+        return List.of(Op.aLoad(1))
+                .appendAll(argNodes.flatMap(arg -> arg.simplify().apply(data)))
+                .append(Op.invokeStaticInterface(Classes.IO, "bind", "(L" + Classes.ENVIRONMENT + ";L" + Classes.IO + ";L" + clazz + ";)L" + Classes.IO + ";"));
     }
 }
