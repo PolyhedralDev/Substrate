@@ -4,6 +4,6 @@ a = [1, 2, 3];
 
 b = "2";
 
-println(str(a[b]));
+a[b];
 
 return false;

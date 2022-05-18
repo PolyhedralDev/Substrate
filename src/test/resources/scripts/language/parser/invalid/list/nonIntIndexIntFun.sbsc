@@ -1,0 +1,9 @@
+// parser should fail when indexing a list with something that isn't INT.
+
+a = [1, 2, 3];
+
+b = (): int -> 3;
+
+a[b];
+
+return false;
