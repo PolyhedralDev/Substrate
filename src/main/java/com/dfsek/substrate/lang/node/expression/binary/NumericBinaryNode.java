@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.DecimalNode;
 import com.dfsek.substrate.lang.node.expression.constant.IntegerNode;
+import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.collection.List;
@@ -24,13 +25,14 @@ public abstract class NumericBinaryNode extends BinaryOperationNode {
     public List<Either<CompileError, Op>> applyOp(BuildData data) {
         Signature leftType = left.reference();
 
-        ParserUtil.checkReturnType(right, leftType);
         if (leftType.equals(Signature.integer())) {
             return List.of(Op.insn(intOp()));
         } else if (leftType.equals(Signature.decimal())) {
             return List.of(Op.insn(doubleOp()));
-        } else {
+        } else if(!(left instanceof ErrorNode || right instanceof ErrorNode)){
             throw new IllegalStateException("Non integer/decimal values in NumericBinaryNode");
+        } else {
+            return List.empty();
         }
     }
 

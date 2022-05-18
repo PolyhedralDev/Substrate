@@ -29,9 +29,7 @@ public abstract class ComparisonBinaryNode extends BinaryOperationNode {
     @Override
     public List<Either<CompileError, Op>> applyOp(BuildData data) {
         Signature leftType = left.reference().getSimpleReturn();
-        Signature rightType = right.reference().getSimpleReturn();
 
-        ParserUtil.checkReturnType(left, rightType);
 
         if (leftType.equals(Signature.integer())) {
             Label f = new Label();

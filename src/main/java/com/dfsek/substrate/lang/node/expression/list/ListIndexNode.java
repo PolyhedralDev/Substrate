@@ -35,7 +35,7 @@ public class ListIndexNode extends ExpressionNode {
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         return listReference
                 .simplify().apply(data)
-                .appendAll(ParserUtil.checkReturnType(index, Signature.integer())
+                .appendAll(index
                         .simplify().apply(data))
                 .append(Op.invokeInterface(Classes.LIST, "get", "(I)L" + Classes.OBJECT + ";"))
                 .appendAll(CompilerUtil.unbox(listReference.reference().getGenericReturn(0)));

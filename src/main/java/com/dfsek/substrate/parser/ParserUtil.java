@@ -55,16 +55,6 @@ public final class ParserUtil {
         return Either.left(new Tuple2<>("Expected " + Arrays.toString(expected) + " but found " + token, token.getPosition()));
     }
 
-    public static <T extends Typed & Positioned> T checkReturnType(T typed, Signature... expected) throws ParseException {
-
-        Signature ref = typed.reference();
-        if (ref.isSimple()) {
-            ref = ref.getSimpleReturn();
-            for (Signature type : expected) if (ref.equals(type)) return typed;
-        }
-        throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
-    }
-
     public static Signature parseSignatureNotation(Lexer lexer) {
         Signature signature = Signature.empty();
         while (lexer.peek().isType()) {

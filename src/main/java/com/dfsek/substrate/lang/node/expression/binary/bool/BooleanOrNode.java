@@ -56,9 +56,9 @@ public class BooleanOrNode extends BooleanOperationNode {
         Label shortFalse = new Label();
         Label end = new Label();
 
-        return ParserUtil.checkReturnType(left, Signature.bool()).apply(data)
+        return left.apply(data)
                 .append(Op.ifNE(shortTrue))
-                .appendAll(ParserUtil.checkReturnType(right, Signature.bool()).apply(data))
+                .appendAll(right.apply(data))
                 .append(Op.ifEQ(shortFalse))
                 .append(Op.label(shortTrue))
                 .append(Op.pushTrue())

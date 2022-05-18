@@ -42,10 +42,7 @@ public class AdditionNode extends NumericBinaryNode {
 
     @Override
     public List<Either<CompileError, Op>> applyOp(BuildData data) {
-        Signature leftType = ParserUtil.checkReturnType(left, Signature.integer(), Signature.decimal(), Signature.string()).reference();
-        ParserUtil.checkReturnType(right, Signature.integer(), Signature.decimal(), Signature.string()).reference();
-
-        ParserUtil.checkReturnType(right, leftType);
+        Signature leftType = left.reference();
 
         if (leftType.equals(Signature.integer())) {
             return List.of(Op.iAdd());

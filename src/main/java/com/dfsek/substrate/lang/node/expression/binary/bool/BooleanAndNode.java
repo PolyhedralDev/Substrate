@@ -54,9 +54,9 @@ public class BooleanAndNode extends BooleanOperationNode {
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Label shortFalse = new Label();
         Label end = new Label();
-        return ParserUtil.checkReturnType(left, Signature.bool()).apply(data)
+        return left.apply(data)
                 .append(Op.ifEQ(shortFalse))
-                .appendAll(ParserUtil.checkReturnType(right, Signature.bool()).apply(data))
+                .appendAll(right.apply(data))
                 .append(Op.ifEQ(shortFalse))
                 .append(Op.pushTrue())
                 .append(Op.goTo(end))

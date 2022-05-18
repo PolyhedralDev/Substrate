@@ -34,9 +34,6 @@ public class IfExpressionNode extends ExpressionNode {
 
         @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        ParserUtil.checkReturnType(predicate, Signature.bool());
-        ParserUtil.checkReturnType(caseTrueNode, caseFalseNode.reference().getSimpleReturn());
-
         Label equal = new Label();
         Label end = new Label();
 
