@@ -2,7 +2,6 @@ package com.dfsek.substrate.tests;
 
 import com.dfsek.substrate.environment.Environment;
 import com.dfsek.substrate.environment.IO;
-import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.parser.Parser;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -27,7 +26,7 @@ public class IOTests {
     private static final String returnTupleIntDoubleString = getScript("returnTupleIntDoubleString");
     private static final String inputClosureInt = getScript("inputClosureInt");
 
-    private static final String basicMonadic = getScript("basicMonadic");
+    private static final String monadicInvalidBind = getScript("monadicInvalidBind");
     private static final String monadicInput = getScript("monadicInput");
     private static final String monadicInputTransformation = getScript("monadicInputTransformation");
 
@@ -78,7 +77,7 @@ public class IOTests {
     @Test
     public void basicMonadic() throws NoSuchMethodException {
         Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
-        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(basicMonadic, Records.Void.class, Records.IOOut.class, true);
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInvalidBind, Records.Void.class, Records.IOOut.class, true);
 
         parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
 
