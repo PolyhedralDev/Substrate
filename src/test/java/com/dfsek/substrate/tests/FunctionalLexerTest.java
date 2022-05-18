@@ -1,3 +1,5 @@
+package com.dfsek.substrate.tests;
+
 import com.dfsek.substrate.lexer.FunctionalLexer;
 
 public class FunctionalLexerTest {

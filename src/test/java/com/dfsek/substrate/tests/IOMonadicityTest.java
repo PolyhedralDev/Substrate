@@ -1,3 +1,5 @@
+package com.dfsek.substrate.tests;
+
 import com.dfsek.substrate.environment.Environment;
 import com.dfsek.substrate.environment.IO;
 import com.dfsek.substrate.environment.io.IOFunctionObj2Obj;

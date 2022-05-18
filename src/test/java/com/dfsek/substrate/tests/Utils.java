@@ -1,3 +1,5 @@
+package com.dfsek.substrate.tests;
+
 import com.dfsek.substrate.lang.std.function.Println;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.parser.Parser;

@@ -1,3 +1,5 @@
+package com.dfsek.substrate.tests;
+
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.exceptions.TokenizerException;
 import com.dfsek.substrate.parser.Parser;
