@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import org.objectweb.asm.Label;
 
 public class Bind implements Macro {
     @Override
@@ -40,11 +41,16 @@ public class Bind implements Macro {
 
     @Override
     public List<Either<CompileError, Op>> invoke(BuildData data, Signature args, List<ExpressionNode> argNodes) {
-        String clazz = switch (args.get(1).getGenericArguments(0).getType(0)) {
-            case NUM -> Classes.IO_FUNCTION_NUM;
-            case INT -> Classes.IO_FUNCTION_INT;
-            default -> Classes.IO_FUNCTION;
-        };
+        String clazz;
+        if (args.get(1).getGenericArguments(0).size() == 0) {
+            clazz = Classes.IO_FUNCTION_UNIT;
+        } else {
+            clazz =  switch (args.get(1).getGenericArguments(0).getType(0)) {
+                case NUM -> Classes.IO_FUNCTION_NUM;
+                case INT -> Classes.IO_FUNCTION_INT;
+                default -> Classes.IO_FUNCTION;
+            };
+        }
 
         return List.of(Op.aLoad(1))
                 .appendAll(argNodes.flatMap(arg -> arg.simplify().apply(data)))

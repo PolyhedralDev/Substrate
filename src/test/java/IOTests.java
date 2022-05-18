@@ -92,8 +92,9 @@ public class IOTests {
         parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
 
         parser.registerMacro("bind", new Bind());
-
-        parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
+        System.out.println("Evaluated.");
+        io.apply(environment);
     }
 
     public static IO<Void, Records.IOOut.BasicEnvironment> putLine(String in) {

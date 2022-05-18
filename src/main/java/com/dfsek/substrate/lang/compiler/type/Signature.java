@@ -102,11 +102,13 @@ public class Signature implements Opcodes {
     }
 
     public Signature getGenericReturn(int index) {
+        if(index >= generic.size()) return empty();
         Signature ret = generic.get(index)._2;
         return ret == null ? empty() : ret;
     }
 
     public Signature getGenericArguments(int index) {
+        if(index >= generic.size()) return empty();
         Signature arg = generic.get(index)._1;
         return arg == null ? empty() : arg;
     }
