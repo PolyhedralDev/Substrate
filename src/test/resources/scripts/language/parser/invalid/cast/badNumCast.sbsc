@@ -1,5 +1,5 @@
 // parser should error at invalid cast
 
-println(num(2.4));
+num(2.4);
 
 return false;
