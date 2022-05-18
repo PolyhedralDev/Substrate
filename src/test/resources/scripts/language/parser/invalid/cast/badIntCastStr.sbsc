@@ -1,0 +1,5 @@
+// parser should error at invalid cast
+
+int("2");
+
+return false;

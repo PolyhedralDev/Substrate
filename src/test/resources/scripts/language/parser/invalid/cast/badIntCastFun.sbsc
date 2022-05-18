@@ -1,0 +1,5 @@
+// parser should error at invalid cast
+
+int((): num -> 3.4);
+
+return false;
