@@ -51,12 +51,18 @@ public class LambdaFactory implements Opcodes {
 
 
 
-            if (args.size() == 1 && returnType.weakEquals(Signature.io())) {
-                ifaces = new String[]{LAMBDA_NAME, switch (args.getType(0)) {
-                    case INT -> Classes.IO_FUNCTION_INT;
-                    case NUM -> Classes.IO_FUNCTION_NUM;
-                    default -> Classes.IO_FUNCTION;
-                }};
+            if (returnType.weakEquals(Signature.io())) {
+                if(args.size() == 1) {
+                    ifaces = new String[]{LAMBDA_NAME, switch (args.getType(0)) {
+                        case INT -> Classes.IO_FUNCTION_INT;
+                        case NUM -> Classes.IO_FUNCTION_NUM;
+                        default -> Classes.IO_FUNCTION;
+                    }};
+                } else if(args.size() == 0) {
+                    ifaces = new String[] {LAMBDA_NAME, Classes.IO_FUNCTION_UNIT};
+                } else {
+                    ifaces = new String[]{LAMBDA_NAME};
+                }
             } else {
                 ifaces = new String[]{LAMBDA_NAME};
             }
@@ -72,31 +78,40 @@ public class LambdaFactory implements Opcodes {
             String sig = "(L" + IMPL_ARG_CLASS_NAME + ";" + args.internalDescriptor() + ")" + ret;
             builder.method("apply", sig, Access.PUBLIC, Access.ABSTRACT);
 
-            if (args.size() == 1 && returnType.weakEquals(Signature.io())) {
-                DataType arg = args.getType(0);
-                MethodVisitor apply = builder.method("apply", "(L" + Classes.ENVIRONMENT + ";" +
-                        switch (arg) {
-                            case INT -> "I";
-                            case NUM -> "D";
-                            default -> "L" + Classes.OBJECT + ";";
-                        } + ")L" + Classes.OBJECT + ";", Access.PUBLIC);
-                apply.visitIntInsn(ALOAD, 0);
-                apply.visitIntInsn(ALOAD, 1);
+            if (returnType.weakEquals(Signature.io())) {
+                if(args.size() == 1) {
+                    DataType arg = args.getType(0);
+                    MethodVisitor apply = builder.method("apply", "(L" + Classes.ENVIRONMENT + ";" +
+                            switch (arg) {
+                                case INT -> "I";
+                                case NUM -> "D";
+                                default -> "L" + Classes.OBJECT + ";";
+                            } + ")L" + Classes.OBJECT + ";", Access.PUBLIC);
+                    apply.visitIntInsn(ALOAD, 0);
+                    apply.visitIntInsn(ALOAD, 1);
 
-                apply.visitIntInsn(arg.loadInsn(), 2);
-                if(arg != DataType.NUM && arg != DataType.INT) {
-                    String type = arg.descriptor().substring(1);
-                    type = type.substring(0, type.length() - 1);
-                    apply.visitTypeInsn(CHECKCAST, type);
+                    apply.visitIntInsn(arg.loadInsn(), 2);
+                    if (arg != DataType.NUM && arg != DataType.INT) {
+                        String type = arg.descriptor().substring(1);
+                        type = type.substring(0, type.length() - 1);
+                        apply.visitTypeInsn(CHECKCAST, type);
+                    }
+
+
+                    apply.visitMethodInsn(INVOKEINTERFACE, name, "apply", sig, true);
+
+                    apply.visitInsn(ARETURN);
+                    apply.visitMaxs(0, 0);
+                } else if(args.size() == 0) {
+                    MethodVisitor apply = builder.method("apply", "(L" + Classes.ENVIRONMENT + ";)L" + Classes.OBJECT + ";", Access.PUBLIC);
+                    apply.visitIntInsn(ALOAD, 0);
+                    apply.visitIntInsn(ALOAD, 1);
+
+                    apply.visitMethodInsn(INVOKEINTERFACE, name, "apply", sig, true);
+
+                    apply.visitInsn(ARETURN);
+                    apply.visitMaxs(0, 0);
                 }
-
-
-                apply.visitMethodInsn(INVOKEINTERFACE, name, "apply", sig, true);
-
-                apply.visitInsn(ARETURN);
-                apply.visitMaxs(0, 0);
-            } else {
-                ifaces = new String[]{LAMBDA_NAME};
             }
 
             classBuilder.inner(name, classBuilder.getName(), endName, Access.PRIVATE, Access.STATIC, Access.FINAL);

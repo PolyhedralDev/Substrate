@@ -5,6 +5,7 @@ import com.dfsek.substrate.Script;
 import com.dfsek.substrate.environment.io.IOFunctionInt2Obj;
 import com.dfsek.substrate.environment.io.IOFunctionNum2Obj;
 import com.dfsek.substrate.environment.io.IOFunctionObj2Obj;
+import com.dfsek.substrate.environment.io.IOFunctionUnit2Obj;
 import com.dfsek.substrate.lang.internal.Lambda;
 import com.dfsek.substrate.lang.internal.Tuple;
 import io.vavr.collection.List;
@@ -27,4 +28,5 @@ public class Classes {
     public static final String IO_FUNCTION = internalName(IOFunctionObj2Obj.class);
     public static final String IO_FUNCTION_INT = internalName(IOFunctionInt2Obj.class);
     public static final String IO_FUNCTION_NUM = internalName(IOFunctionNum2Obj.class);
+    public static final String IO_FUNCTION_UNIT = internalName(IOFunctionUnit2Obj.class);
 }
