@@ -27,6 +27,7 @@ public class IOTests {
 
     private static final String basicMonadic = getScript("basicMonadic");
     private static final String monadicInput = getScript("monadicInput");
+    private static final String monadicInputTransformation = getScript("monadicInputTransformation");
 
     static {
         System.setProperty("substrate.Dump", Boolean.toString(Utils.DUMP_TO_JARS));
@@ -97,6 +98,24 @@ public class IOTests {
         io.apply(environment);
     }
 
+    @Test
+    public void monadicInputTransformation() throws NoSuchMethodException {
+        Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInputTransformation, Records.Void.class, Records.IOOut.class, true);
+
+        parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
+        parser.registerFunction("appendHash", new StaticFunction(IOTests.class.getMethod("appendHash", int.class)));
+
+        System.out.println(new StaticFunction(IOTests.class.getMethod("appendHash", int.class)).reference());
+        System.out.println(new StaticFunction(IOTests.class.getMethod("putLine", String.class)).reference());
+        System.out.println(new StaticFunction(IOTests.class.getMethod("getInt")).reference());
+        parser.registerMacro("bind", new Bind());
+        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
+        System.out.println("Evaluated.");
+        io.apply(environment);
+    }
+
     public static IO<Void, Records.IOOut.BasicEnvironment> putLine(String in) {
         return env -> {
             env.getOut().println(in);
@@ -106,6 +125,10 @@ public class IOTests {
 
     public static IO<Integer, Records.IOOut.BasicEnvironment> getInt() {
         return env -> ThreadLocalRandom.current().nextInt();
+    }
+
+    public static IO<String, Records.IOOut.BasicEnvironment> appendHash(int i) {
+        return env -> i + "::" + ThreadLocalRandom.current().nextInt();
     }
 
     public static IO<Void, Records.IOOut.BasicEnvironment> cheatBind(IO<Void, Records.IOOut.BasicEnvironment> one, IO<Void, Records.IOOut.BasicEnvironment> two) {

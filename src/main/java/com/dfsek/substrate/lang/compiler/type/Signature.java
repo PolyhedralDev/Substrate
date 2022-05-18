@@ -267,16 +267,14 @@ public class Signature implements Opcodes {
         return sig.toString();
     }
 
-    public static Signature fromType(Type clazz) {
+    public static Signature fromType(Type type) {
+        Type clazz = type;
+        if(type instanceof ParameterizedType parameterizedType) {
+            clazz = parameterizedType.getRawType();
+        }
         if (clazz.equals(void.class)) {
             return Signature.empty();
-        } else {
-            return parseType(clazz);
-        }
-    }
-
-    private static Signature parseType(Type clazz) {
-        if (clazz.equals(String.class)) {
+        } else if (clazz.equals(String.class)) {
             return Signature.string();
         } else if (clazz.equals(int.class)) {
             return Signature.integer();
@@ -285,7 +283,7 @@ public class Signature implements Opcodes {
         } else if (clazz.equals(boolean.class)) {
             return Signature.bool();
         } else if (clazz.equals(com.dfsek.substrate.environment.IO.class)) {
-            if (clazz instanceof ParameterizedType parameterizedType) {
+            if (type instanceof ParameterizedType parameterizedType) {
                 return Signature.io().applyGenericReturn(0, fromTypeGeneric(parameterizedType.getActualTypeArguments()[0]));
             }
             return Signature.io();
@@ -294,10 +292,29 @@ public class Signature implements Opcodes {
         }
     }
 
-    public static Signature fromTypeGeneric(Type clazz) {
+    public static Signature fromTypeGeneric(Type type) {
+        Type clazz = type;
+        if(type instanceof ParameterizedType parameterizedType) {
+            clazz = parameterizedType.getRawType();
+        }
         if (clazz.equals(void.class) || clazz.equals(Void.class)) {
             return Signature.empty();
-        } else return parseType(clazz);
+        } if (clazz.equals(String.class)) {
+            return Signature.string();
+        } else if (clazz.equals(int.class) || clazz.equals(Integer.class)) {
+            return Signature.integer();
+        } else if (clazz.equals(double.class) || clazz.equals(Double.class)) {
+            return Signature.decimal();
+        } else if (clazz.equals(boolean.class) || clazz.equals(Boolean.class)) {
+            return Signature.bool();
+        } else if (clazz.equals(com.dfsek.substrate.environment.IO.class)) {
+            if (type instanceof ParameterizedType parameterizedType) {
+                return Signature.io().applyGenericReturn(0, fromTypeGeneric(parameterizedType.getActualTypeArguments()[0]));
+            }
+            return Signature.io();
+        } else {
+            throw new IllegalArgumentException("Illegal class: " + clazz);
+        }
     }
 
     public static Signature fromRecord(Class<? extends Record> record) {

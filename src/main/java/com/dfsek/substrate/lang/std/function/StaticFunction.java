@@ -11,6 +11,7 @@ import io.vavr.control.Either;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 
 public class StaticFunction implements Function {
     private final String owner, name;
@@ -23,13 +24,13 @@ public class StaticFunction implements Function {
         }
         this.owner = CompilerUtil.internalName(method.getDeclaringClass().getCanonicalName());
         this.name = method.getName();
-        Class<?> r = method.getReturnType();
+        Type r = method.getGenericReturnType();
 
         this.ret = Signature.fromType(r);
 
         Signature args = Signature.empty();
 
-        for (Class<?> parameterType : method.getParameterTypes()) {
+        for (Type parameterType : method.getGenericParameterTypes()) {
             args = args.and(Signature.fromType(parameterType));
         }
         this.args = args;
