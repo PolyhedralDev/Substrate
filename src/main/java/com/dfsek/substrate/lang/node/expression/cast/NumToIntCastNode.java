@@ -25,7 +25,6 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
 
     @Override
     public List<Either<CompileError, Op>> applyCast(BuildData data) {
-        ParserUtil.checkReturnType(value, Signature.decimal());
         return List.of(Op.d2i());
     }
 

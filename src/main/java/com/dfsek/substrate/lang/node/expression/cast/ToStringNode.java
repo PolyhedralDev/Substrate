@@ -27,7 +27,7 @@ public class ToStringNode extends TypeCastNode<Object, String> {
 
     @Override
     public List<Either<CompileError, Op>> applyCast(BuildData data) {
-        Signature ref = ParserUtil.checkReturnType(value, Signature.decimal(), Signature.integer(), Signature.bool())
+        Signature ref = value
                 .reference()
                 .getSimpleReturn();
         if (ref.equals(Signature.integer())) {
