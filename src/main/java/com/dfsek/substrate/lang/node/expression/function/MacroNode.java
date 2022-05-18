@@ -32,8 +32,9 @@ public class MacroNode extends ExpressionNode {
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature argSignature = CompilerUtil.expandArguments(args);
-        if (!macro.argsMatch(argSignature)) {
-            throw new ParseException("Macro expects " + macro.arguments() + ", got " + argSignature, position);
+        Signature expected = macro.getArgumentSignature(argSignature);
+        if (!expected.equals(argSignature)) {
+            throw new ParseException("Macro expects " + expected + " (generic: " + macro.arguments() + "), got " + argSignature, position);
         }
 
         return macro.prepare()

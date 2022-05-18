@@ -22,8 +22,8 @@ public interface Macro extends Opcodes {
         return List.empty();
     }
 
-    default boolean argsMatch(Signature attempt) {
-        return arguments().equals(attempt);
+    default Signature getArgumentSignature(Signature attempt) {
+        return arguments();
     }
 
     List<Either<CompileError, Op>> invoke(BuildData data, Signature args, List<ExpressionNode> argNodes);

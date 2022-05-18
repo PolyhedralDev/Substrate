@@ -9,12 +9,11 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-import org.objectweb.asm.Label;
 
 public class Bind implements Macro {
     @Override
     public Signature arguments() {
-        return Signature.any()
+        return Signature.io()
                 .and(Signature.fun()
                         .applyGenericArgument(0, Signature.any())
                         .applyGenericReturn(0, Signature.io())
@@ -22,8 +21,13 @@ public class Bind implements Macro {
     }
 
     @Override
-    public boolean argsMatch(Signature attempt) {
-        return attempt.weakEquals(arguments());
+    public Signature getArgumentSignature(Signature attempt) {
+        Signature param = attempt.get(0).getGenericReturn(0);
+        return Signature.io().applyGenericReturn(0, param)
+                .and(Signature.fun()
+                        .applyGenericArgument(0, param)
+                        .applyGenericReturn(0, attempt.get(1).getGenericReturn(0))
+                );
     }
 
     @Override
