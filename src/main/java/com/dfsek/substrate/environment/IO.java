@@ -8,6 +8,11 @@ import com.dfsek.substrate.environment.io.IOFunctionUnit2Obj;
 public interface IO<V, T extends Environment> {
     V apply(T env);
 
+    static <V1, T1 extends Environment> IO<V1, T1> unit(V1 value) {
+        return e -> value;
+    }
+
+
     static <T, U, E extends Environment> IO<U, E> bind(Environment environment, IO<T, E> io, IOFunctionObj2Obj<T, IO<U, E>> function) {
         return env -> function.apply(environment, io.apply(env)).apply(env);
     }
