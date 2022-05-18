@@ -9,6 +9,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.rules.BaseRule;
+import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.parser.exception.ParseException;
@@ -88,6 +89,8 @@ public class Parser<P extends Record, R extends Record> {
         }
 
         STATIC_FUNCTIONS.forEach(this::registerFunction);
+
+        registerMacro("bind", new Bind());
     }
 
     public Script<P, R> parse() throws ParseException {

@@ -81,7 +81,6 @@ public class IOTests {
         Parser<Records.Void, Records.IOOut> parser = Utils.createParser(basicMonadic, Records.Void.class, Records.IOOut.class, true);
 
         parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
-        parser.registerFunction("bind", new StaticFunction(IOTests.class.getMethod("cheatBind", IO.class, IO.class)));
 
         parser.parse().execute(new Records.Void(), environment).io().apply(environment);
     }
@@ -94,7 +93,6 @@ public class IOTests {
         parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
         parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
 
-        parser.registerMacro("bind", new Bind());
         IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
         System.out.println("Evaluated.");
         io.apply(environment);
@@ -112,7 +110,7 @@ public class IOTests {
         System.out.println(new StaticFunction(IOTests.class.getMethod("appendHash", int.class)).reference());
         System.out.println(new StaticFunction(IOTests.class.getMethod("putLine", String.class)).reference());
         System.out.println(new StaticFunction(IOTests.class.getMethod("getInt")).reference());
-        parser.registerMacro("bind", new Bind());
+
         IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
         System.out.println("Evaluated.");
         io.apply(environment);
@@ -133,13 +131,6 @@ public class IOTests {
         return env -> i + "::" + ThreadLocalRandom.current().nextInt();
     }
 
-    public static IO<Void, Records.IOOut.BasicEnvironment> cheatBind(IO<Void, Records.IOOut.BasicEnvironment> one, IO<Void, Records.IOOut.BasicEnvironment> two) {
-        return env -> {
-            one.apply(env);
-            two.apply(env);
-            return null;
-        };
-    }
 
     @Test
     public void inputClosureInt() throws NoSuchMethodException {
