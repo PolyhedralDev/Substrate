@@ -1,0 +1,11 @@
+bind(
+    bind(
+        bind(
+            getInt(),
+            (i: int): io<str> -> appendHash(i)
+        ),
+        (s: str): io -> putLine("result: " + s)
+    ),
+    (): io -> putLine("done.")
+);
+
