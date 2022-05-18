@@ -32,8 +32,6 @@ public class LambdaInvocationNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        ParserUtil.checkWeakReferenceType(lambda, Signature.fun());
-
         Signature returnType = lambda.reference().getSimpleReturn();
 
         Signature args = lambda.reference().getGenericArguments(0);

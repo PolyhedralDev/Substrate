@@ -30,8 +30,6 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        ParserUtil.checkWeakReferenceType(function, Signature.fun());
-
         Signature argSignature = CompilerUtil.expandArguments(arguments);
 
         if (!function.reference().getGenericArguments(0).equals(argSignature)) {

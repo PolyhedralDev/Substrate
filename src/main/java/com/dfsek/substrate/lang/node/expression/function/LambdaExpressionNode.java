@@ -103,7 +103,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                         delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
                     }
 
-                    return ParserUtil.checkReferenceType(content, returnType).simplify().apply(delegate)
+                    return content.simplify().apply(delegate)
                             .append(returnType.retInsn()
                                     .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
                                     .map(Op::insnUnwrapped));

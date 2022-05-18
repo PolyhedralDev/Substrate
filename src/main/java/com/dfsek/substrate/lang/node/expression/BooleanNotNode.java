@@ -19,18 +19,18 @@ public class BooleanNotNode extends ExpressionNode {
     private final Position position;
     private final ExpressionNode node;
 
-    public BooleanNotNode(Position position, ExpressionNode node) {
+    private BooleanNotNode(Position position, Unchecked<? extends ExpressionNode> node) {
         this.position = position;
-        this.node = node;
+        this.node = node.get(Signature.bool());
     }
 
     public static Unchecked<BooleanNotNode> of(Position position, Unchecked<? extends ExpressionNode> node) {
-        return Unchecked.of(new BooleanNotNode(position, node.get(Signature.bool())));
+        return Unchecked.of(new BooleanNotNode(position, node));
     }
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        return ParserUtil.checkReferenceType(node, Signature.bool())
+        return node
                 .simplify()
                 .apply(data)
                 .appendAll(Op.invertBoolean());

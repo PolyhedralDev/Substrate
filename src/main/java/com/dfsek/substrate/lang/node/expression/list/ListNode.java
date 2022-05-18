@@ -36,10 +36,6 @@ public class ListNode extends ExpressionNode {
 
     @Override
     public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        Signature signature = elements.get(0)._1.reference();
-        elements.forEach(element -> ParserUtil.checkReferenceType(element._1, signature));
-
-
         return List.of(Op.invokeStaticInterface(Classes.LIST, "empty", "()L" + Classes.LIST + ";"))
                 .appendAll(elements.flatMap(element ->
                         element._1.apply(data)

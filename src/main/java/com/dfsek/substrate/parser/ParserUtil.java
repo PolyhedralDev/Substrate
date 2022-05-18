@@ -65,24 +65,6 @@ public final class ParserUtil {
         throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
     }
 
-    public static <T extends Typed & Positioned> T checkReferenceType(T typed, Signature... expected) throws ParseException {
-        Signature ref = typed.reference();
-        for (Signature type : expected) if (ref.equals(type)) return typed;
-        throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
-    }
-
-    public static <T extends Typed & Positioned> Either<Tuple2<String, Position>, T> checkReferenceTypeFunctional(T typed, Signature... expected) throws ParseException {
-        Signature ref = typed.reference();
-        for (Signature type : expected) if (ref.equals(type)) return Either.right(typed);
-        return Either.left(new Tuple2<>("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition()));
-    }
-
-    public static <T extends Typed & Positioned> T checkWeakReferenceType(T typed, Signature... expected) throws ParseException {
-        Signature ref = typed.reference();
-        for (Signature type : expected) if (ref.weakEquals(type)) return typed;
-        throw new ParseException("Expected type(s) " + Arrays.toString(expected) + " but found " + ref, typed.getPosition());
-    }
-
     public static Signature parseSignatureNotation(Lexer lexer) {
         Signature signature = Signature.empty();
         while (lexer.peek().isType()) {

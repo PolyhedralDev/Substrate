@@ -21,18 +21,18 @@ public class NumberInverseNode extends ExpressionNode {
     private final Position position;
     private final ExpressionNode node;
 
-    private NumberInverseNode(Position position, ExpressionNode node) {
+    private NumberInverseNode(Position position, Unchecked<? extends ExpressionNode> node) {
         this.position = position;
-        this.node = node;
+        this.node = node.get(Signature.decimal(), Signature.integer());
     }
 
     public static Unchecked<NumberInverseNode> of(Position position, Unchecked<? extends ExpressionNode> node) {
-        return Unchecked.of(new NumberInverseNode(position, node.get(Signature.decimal(), Signature.integer())));
+        return Unchecked.of(new NumberInverseNode(position, node));
     }
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        return ParserUtil.checkReferenceType(node, Signature.integer(), Signature.decimal()).simplify().apply(data)
+        return node.simplify().apply(data)
                 .append(Match(node.reference()).of(
                         Case($(Signature.integer()), Op.iNeg()),
                         Case($(Signature.decimal()), Op.dNeg()),

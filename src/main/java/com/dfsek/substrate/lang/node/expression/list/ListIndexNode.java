@@ -33,7 +33,7 @@ public class ListIndexNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        return ParserUtil.checkWeakReferenceType(listReference, Signature.list())
+        return listReference
                 .simplify().apply(data)
                 .appendAll(ParserUtil.checkReturnType(index, Signature.integer())
                         .simplify().apply(data))
