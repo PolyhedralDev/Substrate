@@ -5,6 +5,7 @@ import com.dfsek.substrate.environment.IO;
 import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.parser.Parser;
+import com.dfsek.substrate.parser.exception.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test input/output from scripts.
@@ -82,7 +82,13 @@ public class IOTests {
 
         parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
 
-        parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+        try {
+            parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+        fail();
     }
 
     @Test
