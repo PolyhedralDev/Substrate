@@ -6,9 +6,13 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Typed;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -94,6 +98,17 @@ public final class CompilerUtil implements Opcodes {
             return list;
         }
         return io.vavr.collection.List.empty();
+    }
+
+
+    public static int getTotalOffset(LinkedHashMap<String, Value> values) {
+        return values.values().foldLeft(0, (i, v) -> i + v.getLVWidth());
+    }
+
+    public static Option<Integer> getOffset(LinkedHashMap<String, Value> values, String id) {
+        return values
+                .get(id)
+                .map(value -> values.takeUntil(v -> v._1.equals(id)).values().foldLeft(0, (i, v) -> i + v.getLVWidth()) + value.getLVWidth());
     }
 
     public static io.vavr.collection.List<Either<CompileError, Op>> box(Typed typed) {

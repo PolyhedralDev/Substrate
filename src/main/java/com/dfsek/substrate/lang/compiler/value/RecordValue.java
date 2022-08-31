@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -23,7 +24,7 @@ public record RecordValue(
     }
 
     @Override
-    public List<Either<CompileError, Op>> load(BuildData data) {
+    public List<Either<CompileError, Op>> load(BuildData data, LinkedHashMap<String, Value> values) {
         return List.of(Op.aLoad(1))
                 .append(Op.checkCast(CompilerUtil.internalName(inputClass)))
                 .append(Op.invokeVirtual(

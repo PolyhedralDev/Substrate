@@ -14,19 +14,18 @@ import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.List;
-import io.vavr.collection.Set;
-import io.vavr.collection.Stream;
+import io.vavr.collection.*;
 import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.is;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
@@ -69,7 +68,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
         Stream<Tuple2<String, Signature>> closureTypes = content
                 .streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
@@ -78,7 +77,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .flatMap(valueReferenceNode -> {
                     String id = valueReferenceNode.getId().getContent();
                     boolean isArg = argRefs.contains(id);
-                    if (!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && data.valueExists(id)) {
+                    if (!isArg && !valueReferenceNode.isLambdaArgument() || !isArg && values.containsKey(id)) {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
                             closureIDs.add(id);
                             return List.of(new Tuple2<>(valueReferenceNode.getId().getContent(),
@@ -91,23 +90,25 @@ public class LambdaExpressionNode extends ExpressionNode {
 
         Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
 
-        return data.lambdaFactory().implement(parameters, reference().getSimpleReturn(), closure, clazz -> {
-                    BuildData delegate = data.sub(clazz);
-
-                    closureTypes.zipWithIndex()
-                            .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
-                            .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, delegate.offsetInc(argument._2().frames())))))
-                            .forEach(v -> delegate.registerUnchecked(v._1, v._2));
-
-                    if (self != null) {
-                        delegate.registerUnchecked(self, new ThisReferenceValue(reference()));
-                    }
-
-                    return content.simplify().apply(delegate)
-                            .append(returnType.retInsn()
-                                    .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
-                                    .map(Op::insnUnwrapped));
-                })
+        return data
+                .lambdaFactory()
+                .implement(parameters, reference().getSimpleReturn(), closure, clazz ->
+                        content
+                                .simplify()
+                                .apply(data, values
+                                        .merge(closureTypes
+                                                .zipWithIndex()
+                                                .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
+                                                .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, argument._1, argument._2.frames()))))
+                                                .toMap(Function.identity()))
+                                        .merge(
+                                                Match(self).of(
+                                                        Case($(is(null)), HashMap.empty()),
+                                                        Case($(), id -> HashMap.of(id, new ThisReferenceValue(reference())))
+                                                )))
+                                .append(returnType.retInsn()
+                                        .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
+                                        .map(Op::insnUnwrapped)))
                 .apply((errors, clazz) -> errors
                         .map((Function<CompileError, Either<CompileError, Op>>) Either::left)
                         .append(Op.newInsn(clazz.getName()))
@@ -117,7 +118,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                                 .flatMap(pair -> {
                                     if (pair._1.equals(self))
                                         return List.empty(); // dont load self into closure.
-                                    return data.getValue(pair._1).load(data);
+                                    return Op.getValue(values, data, pair._1, getPosition());
                                 })
                                 .collect(Collectors.toList()))
                         .append(Op.invokeSpecial(CompilerUtil.internalName(clazz.getName()),

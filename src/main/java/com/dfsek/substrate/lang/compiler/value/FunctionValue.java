@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.util.Lazy;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -30,7 +31,7 @@ public class FunctionValue implements Value {
     }
 
     @Override
-    public List<Either<CompileError, Op>> load(BuildData data) {
+    public List<Either<CompileError, Op>> load(BuildData data, LinkedHashMap<String, Value> values) {
         return List.of(Op.getStatic(implementationClassName,
                 fieldName,
                 "L" + name.get() + ";"));

@@ -14,11 +14,16 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.FunctionValue;
 import com.dfsek.substrate.lang.compiler.value.RecordValue;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.collection.Array;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -74,51 +79,48 @@ public class ScriptBuilder implements Opcodes {
         BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
 
         RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
-        for (int i = 0; i < recordComponents.length; i++) {
-            RecordComponent recordComponent = recordComponents[i];
-            data.registerValue(recordComponent.getName(), new RecordValue(Signature.fromType(recordComponent.getType()), parseData.getParameterClass(), i));
-        }
-
-        // prepare functions.
 
         MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
         staticInitializer.visitCode();
 
-        for (Tuple2<String, Function> stringFunctionPair : functions) {
-            Function function = stringFunctionPair._2;
-            String functionName = "wrap$" + stringFunctionPair._1;
+        LinkedHashMap<String, Value> values = (LinkedHashMap<String, Value>) Array.of(recordComponents)
+                .zipWithIndex()
+                .toLinkedMap(tuple2 -> new Tuple2<>(tuple2._1.getName(), (Value) new RecordValue(Signature.fromType(tuple2._1.getType()), parseData.getParameterClass(), tuple2._2)))
+                .merge(functions.toMap(stringFunctionPair -> {
+                    Function function = stringFunctionPair._2;
+                    String functionName = "wrap$" + stringFunctionPair._1;
 
-            data.registerValue(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
-                BuildData separate = data.sub();
-                Signature ref = function.reference();
+                    return Tuple.of(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
+                        BuildData separate = data.sub();
+                        Signature ref = function.reference();
 
-                String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), clazz -> {
-                    List<Either<CompileError, Op>> ops = function.prepare();
-                    Signature args = function.arguments();
-                    int frame = 2;
-                    for (int arg = 0; arg < args.size(); arg++) {
-                        ops = ops.append(Op.varInsn(args.getType(arg).loadInsn(), frame));
-                        frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
-                    }
-                    Signature functionReturn = function.reference().getGenericReturn(0);
-                    return ops.appendAll(function.invoke(separate, args))
-                            .append(functionReturn.retInsn()
-                                    .mapLeft(m -> Op.errorUnwrapped(m, Position.getNull()))
-                                    .map(Op::insnUnwrapped));
-                })._2.getName();
+                        String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), clazz -> {
+                            List<Either<CompileError, Op>> ops = function.prepare();
+                            Signature args = function.arguments();
+                            int frame = 2;
+                            for (int arg = 0; arg < args.size(); arg++) {
+                                ops = ops.append(Op.varInsn(args.getType(arg).loadInsn(), frame));
+                                frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
+                            }
+                            Signature functionReturn = function.reference().getGenericReturn(0);
+                            return ops.appendAll(function.invoke(separate, args))
+                                    .append(functionReturn.retInsn()
+                                            .mapLeft(m -> Op.errorUnwrapped(m, Position.getNull()))
+                                            .map(Op::insnUnwrapped));
+                        })._2.getName();
 
-                builder.field(functionName,
-                        "L" + delegate + ";",
-                        Access.PUBLIC, Access.STATIC, Access.STATIC);
+                        builder.field(functionName,
+                                "L" + delegate + ";",
+                                Access.PUBLIC, Access.STATIC, Access.STATIC);
 
-                staticInitializer.visitTypeInsn(NEW, delegate);
-                staticInitializer.visitInsn(DUP);
-                staticInitializer.visitMethodInsn(INVOKESPECIAL, delegate, "<init>", "()V", false);
-                staticInitializer.visitFieldInsn(PUTSTATIC, implementationClassName, functionName, "L" + delegate + ";");
+                        staticInitializer.visitTypeInsn(NEW, delegate);
+                        staticInitializer.visitInsn(DUP);
+                        staticInitializer.visitMethodInsn(INVOKESPECIAL, delegate, "<init>", "()V", false);
+                        staticInitializer.visitFieldInsn(PUTSTATIC, implementationClassName, functionName, "L" + delegate + ";");
 
-                return delegate;
-            }));
-        }
+                        return delegate;
+                    }));
+                }));
 
 
         MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
@@ -127,7 +129,7 @@ public class ScriptBuilder implements Opcodes {
 
         List<CompileError> errors = ops
                 .flatMap(node -> node
-                        .apply(data)
+                        .apply(data, values)
                         .flatMap(result -> result
                                 .fold(List::of, op -> {
                                     op.apply(absMethod);
@@ -142,9 +144,6 @@ public class ScriptBuilder implements Opcodes {
 
         absMethod.visitMaxs(0, 0);
         absMethod.visitEnd();
-
-
-
 
 
         parseData
@@ -172,7 +171,8 @@ public class ScriptBuilder implements Opcodes {
             Object instance = clazz.getDeclaredConstructor().newInstance();
             //noinspection unchecked
             return (Script<P, R>) instance;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

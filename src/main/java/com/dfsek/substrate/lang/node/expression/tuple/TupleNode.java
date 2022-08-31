@@ -7,9 +7,11 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -27,11 +29,11 @@ public class TupleNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
         return data.tupleFactory()
                 .construct(
                         reference(),
-                        args.flatMap(arg -> arg.simplify().apply(data).appendAll(CompilerUtil.deconstructTuple(arg, data)))
+                        args.flatMap(arg -> arg.simplify().apply(data, values).appendAll(CompilerUtil.deconstructTuple(arg, data)))
                 );
     }
 

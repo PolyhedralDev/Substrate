@@ -6,13 +6,16 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -39,20 +42,18 @@ public class ValueAssignmentNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
         Signature ref = value.reference();
-
-
-        data.registerValue(id.getContent(), new PrimitiveValue(ref, data.getOffset()), value.reference().frames());
 
         if (value instanceof LambdaExpressionNode) {
             ((LambdaExpressionNode) value).setSelf(id.getContent());
         }
 
-        int offset = data.offset(id.getContent());
+        int width = ref.frames();
+        int offset = CompilerUtil.getTotalOffset(values) + width;
 
 
-        return value.apply(data)
+        return value.apply(data, values.put(id.getContent(), new PrimitiveValue(ref, id.toString(), width)))
                 .append(dup(ref))
                 .append(ref
                         .storeInsn()

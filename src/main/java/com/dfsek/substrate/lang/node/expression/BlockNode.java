@@ -6,9 +6,10 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
@@ -32,9 +33,9 @@ public class BlockNode extends ExpressionNode {
     }
 
     @Override
-    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
         BuildData scope = data.sub();
-        return contents.flatMap(node -> node.simplify().apply(scope));
+        return contents.flatMap(node -> node.simplify().apply(scope, values));
     }
 
     @Override

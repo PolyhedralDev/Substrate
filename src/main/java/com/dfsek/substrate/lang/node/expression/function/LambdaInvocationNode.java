@@ -6,10 +6,11 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -31,12 +32,12 @@ public class LambdaInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
         Signature returnType = lambda.reference().getSimpleReturn();
 
         Signature args = lambda.reference().getGenericArguments(0);
 
-        return lambda.simplify().apply(data)
+        return lambda.simplify().apply(data, values)
                 .append(Op.aLoad(data.getImplArgsOffset()))
                 .append(data.lambdaFactory().invoke(args, returnType, data));
     }
