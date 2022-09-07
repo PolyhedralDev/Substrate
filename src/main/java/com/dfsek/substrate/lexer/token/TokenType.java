@@ -119,10 +119,6 @@ public enum TokenType {
      */
     BOOLEAN_AND,
     /**
-     * Return statement
-     */
-    RETURN,
-    /**
      * Arrow token "->"
      */
     ARROW,
