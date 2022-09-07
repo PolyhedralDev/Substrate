@@ -148,7 +148,6 @@ public class FunctionalLexer {
                                 literalMatch(c, "false", TokenType.BOOLEAN),
                                 literalMatch(c, "true", TokenType.BOOLEAN),
 
-                                literalMatch(c, "return", TokenType.RETURN),
 
                                 literalMatch(c, "num", TokenType.NUM_TYPE),
                                 literalMatch(c, "int", TokenType.INT_TYPE),
