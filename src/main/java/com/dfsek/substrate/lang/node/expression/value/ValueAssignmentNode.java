@@ -27,14 +27,16 @@ import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.dup;
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
     private final ExpressionNode value;
+    private final Node next;
 
-    private ValueAssignmentNode(Token id, ExpressionNode value) {
+    private ValueAssignmentNode(Token id, ExpressionNode value, Node next) {
         this.id = id;
         this.value = value.simplify();
+        this.next = next;
     }
 
-    public static Unchecked<ValueAssignmentNode> of(Token id, Unchecked<? extends ExpressionNode> value) {
-        return Unchecked.of(new ValueAssignmentNode(id, value.unchecked()));
+    public static Unchecked<ValueAssignmentNode> of(Token id, Unchecked<? extends ExpressionNode> value, Node next) {
+        return Unchecked.of(new ValueAssignmentNode(id, value.unchecked(), next));
     }
 
     public Token getId() {
@@ -52,13 +54,15 @@ public class ValueAssignmentNode extends ExpressionNode {
         int width = ref.frames();
         int offset = CompilerUtil.getTotalOffset(values) + width;
 
+        LinkedHashMap<String, Value> newValues = values.put(id.getContent(), new PrimitiveValue(ref, id.toString(), width));
 
-        return value.apply(data, values.put(id.getContent(), new PrimitiveValue(ref, id.toString(), width)))
+        return value.apply(data, newValues)
                 .append(dup(ref))
                 .append(ref
                         .storeInsn()
                         .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))
-                        .map(insn -> Op.varInsnUnwrapped(insn, offset)));
+                        .map(insn -> Op.varInsnUnwrapped(insn, offset)))
+                        .appendAll(next.apply(data, newValues));
     }
 
     @Override

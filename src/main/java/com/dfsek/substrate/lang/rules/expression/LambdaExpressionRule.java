@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
-import com.dfsek.substrate.lang.rules.BlockRule;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
@@ -63,12 +62,8 @@ public class LambdaExpressionRule {
 
         ParserUtil.checkType(lexer.consume(), TokenType.ARROW);
 
-        Unchecked<? extends ExpressionNode> uncheckedExpression;
-        if (lexer.peek().getType() == TokenType.BLOCK_BEGIN) {
-            uncheckedExpression = BlockRule.assemble(lexer, data, lambda);
-        } else {
-            uncheckedExpression = ExpressionRule.assemble(lexer, data, lambda);
-        }
+        Unchecked<? extends ExpressionNode> uncheckedExpression = ExpressionRule.assemble(lexer, data, lambda);
+
 
         ExpressionNode expression = uncheckedExpression.get(returnType);
 
