@@ -1,7 +1,3 @@
-assert(!false);
-
-b = false;
-
-assert(!b);
-
-return true;
+let {
+    b = false
+} in !b

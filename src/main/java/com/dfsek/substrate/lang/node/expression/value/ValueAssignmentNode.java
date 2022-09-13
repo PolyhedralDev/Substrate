@@ -27,16 +27,16 @@ import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.dup;
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
     private final ExpressionNode value;
-    private final Node next;
+    private final ExpressionNode next;
 
-    private ValueAssignmentNode(Token id, ExpressionNode value, Node next) {
+    private ValueAssignmentNode(Token id, ExpressionNode value, ExpressionNode next) {
         this.id = id;
         this.value = value.simplify();
         this.next = next;
     }
 
-    public static Unchecked<ValueAssignmentNode> of(Token id, Unchecked<? extends ExpressionNode> value, Node next) {
-        return Unchecked.of(new ValueAssignmentNode(id, value.unchecked(), next));
+    public static Unchecked<ValueAssignmentNode> of(Token id, Unchecked<? extends ExpressionNode> value, Unchecked<? extends ExpressionNode> next) {
+        return Unchecked.of(new ValueAssignmentNode(id, value.unchecked(), next.unchecked()));
     }
 
     public Token getId() {
@@ -69,7 +69,7 @@ public class ValueAssignmentNode extends ExpressionNode {
     public ExpressionNode simplify() {
         if (Node.disableOptimisation()) return this;
         if (value instanceof ConstantExpressionNode) {
-            return new ConstantValueNode(id, (ConstantExpressionNode<?>) value);
+            return new ConstantValueNode(id, (ConstantExpressionNode<?>) value, next);
         }
         return this;
     }
@@ -81,7 +81,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return value.reference();
+        return next.reference();
     }
 
     @Override

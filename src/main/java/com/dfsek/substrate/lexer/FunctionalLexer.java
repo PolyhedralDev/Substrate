@@ -160,6 +160,9 @@ public class FunctionalLexer {
                                 literalMatch(c, "if", TokenType.IF),
                                 literalMatch(c, "else", TokenType.ELSE),
 
+                                literalMatch(c, "let", TokenType.LET),
+                                literalMatch(c, "in", TokenType.IN),
+
                                 Case($(), word -> Option.of(new Tuple2<>(new Token(word, TokenType.IDENTIFIER, c.get().getPosition()), c.drop(word.length()))))
                         )
                 )));

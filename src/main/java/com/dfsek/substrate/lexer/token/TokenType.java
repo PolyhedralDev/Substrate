@@ -165,5 +165,8 @@ public enum TokenType {
     /**
      * Else token "else"
      */
-    ELSE
+    ELSE,
+
+    LET,
+    IN
 }

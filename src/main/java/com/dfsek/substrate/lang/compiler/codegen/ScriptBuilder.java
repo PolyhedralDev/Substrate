@@ -23,7 +23,6 @@ import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
-import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -41,15 +40,63 @@ import java.util.zip.ZipOutputStream;
 public class ScriptBuilder implements Opcodes {
     private static int builds = 0;
     private final Map<String, Macro> macros = new HashMap<>();
-    private List<Node> ops = List.empty();
     private List<Tuple2<String, Function>> functions = List.empty();
 
-    public void addOperation(Node op) {
-        this.ops = ops.append(op); // todo: bad
+    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Node node) throws ParseException {
+        DynamicClassLoader classLoader = new DynamicClassLoader();
+
+        ZipOutputStream zipOutputStream = createOutputStream();
+
+        String implementationClassName = Classes.SCRIPT + "IMPL_" + builds;
+
+        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
+
+        BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
+
+        RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
+
+        MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
+        staticInitializer.visitCode();
+
+        LinkedHashMap<String, Value> values = buildInitialiser(parseData, implementationClassName, builder, data, recordComponents, staticInitializer);
+
+
+        MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
+        absMethod.visitCode();
+        macros.forEach(data::registerMacro);
+
+        List<CompileError> errors = node
+                .apply(data, values)
+                .flatMap(result -> result
+                        .fold(List::of, op -> {
+                            op.apply(absMethod);
+                            return List.empty();
+                        }));
+        if (!errors.isEmpty()) {
+            throw new ParseException(errors.foldLeft(errors.size() + " error(s) present in script:\n\t", (s, e) -> {
+                e.dumpStack();
+                return s + e.message() + ": " + e.getPosition() + "\n\t";
+            }), errors.last().getPosition());
+        }
+
+        absMethod.visitMaxs(0, 0);
+        absMethod.visitEnd();
+
+
+        parseData
+                .getAssertions()
+                .forEach(consumer -> consumer.accept(data)); // perform assertions
+
+        data.lambdaFactory().buildAll();
+
+        staticInitializer.visitInsn(RETURN);
+        staticInitializer.visitMaxs(0, 0);
+        staticInitializer.visitEnd();
+
+        return dumpClass(classLoader, zipOutputStream, builder);
     }
 
-    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData) throws ParseException {
-        DynamicClassLoader classLoader = new DynamicClassLoader();
+    private static ZipOutputStream createOutputStream() {
         ZipOutputStream zipOutputStream;
         if ("true".equals(System.getProperty("substrate.Dump"))) {
             try {
@@ -72,18 +119,11 @@ public class ScriptBuilder implements Opcodes {
         } else {
             zipOutputStream = null;
         }
-        String implementationClassName = Classes.SCRIPT + "IMPL_" + builds;
+        return zipOutputStream;
+    }
 
-        ClassBuilder builder = new ClassBuilder(CompilerUtil.internalName(implementationClassName), Classes.SCRIPT).defaultConstructor();
-
-        BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
-
-        RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
-
-        MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
-        staticInitializer.visitCode();
-
-        LinkedHashMap<String, Value> values = (LinkedHashMap<String, Value>) Array.of(recordComponents)
+    private LinkedHashMap<String, Value> buildInitialiser(ParseData parseData, String implementationClassName, ClassBuilder builder, BuildData data, RecordComponent[] recordComponents, MethodVisitor staticInitializer) {
+        return (LinkedHashMap<String, Value>) Array.of(recordComponents)
                 .zipWithIndex()
                 .toLinkedMap(tuple2 -> new Tuple2<>(tuple2._1.getName(), (Value) new RecordValue(Signature.fromType(tuple2._1.getType()), parseData.getParameterClass(), tuple2._2)))
                 .merge(functions.toMap(stringFunctionPair -> {
@@ -121,41 +161,9 @@ public class ScriptBuilder implements Opcodes {
                         return delegate;
                     }));
                 }));
+    }
 
-
-        MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
-        absMethod.visitCode();
-        macros.forEach(data::registerMacro);
-
-        List<CompileError> errors = ops
-                .flatMap(node -> node
-                        .apply(data, values)
-                        .flatMap(result -> result
-                                .fold(List::of, op -> {
-                                    op.apply(absMethod);
-                                    return List.empty();
-                                })));
-        if (!errors.isEmpty()) {
-            throw new ParseException(errors.foldLeft(errors.size() + " error(s) present in script:\n\t", (s, e) -> {
-                e.dumpStack();
-                return s + e.message() + ": " + e.getPosition() + "\n\t";
-            }), errors.last().getPosition());
-        }
-
-        absMethod.visitMaxs(0, 0);
-        absMethod.visitEnd();
-
-
-        parseData
-                .getAssertions()
-                .forEach(consumer -> consumer.accept(data)); // perform assertions
-
-        data.lambdaFactory().buildAll();
-
-        staticInitializer.visitInsn(RETURN);
-        staticInitializer.visitMaxs(0, 0);
-        staticInitializer.visitEnd();
-
+    private static <P extends Record, R extends Record> Script<P, R> dumpClass(DynamicClassLoader classLoader, ZipOutputStream zipOutputStream, ClassBuilder builder) {
         Class<?> clazz = builder.build(classLoader, zipOutputStream);
 
         if (zipOutputStream != null) {

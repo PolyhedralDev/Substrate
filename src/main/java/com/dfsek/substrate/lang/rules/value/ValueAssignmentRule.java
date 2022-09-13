@@ -4,7 +4,6 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
-import com.dfsek.substrate.lang.rules.StatementRule;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
@@ -23,6 +22,6 @@ public class ValueAssignmentRule {
         }
         scope.register(id.getContent(), value.reference());
 
-        return ValueAssignmentNode.of(id, value, StatementRule.assemble(lexer, data, scope));
+        return ValueAssignmentNode.of(id, value, ExpressionRule.assemble(lexer, data, scope));
     }
 }
