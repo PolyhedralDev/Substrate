@@ -3,7 +3,6 @@ package com.dfsek.substrate.lang.compiler.codegen;
 import com.dfsek.substrate.Script;
 import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Function;
-import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
@@ -33,17 +32,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder implements Opcodes {
     private static int builds = 0;
-    private final Map<String, Macro> macros = new HashMap<>();
-    private List<Tuple2<String, Function>> functions = List.empty();
 
-    public <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Node node) throws ParseException {
+    public static  <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Node node, List<Tuple2<String, Function>> functions) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
 
         ZipOutputStream zipOutputStream = createOutputStream();
@@ -59,12 +53,11 @@ public class ScriptBuilder implements Opcodes {
         MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
         staticInitializer.visitCode();
 
-        LinkedHashMap<String, Value> values = buildInitialiser(parseData, implementationClassName, builder, data, recordComponents, staticInitializer);
+        LinkedHashMap<String, Value> values = buildInitialiser(parseData, implementationClassName, builder, data, recordComponents, staticInitializer, functions);
 
 
         MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
         absMethod.visitCode();
-        macros.forEach(data::registerMacro);
 
         List<CompileError> errors = node
                 .apply(data, values)
@@ -123,7 +116,7 @@ public class ScriptBuilder implements Opcodes {
         return zipOutputStream;
     }
 
-    private LinkedHashMap<String, Value> buildInitialiser(ParseData parseData, String implementationClassName, ClassBuilder builder, BuildData data, RecordComponent[] recordComponents, MethodVisitor staticInitializer) {
+    private static LinkedHashMap<String, Value> buildInitialiser(ParseData parseData, String implementationClassName, ClassBuilder builder, BuildData data, RecordComponent[] recordComponents, MethodVisitor staticInitializer, List<Tuple2<String, Function>> functions) {
         return (LinkedHashMap<String, Value>) Array.of(recordComponents)
                 .zipWithIndex()
                 .toLinkedMap(tuple2 -> new Tuple2<>(tuple2._1.getName(), (Value) new RecordValue(Signature.fromType(tuple2._1.getType()), parseData.getParameterClass(), tuple2._2)))
@@ -132,7 +125,6 @@ public class ScriptBuilder implements Opcodes {
                     String functionName = "wrap$" + stringFunctionPair._1;
 
                     return Tuple.of(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
-                        BuildData separate = data.sub();
                         Signature ref = function.reference();
 
                         String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), clazz -> {
@@ -144,7 +136,7 @@ public class ScriptBuilder implements Opcodes {
                                 frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
                             }
                             Signature functionReturn = function.reference().getGenericReturn(0);
-                            return ops.appendAll(function.invoke(separate, args))
+                            return ops.appendAll(function.invoke(data, args))
                                     .append(functionReturn.retInsn()
                                             .mapLeft(m -> Op.errorUnwrapped(m, Position.getNull()))
                                             .map(Op::insnUnwrapped));
@@ -185,13 +177,4 @@ public class ScriptBuilder implements Opcodes {
             throw new RuntimeException(e);
         }
     }
-
-    public void registerFunction(String id, Function function) {
-        functions = functions.append(new Tuple2<>(id, function)); // todo: bad
-    }
-
-    public void registerMacro(String id, Macro macro) {
-        macros.put(id, macro);
-    }
-
 }

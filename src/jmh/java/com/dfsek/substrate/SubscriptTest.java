@@ -28,17 +28,16 @@ public class SubscriptTest {
         public void setup() {
             try {
                 script = new Parser<>(
-                        IOUtils.toString(
-                                Objects.requireNonNull(
-                                        SubscriptTest.class.getResource(
-                                                "/performance.sbsc"
-                                        )
-                                ),
-                                Charset.defaultCharset()
-                        ),
                         Input.class,
                         Output.class
-                ).parse();
+                ).parse(IOUtils.toString(
+                        Objects.requireNonNull(
+                                SubscriptTest.class.getResource(
+                                        "/performance.sbsc"
+                                )
+                        ),
+                        Charset.defaultCharset()
+                ));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

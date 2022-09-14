@@ -36,53 +36,53 @@ public class IOTests {
 
     @Test
     public void singleBooleanRecordInput() throws NoSuchMethodException {
-        Assertions.assertTrue(Utils.createParser(returnInputScript, Records.BooleanInput.class, Records.BooleanInput.class, true).parse().execute(new Records.BooleanInput(true), null).input());
+        Assertions.assertTrue(Utils.createParser(Records.BooleanInput.class, Records.BooleanInput.class, true).parse(returnInputScript).execute(new Records.BooleanInput(true), null).input());
     }
 
     @Test
     public void singleIntRecordInput() throws NoSuchMethodException {
-        Assertions.assertEquals(5, Utils.createParser(returnInputScript, Records.IntInput.class, Records.IntInput.class, true).parse().execute(new Records.IntInput(5), null).input());
+        Assertions.assertEquals(5, Utils.createParser(Records.IntInput.class, Records.IntInput.class, true).parse(returnInputScript).execute(new Records.IntInput(5), null).input());
     }
 
     @Test
     public void singleDoubleRecordInput() throws NoSuchMethodException {
-        Assertions.assertEquals(5.5, Utils.createParser(returnInputScript, Records.DoubleInput.class, Records.DoubleInput.class, true).parse().execute(new Records.DoubleInput(5.5), null).input());
+        Assertions.assertEquals(5.5, Utils.createParser(Records.DoubleInput.class, Records.DoubleInput.class, true).parse(returnInputScript).execute(new Records.DoubleInput(5.5), null).input());
     }
 
     @Test
     public void singleStringRecordInput() throws NoSuchMethodException {
-        Assertions.assertEquals("bazinga", Utils.createParser(returnInputScript, Records.StringInput.class, Records.StringInput.class, true).parse().execute(new Records.StringInput("bazinga"), null).input());
+        Assertions.assertEquals("bazinga", Utils.createParser(Records.StringInput.class, Records.StringInput.class, true).parse(returnInputScript).execute(new Records.StringInput("bazinga"), null).input());
     }
 
     @Test
     public void intEquals() throws NoSuchMethodException {
-        Assertions.assertTrue(Utils.createParser(compareInputsEquals, Records.TwoInts.class, Records.BooleanInput.class, true).parse().execute(new Records.TwoInts(5, 5), null).input());
+        Assertions.assertTrue(Utils.createParser(Records.TwoInts.class, Records.BooleanInput.class, true).parse(compareInputsEquals).execute(new Records.TwoInts(5, 5), null).input());
     }
 
     @Test
     public void doubleEquals() throws NoSuchMethodException {
-        Assertions.assertTrue(Utils.createParser(compareInputsEquals, Records.TwoDoubles.class, Records.BooleanInput.class, true).parse().execute(new Records.TwoDoubles(5.5, 5.5), null).input());
+        Assertions.assertTrue(Utils.createParser(Records.TwoDoubles.class, Records.BooleanInput.class, true).parse(compareInputsEquals).execute(new Records.TwoDoubles(5.5, 5.5), null).input());
     }
 
     @Test
     public void stringEquals() throws NoSuchMethodException {
-        Assertions.assertTrue(Utils.createParser(compareInputsEquals, Records.TwoStrings.class, Records.BooleanInput.class, true).parse().execute(new Records.TwoStrings("bazinga", "bazinga"), null).input());
+        Assertions.assertTrue(Utils.createParser(Records.TwoStrings.class, Records.BooleanInput.class, true).parse(compareInputsEquals).execute(new Records.TwoStrings("bazinga", "bazinga"), null).input());
     }
 
     @Test
     public void returnTupleIntDoubleString() throws NoSuchMethodException {
-        Assertions.assertEquals(new Records.IntDoubleString(5, 4.3, "bazinga"), Utils.createParser(returnTupleIntDoubleString, Records.Void.class, Records.IntDoubleString.class, true).parse().execute(new Records.Void(), null));
+        Assertions.assertEquals(new Records.IntDoubleString(5, 4.3, "bazinga"), Utils.createParser(Records.Void.class, Records.IntDoubleString.class, true).parse(returnTupleIntDoubleString).execute(new Records.Void(), null));
     }
 
     @Test
     public void basicMonadic() throws NoSuchMethodException {
         Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
-        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInvalidBind, Records.Void.class, Records.IOOut.class, true);
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(Records.Void.class, Records.IOOut.class, true);
 
-        parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        //parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
 
         try {
-            parser.parse().execute(new Records.Void(), environment).io().apply(environment);
+            parser.parse(monadicInvalidBind).execute(new Records.Void(), environment).io().apply(environment);
         } catch (ParseException e) {
             e.printStackTrace();
             return;
@@ -93,12 +93,12 @@ public class IOTests {
     @Test
     public void monadicInput() throws NoSuchMethodException {
         Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
-        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInput, Records.Void.class, Records.IOOut.class, true);
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(Records.Void.class, Records.IOOut.class, true);
 
-        parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
-        parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
+        //parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        //parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
 
-        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
+        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse(monadicInput).execute(new Records.Void(), environment).io();
         System.out.println("Evaluated.");
         io.apply(environment);
     }
@@ -106,17 +106,17 @@ public class IOTests {
     @Test
     public void monadicInputTransformation() throws NoSuchMethodException {
         Records.IOOut.BasicEnvironment environment = new Records.IOOut.BasicEnvironment();
-        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(monadicInputTransformation, Records.Void.class, Records.IOOut.class, true);
+        Parser<Records.Void, Records.IOOut> parser = Utils.createParser(Records.Void.class, Records.IOOut.class, true);
 
-        parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
-        parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
-        parser.registerFunction("appendHash", new StaticFunction(IOTests.class.getMethod("appendHash", int.class)));
+        //parser.registerFunction("putLine", new StaticFunction(IOTests.class.getMethod("putLine", String.class)));
+        //parser.registerFunction("getInt", new StaticFunction(IOTests.class.getMethod("getInt")));
+        //parser.registerFunction("appendHash", new StaticFunction(IOTests.class.getMethod("appendHash", int.class)));
 
         System.out.println(new StaticFunction(IOTests.class.getMethod("appendHash", int.class)).reference());
         System.out.println(new StaticFunction(IOTests.class.getMethod("putLine", String.class)).reference());
         System.out.println(new StaticFunction(IOTests.class.getMethod("getInt")).reference());
 
-        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse().execute(new Records.Void(), environment).io();
+        IO<Void, Records.IOOut.BasicEnvironment> io = parser.parse(monadicInputTransformation).execute(new Records.Void(), environment).io();
         System.out.println("Evaluated.");
         io.apply(environment);
     }
@@ -140,7 +140,7 @@ public class IOTests {
     @Test
     public void inputClosureInt() throws NoSuchMethodException {
         System.setProperty(Utils.DISABLE_OPTIMISATION_PROPERTY, "true");
-        Assertions.assertEquals(5, Utils.createParser(inputClosureInt, Records.IntInput.class, Records.IntInput.class, true).parse().execute(new Records.IntInput(5), null).input());
+        Assertions.assertEquals(5, Utils.createParser(Records.IntInput.class, Records.IntInput.class, true).parse(inputClosureInt).execute(new Records.IntInput(5), null).input());
         System.clearProperty(Utils.DISABLE_OPTIMISATION_PROPERTY);
     }
 

@@ -10,11 +10,11 @@ public class Utils {
     static final boolean STACK_TRACES_FOR_INVALID = true;
     static final boolean DUMP_TO_JARS = true;
 
-    public static <P extends Record, R extends Record> Parser<P, R> createParser(String script, Class<P> params, Class<R> ret, boolean cheatingPrintln) throws NoSuchMethodException {
-        Parser<P, R> parser = new Parser<>(script, params, ret);
-        if (cheatingPrintln) parser.registerFunction("println", new Println());
-        parser.registerFunction("fail", new StaticFunction(Utils.class.getMethod("fail")));
-        parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
+    public static <P extends Record, R extends Record> Parser<P, R> createParser(Class<P> params, Class<R> ret, boolean cheatingPrintln) throws NoSuchMethodException {
+        Parser<P, R> parser = new Parser<>(params, ret);
+        //if (cheatingPrintln) parser.registerFunction("println", new Println());
+        //parser.registerFunction("fail", new StaticFunction(Utils.class.getMethod("fail")));
+        //parser.registerFunction("assert", new StaticFunction(Assertions.class.getMethod("assertTrue", boolean.class)));
         return parser;
     }
 

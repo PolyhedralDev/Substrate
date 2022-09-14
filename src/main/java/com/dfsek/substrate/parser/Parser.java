@@ -13,97 +13,80 @@ import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
 
 import java.lang.reflect.RecordComponent;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class Parser<P extends Record, R extends Record> {
-    private static final Map<String, StaticFunction> STATIC_FUNCTIONS = new LinkedHashMap<>();
+    private static final Map<String, StaticFunction> STATIC_FUNCTIONS;
 
     static {
         try {
-            STATIC_FUNCTIONS.put("pow", new StaticFunction(Math.class.getMethod("pow", double.class, double.class)));
-            STATIC_FUNCTIONS.put("intPow", new StaticFunction(MathUtils.class.getMethod("intPow", double.class, double.class)));
-            STATIC_FUNCTIONS.put("pow2", new StaticFunction(MathUtils.class.getMethod("pow2", double.class)));
+            STATIC_FUNCTIONS = LinkedHashMap.of("pow", new StaticFunction(Math.class.getMethod("pow", double.class, double.class)))
+                    .put("intPow", new StaticFunction(MathUtils.class.getMethod("intPow", double.class, double.class)))
+                    .put("pow2", new StaticFunction(MathUtils.class.getMethod("pow2", double.class)))
 
-            STATIC_FUNCTIONS.put("sqrt", new StaticFunction(Math.class.getMethod("sqrt", double.class)));
-            STATIC_FUNCTIONS.put("cbrt", new StaticFunction(Math.class.getMethod("cbrt", double.class)));
+                    .put("sqrt", new StaticFunction(Math.class.getMethod("sqrt", double.class)))
+                    .put("cbrt", new StaticFunction(Math.class.getMethod("cbrt", double.class)))
 
-            STATIC_FUNCTIONS.put("exp", new StaticFunction(Math.class.getMethod("exp", double.class)));
-            STATIC_FUNCTIONS.put("ln", new StaticFunction(Math.class.getMethod("log", double.class)));
-            STATIC_FUNCTIONS.put("log", new StaticFunction(Math.class.getMethod("log10", double.class)));
+                    .put("exp", new StaticFunction(Math.class.getMethod("exp", double.class)))
+                    .put("ln", new StaticFunction(Math.class.getMethod("log", double.class)))
+                    .put("log", new StaticFunction(Math.class.getMethod("log10", double.class)))
 
-            STATIC_FUNCTIONS.put("absInt", new StaticFunction(Math.class.getMethod("abs", int.class)));
-            STATIC_FUNCTIONS.put("absNum", new StaticFunction(Math.class.getMethod("abs", double.class)));
+                    .put("absInt", new StaticFunction(Math.class.getMethod("abs", int.class)))
+                    .put("absNum", new StaticFunction(Math.class.getMethod("abs", double.class)))
 
-            STATIC_FUNCTIONS.put("sin", new StaticFunction(Math.class.getMethod("sin", double.class)));
-            STATIC_FUNCTIONS.put("cos", new StaticFunction(Math.class.getMethod("cos", double.class)));
-            STATIC_FUNCTIONS.put("tan", new StaticFunction(Math.class.getMethod("tan", double.class)));
+                    .put("sin", new StaticFunction(Math.class.getMethod("sin", double.class)))
+                    .put("cos", new StaticFunction(Math.class.getMethod("cos", double.class)))
+                    .put("tan", new StaticFunction(Math.class.getMethod("tan", double.class)))
 
-            STATIC_FUNCTIONS.put("sinh", new StaticFunction(Math.class.getMethod("sinh", double.class)));
-            STATIC_FUNCTIONS.put("cosh", new StaticFunction(Math.class.getMethod("cosh", double.class)));
-            STATIC_FUNCTIONS.put("tanh", new StaticFunction(Math.class.getMethod("tanh", double.class)));
+                    .put("sinh", new StaticFunction(Math.class.getMethod("sinh", double.class)))
+                    .put("cosh", new StaticFunction(Math.class.getMethod("cosh", double.class)))
+                    .put("tanh", new StaticFunction(Math.class.getMethod("tanh", double.class)))
 
-            STATIC_FUNCTIONS.put("asin", new StaticFunction(Math.class.getMethod("asin", double.class)));
-            STATIC_FUNCTIONS.put("acos", new StaticFunction(Math.class.getMethod("acos", double.class)));
-            STATIC_FUNCTIONS.put("atan", new StaticFunction(Math.class.getMethod("atan", double.class)));
-            STATIC_FUNCTIONS.put("atan2", new StaticFunction(Math.class.getMethod("atan2", double.class, double.class)));
+                    .put("asin", new StaticFunction(Math.class.getMethod("asin", double.class)))
+                    .put("acos", new StaticFunction(Math.class.getMethod("acos", double.class)))
+                    .put("atan", new StaticFunction(Math.class.getMethod("atan", double.class)))
+                    .put("atan2", new StaticFunction(Math.class.getMethod("atan2", double.class, double.class)))
 
-            STATIC_FUNCTIONS.put("rad", new StaticFunction(Math.class.getMethod("toRadians", double.class)));
-            STATIC_FUNCTIONS.put("deg", new StaticFunction(Math.class.getMethod("toDegrees", double.class)));
-
-
-            STATIC_FUNCTIONS.put("floor", new StaticFunction(MathUtils.class.getMethod("fastFloor", double.class)));
-            STATIC_FUNCTIONS.put("ceil", new StaticFunction(MathUtils.class.getMethod("fastCeil", double.class)));
-
-            STATIC_FUNCTIONS.put("max", new StaticFunction(Math.class.getMethod("max", double.class, double.class)));
-            STATIC_FUNCTIONS.put("intMax", new StaticFunction(Math.class.getMethod("max", int.class, int.class)));
-            STATIC_FUNCTIONS.put("min", new StaticFunction(Math.class.getMethod("min", double.class, double.class)));
-            STATIC_FUNCTIONS.put("intMin", new StaticFunction(Math.class.getMethod("min", int.class, int.class)));
+                    .put("rad", new StaticFunction(Math.class.getMethod("toRadians", double.class)))
+                    .put("deg", new StaticFunction(Math.class.getMethod("toDegrees", double.class)))
 
 
-            STATIC_FUNCTIONS.put("substring", new StaticFunction(StringUtils.class.getMethod("substring", String.class, int.class, int.class)));
-            STATIC_FUNCTIONS.put("upperCase", new StaticFunction(StringUtils.class.getMethod("toUpperCase", String.class)));
-            STATIC_FUNCTIONS.put("lowerCase", new StaticFunction(StringUtils.class.getMethod("toLowerCase", String.class)));
-            STATIC_FUNCTIONS.put("startsWith", new StaticFunction(StringUtils.class.getMethod("startsWith", String.class, String.class)));
-            STATIC_FUNCTIONS.put("endsWith", new StaticFunction(StringUtils.class.getMethod("endsWith", String.class, String.class)));
+                    .put("floor", new StaticFunction(MathUtils.class.getMethod("fastFloor", double.class)))
+                    .put("ceil", new StaticFunction(MathUtils.class.getMethod("fastCeil", double.class)))
+
+                    .put("max", new StaticFunction(Math.class.getMethod("max", double.class, double.class)))
+                    .put("intMax", new StaticFunction(Math.class.getMethod("max", int.class, int.class)))
+                    .put("min", new StaticFunction(Math.class.getMethod("min", double.class, double.class)))
+                    .put("intMin", new StaticFunction(Math.class.getMethod("min", int.class, int.class)))
+
+                    .put("substring", new StaticFunction(StringUtils.class.getMethod("substring", String.class, int.class, int.class)))
+                    .put("upperCase", new StaticFunction(StringUtils.class.getMethod("toUpperCase", String.class)))
+                    .put("lowerCase", new StaticFunction(StringUtils.class.getMethod("toLowerCase", String.class)))
+                    .put("startsWith", new StaticFunction(StringUtils.class.getMethod("startsWith", String.class, String.class)))
+                    .put("endsWith", new StaticFunction(StringUtils.class.getMethod("endsWith", String.class, String.class)));
+
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private final Lexer lexer;
-    private final ScriptBuilder builder = new ScriptBuilder();
-    private final ParserScope scope = new ParserScope();
-    private final ParseData data;
+    private final Class<P> parameters;
+    private final Class<R> ret;
 
-
-
-    public Parser(String data, Class<P> parameters, Class<R> ret) throws ParseException {
-        lexer = new Lexer(data);
-        this.data = new ParseData(parameters, ret);
-
-        for (RecordComponent recordComponent : parameters.getRecordComponents()) {
-            scope.register(recordComponent.getName(), Signature.fromType(recordComponent.getType()));
-        }
-
-        STATIC_FUNCTIONS.forEach(this::registerFunction);
-
-        registerMacro("bind", new Bind());
+    public Parser(Class<P> parameters, Class<R> ret) throws ParseException {
+        this.parameters = parameters;
+        this.ret = ret;
     }
 
-    public Script<P, R> parse() throws ParseException {
-        return builder.build(data, BaseRule.assemble(lexer, data, scope).get(data.getReturnType()));
-    }
-
-    public void registerMacro(String id, Macro macro) {
-        builder.registerMacro(id, macro);
-        data.registerMacro(id, macro);
-    }
-
-    public void registerFunction(String id, Function function) {
-        builder.registerFunction(id, function);
-        scope.register(id, function.reference());
+    public Script<P, R> parse(String data) throws ParseException {
+        ParseData parseData = new ParseData(parameters, ret);
+        ParserScope scope = List.of(parameters.getRecordComponents())
+                .foldLeft(new ParserScope(), ((parserScope, recordComponent) -> parserScope.register(recordComponent.getName(), Signature.fromType(recordComponent.getType()))));
+        Lexer lexer = new Lexer(data);
+        return ScriptBuilder.build(parseData, BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret)), List.empty());
     }
 }

@@ -9,7 +9,7 @@ public class DevScript {
     public static void main(String... args) throws Exception {
         System.setProperty("substrate.Dump", Boolean.toString(true));
         String s = IOUtils.resourceToString("/dev.sbsc", Charset.defaultCharset());
-        new Parser<>(s, In.class, Out.class).parse();
+        new Parser<>(In.class, Out.class).parse(s);
     }
 
     public record In() {
