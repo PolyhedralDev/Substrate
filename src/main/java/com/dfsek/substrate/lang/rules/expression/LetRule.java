@@ -20,20 +20,10 @@ public class LetRule {
                 .and(lexer.consume(), TokenType.BLOCK_BEGIN)
                 .getP(() -> assignmentNode(lexer, data, scope))
         ;
-        return ParserUtil.checkTypeFunctional(lexer.consume(), TokenType.LET)
-                .fold(err -> new ErrorNode(err._2, err._1), ignore -> {
-                    return
-                })
+        return null;
     }
 
     private static ValueAssignmentNode assignmentNode(Lexer lexer, ParseData data, ParserScope scope) {
-
-    }
-
-    private static Tuple2<String, ExpressionNode> parseAssignment(Lexer lexer, ParseData data, ParserScope scope) {
-        return ParserUtil.checkTypeFunctional(lexer.consume(), TokenType.IDENTIFIER)
-                .fold(err -> new ErrorNode(err._2, err._1), token -> {
-                    return
-                })
+        return null;
     }
 }

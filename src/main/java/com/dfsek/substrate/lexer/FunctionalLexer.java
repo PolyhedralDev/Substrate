@@ -7,6 +7,7 @@ import com.dfsek.substrate.lexer.read.Char;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
+import io.vavr.Function1;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
@@ -103,10 +104,11 @@ public class FunctionalLexer {
     }
 
     private static Option<Tuple2<? extends Token, ? extends Stream<Char>>> fetch(Stream<Char> chars) throws TokenizerException {
+        if(chars.isEmpty()) return Option.none();
         return Option.narrow(Match(chars.dropWhile(Predicates.anyOf(Char::isEOF, Char::isWhitespace))).of(
                 Case($(Stream::isEmpty), c -> Option.none()),
                 Case($(c -> c.get().isEOF()), c -> Option.none()),
-                Case(startsWith("//"), d -> fetch(d.dropUntil(c -> c.getCharacter() == '\n').tail())),
+                Case(startsWith("//"), s -> s.dropUntil(c -> c.getCharacter() == '\n').tailOption().flatMap(FunctionalLexer::fetch)),
                 Case(startsWith("/*"), FunctionalLexer::consumeBlockCommentAndFetch),
                 Case($(FunctionalLexer::isNumberStart), FunctionalLexer::parseNumber),
                 Case($(c -> c.get().is('"')), FunctionalLexer::parseString),
