@@ -1,1 +1,6 @@
 // dev script
+
+let {
+  test = b,
+  test2 = !b
+} in b && !b
