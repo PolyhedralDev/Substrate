@@ -168,5 +168,7 @@ public enum TokenType {
     ELSE,
 
     LET,
-    IN
+    IN,
+
+    EOF
 }

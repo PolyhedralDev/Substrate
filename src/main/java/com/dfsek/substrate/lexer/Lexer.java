@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lexer;
 
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.lexer.token.TokenType;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.Stream;
 
@@ -9,7 +10,7 @@ public class Lexer {
     private Token last;
 
     public Lexer(String data) throws ParseException {
-        tokens = FunctionalLexer.stream(data);
+        tokens = FunctionalLexer.stream(data).peek(System.out::println);
     }
 
     /**
@@ -19,7 +20,7 @@ public class Lexer {
      * @throws ParseException If token does not exist
      */
     public Token peek() throws ParseException {
-        return tokens.headOption().getOrElseThrow(() -> new ParseException("Unexpected end of input", last.getPosition()));
+        return tokens.headOption().getOrElse(() -> new Token("_EOF", TokenType.EOF, last.getPosition()));
     }
 
     public Token peek(int n) throws ParseException {

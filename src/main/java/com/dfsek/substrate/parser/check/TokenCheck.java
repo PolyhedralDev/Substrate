@@ -46,6 +46,6 @@ public class TokenCheck {
     }
 
     public <T> ParameterizedCheck<T> getP(Function<Token, T> get) {
-        return new ParameterizedCheck<>(checked, fail, get);
+        return new ParameterizedCheck<>(checked, fail, get(get).toOption());
     }
 }

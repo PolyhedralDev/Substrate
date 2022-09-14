@@ -13,9 +13,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ParameterizedCheck<T> extends TokenCheck{
-    private final Function<Token, T> parameter;
+    private final Option<T> parameter;
 
-    protected ParameterizedCheck(Token checked, Option<Tuple2<String, Position>> fail, Function<Token, T> parameter) {
+    protected ParameterizedCheck(Token checked, Option<Tuple2<String, Position>> fail, Option<T> parameter) {
         super(checked, fail);
         this.parameter = parameter;
     }
@@ -26,14 +26,14 @@ public class ParameterizedCheck<T> extends TokenCheck{
     }
 
     public <U> ParameterizedCheck<U> map(Function<T, U> map) {
-        return new ParameterizedCheck<>(checked, fail, parameter.andThen(map));
+        return new ParameterizedCheck<>(checked, fail, parameter.map(map));
     }
 
     public <U> ParameterizedCheck<U> map(Function2<Token, T, U> map) {
-        return new ParameterizedCheck<>(checked, fail, parameter.andThen(map.apply(checked)));
+        return new ParameterizedCheck<>(checked, fail, parameter.map(map.apply(checked)));
     }
 
     public Either<Tuple2<String, Position>, T> get() {
-        return fail.toEither(() -> parameter.apply(checked)).swap();
+        return fail.toEither(parameter::get).swap();
     }
 }

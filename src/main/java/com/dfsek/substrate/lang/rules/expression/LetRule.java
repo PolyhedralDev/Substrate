@@ -21,10 +21,12 @@ import java.util.function.Function;
 
 public class LetRule {
     public static Unchecked<? extends ExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope) {
+        System.out.println("Parsing LET");
         return ParserUtil.check(lexer.consume(), TokenType.LET)
                 .and(lexer.consume(), TokenType.BLOCK_BEGIN)
                 .getP(() -> assignmentNode(LinkedHashMap.empty(), lexer, data, scope))
                 .and(lexer.consume(), TokenType.BLOCK_END)
+                .and(lexer.consume(), TokenType.IN)
                 .map(assignment -> (Unchecked<? extends ExpressionNode>) LetNode.of(assignment,
                         ExpressionRule.assemble(lexer, data, assignment
                                 .foldLeft(scope, (parserScope, stringExpressionNodeTuple2) -> parserScope
@@ -36,7 +38,9 @@ public class LetRule {
     }
 
     private static LinkedHashMap<String, ExpressionNode> assignmentNode(LinkedHashMap<String, ExpressionNode> start, Lexer lexer, ParseData data, ParserScope scope) {
+        System.out.println("Checking");
         if (lexer.peek().getType() != TokenType.IDENTIFIER) return start;
+        System.out.println("hhh");
         Token id = lexer.consume();
 
         LinkedHashMap<String, ExpressionNode> put = start.put(id.getContent(),
@@ -47,6 +51,7 @@ public class LetRule {
                         .fold(ErrorNode::of, Function.identity()).unchecked());
 
         if (lexer.peek().getType() == TokenType.SEPARATOR) {
+            lexer.consume();
             return assignmentNode(put, lexer, data, scope);
         }
         return put;
