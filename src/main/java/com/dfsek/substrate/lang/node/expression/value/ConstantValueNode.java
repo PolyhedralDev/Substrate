@@ -11,16 +11,14 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
-import io.vavr.collection.Stream;
 import io.vavr.control.Either;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ConstantValueNode extends ExpressionNode {
     private final Token id;
@@ -33,12 +31,12 @@ public class ConstantValueNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         if (values.containsKey(id.getContent())) {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
         LinkedHashMap<String, Value> newValues = values.put(id.getContent(), new BakedValue(value));
-        return value.apply(data, newValues);
+        return value.apply(data, , newValues);
     }
 
     @Override

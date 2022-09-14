@@ -1,7 +1,9 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.LetNode;
 import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
@@ -29,8 +31,12 @@ public class LetRule {
                 .and(lexer.consume(), TokenType.IN)
                 .map(assignment -> (Unchecked<? extends ExpressionNode>) LetNode.of(assignment,
                         ExpressionRule.assemble(lexer, data, assignment
-                                .foldLeft(scope, (parserScope, stringExpressionNodeTuple2) -> parserScope
-                                        .register(stringExpressionNodeTuple2._1, stringExpressionNodeTuple2._2.reference()))
+                                .foldLeft(scope, (parserScope, stringExpressionNodeTuple2) -> {
+                                    Signature reference = stringExpressionNodeTuple2._2.reference();
+                                    String id = stringExpressionNodeTuple2._1;
+                                    return parserScope
+                                            .register(id, new PrimitiveValue(reference, id, parserScope.getLocalWidth(), reference.frames()));
+                                })
                         )
                 ))
                 .get()

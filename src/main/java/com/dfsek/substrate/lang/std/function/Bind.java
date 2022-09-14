@@ -59,7 +59,7 @@ public class Bind implements Macro {
         }
 
         return List.of(Op.aLoad(1))
-                .appendAll(argNodes.flatMap(arg -> arg.simplify().apply(data, values)))
+                .appendAll(argNodes.flatMap(arg -> arg.simplify().apply(data, , values)))
                 .append(Op.invokeStaticInterface(Classes.IO, "bind", "(L" + Classes.ENVIRONMENT + ";L" + Classes.IO + ";L" + clazz + ";)L" + Classes.IO + ";"));
     }
 }

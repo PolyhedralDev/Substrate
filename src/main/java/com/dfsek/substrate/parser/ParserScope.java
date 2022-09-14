@@ -1,33 +1,36 @@
 package com.dfsek.substrate.parser;
 
-import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
 
 
 public class ParserScope {
-    private final Map<String, Signature> values;
+    private final Map<String, Value> values;
 
-    public ParserScope(Map<String, Signature> values) {
+    private final int localWidth;
+
+    public ParserScope(Map<String, Value> values, int localWidth) {
         this.values = values;
+        this.localWidth = localWidth;
     }
 
     public ParserScope() {
-        this(HashMap.empty());
+        this(HashMap.empty(), 3);
     }
 
-    public ParserScope register(String val, Signature signature) {
+    public ParserScope register(String val, Value signature) {
         if (values.containsKey(val))
             throw new IllegalArgumentException("Value " + val + " already exists in this scope.");
-        return new ParserScope(values.put(val, signature));
+        return new ParserScope(values.put(val, signature), localWidth + signature.getLVWidth());
     }
 
-    public boolean contains(String val) {
-        return values.containsKey(val);
-    }
-
-    public Option<Signature> get(String val) {
+    public Option<Value> get(String val) {
         return values.get(val);
+    }
+
+    public int getLocalWidth() {
+        return localWidth;
     }
 }

@@ -5,13 +5,12 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
@@ -50,14 +49,14 @@ public class BooleanOrNode extends BooleanOperationNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         Label shortTrue = new Label();
         Label shortFalse = new Label();
         Label end = new Label();
 
-        return left.apply(data, values)
+        return left.apply(data, scope)
                 .append(Op.ifNE(shortTrue))
-                .appendAll(right.apply(data, values))
+                .appendAll(right.apply(data, scope))
                 .append(Op.ifEQ(shortFalse))
                 .append(Op.label(shortTrue))
                 .append(Op.pushTrue())

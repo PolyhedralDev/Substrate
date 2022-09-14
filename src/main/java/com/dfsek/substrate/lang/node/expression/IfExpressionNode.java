@@ -6,10 +6,9 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
@@ -34,16 +33,16 @@ public class IfExpressionNode extends ExpressionNode {
     }
 
         @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         Label equal = new Label();
         Label end = new Label();
 
-        return predicate.simplify().apply(data, values)
+        return predicate.simplify().apply(data, scope)
                 .append(Op.ifEQ(equal))
-                .appendAll(caseTrueNode.simplify().apply(data, values))
+                .appendAll(caseTrueNode.simplify().apply(data, scope))
                 .append(Op.goTo(end))
                 .append(Op.label(equal))
-                .appendAll(caseFalseNode.apply(data, values))
+                .appendAll(caseFalseNode.apply(data, scope))
                 .append(Op.label(end));
     }
 

@@ -7,11 +7,10 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -30,17 +29,17 @@ public class FunctionInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         Signature argSignature = CompilerUtil.expandArguments(arguments);
 
         if (!function.reference().getGenericArguments(0).equals(argSignature)) {
             return List.of(Op.error("Function argument mismatch, expected " + function.reference().getGenericArguments(0) + ", got " + argSignature, function.getPosition()));
         }
 
-        return function.apply(data, values)
+        return function.apply(data, , values)
                 .append(Op.aLoad(data.getImplArgsOffset()))
                 .appendAll(arguments
-                        .flatMap(arg -> arg.simplify().apply(data, values)
+                        .flatMap(arg -> arg.simplify().apply(data, , values)
                                 .appendAll(CompilerUtil.deconstructTuple(arg, data))))
                 .append(data.lambdaFactory().invoke(argSignature, reference(), data));
 

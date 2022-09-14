@@ -14,6 +14,7 @@ import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
@@ -68,7 +69,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         Stream<Tuple2<String, Signature>> closureTypes = content
                 .streamContents()
                 .filter(node -> node instanceof ValueReferenceNode)
@@ -95,12 +96,12 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .implement(parameters, reference().getSimpleReturn(), closure, clazz ->
                         content
                                 .simplify()
-                                .apply(data, values
-                                        .merge(closureTypes
-                                                .zipWithIndex()
-                                                .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
-                                                .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, argument._1, argument._2.frames()))))
-                                                .toMap(Function.identity()))
+                                .apply(data, closureTypes
+                                        .zipWithIndex()
+                                        .map(closureMember -> new Tuple2<>(closureMember._1._1, (Value) new ShadowValue(closureMember._1._2, closureMember._2)))
+                                        .appendAll(types.map(argument -> new Tuple2<>(argument._1, new PrimitiveValue(argument._2, argument._1, argument._2.frames()))))
+                                        .toMap(Function.identity())
+                                        .foldLeft(scope, (s, p) -> s.register(p._1, p._2))
                                         .merge(
                                                 Match(self).of(
                                                         Case($(is(null)), HashMap.empty()),

@@ -3,6 +3,8 @@ package com.dfsek.substrate.lang.rules.expression;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
+import com.dfsek.substrate.lang.compiler.value.ThisReferenceValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
@@ -29,6 +31,7 @@ public class LambdaExpressionRule {
 
         Signature argSig = Signature.empty();
 
+        int i = 1; // 0 = this
         while (lexer.peek().getType() != TokenType.GROUP_END) {
             Token id = ParserUtil.checkType(lexer.consume(), TokenType.IDENTIFIER);
             ParserUtil.checkType(lexer.consume(), TokenType.TYPE);
@@ -37,7 +40,8 @@ public class LambdaExpressionRule {
             argSig = argSig.and(argSignature);
             types = types.append(new Tuple2<>(argName, argSignature));
 
-            lambda = lambda.register(argName, argSignature);
+            lambda = lambda.register(argName, new PrimitiveValue(argSignature, argName, i, argSignature.frames()));
+            i += argSignature.frames();
 
             args.add(id.getContent());
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
@@ -57,7 +61,7 @@ public class LambdaExpressionRule {
         }
 
         if (variableName != null) {
-            lambda = lambda.register(variableName, Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType));
+            lambda = lambda.register(variableName, new ThisReferenceValue(Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType)));
         }
 
         ParserUtil.checkType(lexer.consume(), TokenType.ARROW);
@@ -69,11 +73,11 @@ public class LambdaExpressionRule {
 
         Set<String> locals = new HashSet<>();
         expression.streamContents()
-                .filter(node -> node instanceof ValueAssignmentNode)
+                .filter(ValueAssignmentNode.class::isInstance)
                 .forEach(node -> locals.add(((ValueAssignmentNode) node).getId().getContent()));
 
         expression.streamContents()
-                .filter(node -> node instanceof ValueReferenceNode)
+                .filter(ValueReferenceNode.class::isInstance)
                 .filter(node -> locals.contains(((ValueReferenceNode) node).getId().getContent()))
                 .forEach(node -> ((ValueReferenceNode) node).setLocal(true));
 
@@ -83,7 +87,7 @@ public class LambdaExpressionRule {
                 begin.getPosition(),
                 returnType,
                 expression.streamContents()
-                        .filter(node -> node instanceof ValueReferenceNode)
+                        .filter(ValueReferenceNode.class::isInstance)
                         .filter(node -> args.contains(((ValueReferenceNode) node).getId().getContent()))
                         .map(node -> {
                             ((ValueReferenceNode) node).setLambdaArgument(true);

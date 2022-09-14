@@ -14,6 +14,7 @@ import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
@@ -42,7 +43,7 @@ public class ValueAssignmentNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         Signature ref = value.reference();
 
         if (value instanceof LambdaExpressionNode lambdaExpressionNode) {
@@ -54,7 +55,7 @@ public class ValueAssignmentNode extends ExpressionNode {
 
         LinkedHashMap<String, Value> newValues = values.put(id.getContent(), new PrimitiveValue(ref, id.toString(), width));
 
-        return value.apply(data, newValues)
+        return value.apply(data, , newValues)
                 .append(dup(ref))
                 .append(ref
                         .storeInsn()

@@ -8,12 +8,11 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Tuple2;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
@@ -36,10 +35,10 @@ public class ListNode extends ExpressionNode {
     }
 
     @Override
-    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
+    public io.vavr.collection.List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
         return List.of(Op.invokeStaticInterface(Classes.LIST, "empty", "()L" + Classes.LIST + ";"))
                 .appendAll(elements.flatMap(element ->
-                        element._1.apply(data, values)
+                        element._1.apply(data, , values)
                                 .appendAll(CompilerUtil.box(element._1))
                                 .append(Op.invokeInterface(Classes.LIST, "append", "(L" + Classes.OBJECT + ";)L" + Classes.LIST + ";")))
                 );

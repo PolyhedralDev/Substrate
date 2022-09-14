@@ -5,12 +5,11 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -30,9 +29,9 @@ public abstract class BinaryOperationNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
-        return left.apply(data, values)
-                .appendAll(right.apply(data, values))
+    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+        return left.apply(data, scope)
+                .appendAll(right.apply(data, scope))
                 .appendAll(applyOp(data));
     }
 

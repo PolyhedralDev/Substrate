@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Positioned;
+import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
@@ -19,7 +20,7 @@ public interface Node extends Opcodes, Positioned {
         return p != null && p.equals("true");
     }
 
-    List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException;
+    List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException;
 
     default Node simplify() {
         return this;

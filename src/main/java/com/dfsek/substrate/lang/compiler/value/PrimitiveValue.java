@@ -13,20 +13,19 @@ import io.vavr.control.Either;
 public record PrimitiveValue(
         Signature reference,
         String id,
+        int position,
         int width
 ) implements Value {
 
     @Override
     public List<Either<CompileError, Op>> load(BuildData data, LinkedHashMap<String, Value> values) {
-        return List.of(CompilerUtil.getOffset(values, id).fold(
-                () -> Op.error("No such value \"" + id + "\"", Position.getNull()),
-                offset -> reference
+        return List.of(reference
                         .loadInsn()
                         .bimap(
                                 s -> Op.errorUnwrapped(s, Position.getNull()),
-                                load -> Op.varInsnUnwrapped(load, offset)
+                                load -> Op.varInsnUnwrapped(load, position)
                         )
-        ));
+        );
     }
 
     @Override

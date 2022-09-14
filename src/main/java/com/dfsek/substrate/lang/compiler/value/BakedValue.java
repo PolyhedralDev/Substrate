@@ -20,6 +20,6 @@ public record BakedValue(
 
     @Override
     public List<Either<CompileError, Op>> load(BuildData data, LinkedHashMap<String, Value> values) {
-        return value.apply(data, values);
+        return value.apply(data, , values);
     }
 }

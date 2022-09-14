@@ -108,7 +108,8 @@ public final class CompilerUtil implements Opcodes {
     public static Option<Integer> getOffset(LinkedHashMap<String, Value> values, String id) {
         return values
                 .get(id)
-                .map(value -> values.takeUntil(v -> v._1.equals(id)).values().foldLeft(0, (i, v) -> i + v.getLVWidth()) + value.getLVWidth());
+                .map(value -> values.takeUntil(v -> v._1.equals(id)).values().foldLeft(0, (i, v) -> i + v.getLVWidth()) + value.getLVWidth())
+                .map(i -> i + 2); // 2 method parameters of #execute
     }
 
     public static io.vavr.collection.List<Either<CompileError, Op>> box(Typed typed) {
