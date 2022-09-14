@@ -6,10 +6,8 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Tuple2;
@@ -32,36 +30,21 @@ public class LetNode extends ExpressionNode {
         this.node = node;
     }
 
-    public static LetNode of(Map<String, Unchecked<? extends ExpressionNode>> values, Unchecked<? extends ExpressionNode> node) {
-        return new LetNode(values.mapValues(Unchecked::unchecked), node.unchecked());
+    public static Unchecked<LetNode> of(Map<String, ExpressionNode> values, Unchecked<? extends ExpressionNode> node) {
+        return Unchecked.of(new LetNode(values, node.unchecked()));
     }
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> values) throws ParseException {
-        return localValues.foldLeft(new Tuple2<List<Either<CompileError, Op>>, LinkedHashMap<String, Value>>(List.empty(), values), (listLinkedHashMapTuple2, value) -> applyAssignment(data, listLinkedHashMapTuple2._2, value._2, value._1))
-                .apply((ops, newValues) -> ops.appendAll(node.apply(data, newValues)));
+        Tuple2<LinkedHashMap<String, Value>, List<Either<CompileError, Op>>> tuple21 = localValues.foldLeft(new Tuple2<>(values, List.empty()), (tuple2, stringExpressionNodeTuple2) -> tuple2.map((tuple2s, eithers) -> {
+            Signature reference = stringExpressionNodeTuple2._2.reference();
+            return new Tuple2<>(tuple2s.put(stringExpressionNodeTuple2._1, new PrimitiveValue(reference, stringExpressionNodeTuple2._1, reference.frames())), eithers.appendAll(stringExpressionNodeTuple2._2.apply(data, tuple2s)));
+        }));
+
+        return tuple21._2
+                .appendAll(node.apply(data, tuple21._1));
     }
 
-    private Tuple2<List<Either<CompileError, Op>>, LinkedHashMap<String, Value>> applyAssignment(BuildData data, LinkedHashMap<String, Value> values, ExpressionNode value, String id) throws ParseException {
-        Signature ref = value.reference();
-
-        if (value instanceof LambdaExpressionNode) {
-            ((LambdaExpressionNode) value).setSelf(id);
-        }
-
-        int width = ref.frames();
-        int offset = CompilerUtil.getTotalOffset(values) + width;
-
-        LinkedHashMap<String, Value> newValues = values.put(id, new PrimitiveValue(ref, id, width));
-
-        return new Tuple2<>(value.apply(data, newValues)
-                .append(dup(ref))
-                .append(ref
-                        .storeInsn()
-                        .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))
-                        .map(insn -> Op.varInsnUnwrapped(insn, offset))),
-                newValues);
-    }
 
     @Override
     public Signature reference() {
@@ -70,11 +53,11 @@ public class LetNode extends ExpressionNode {
 
     @Override
     protected Iterable<? extends Node> contents() {
-        return null;
+        return localValues.values().append(node);
     }
 
     @Override
     public Position getPosition() {
-        return null;
+        return node.getPosition();
     }
 }

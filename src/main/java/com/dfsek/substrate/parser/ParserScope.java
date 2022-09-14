@@ -1,55 +1,33 @@
 package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.control.Option;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class ParserScope {
-    private static final ParserScope NULL = new ParserScope() {
-        @Override
-        public void register(String val, Signature signature) {
-            throw new IllegalArgumentException();
-        }
+    private final Map<String, Signature> values;
 
-        @Override
-        public boolean contains(String val) {
-            return false;
-        }
-
-        @Override
-        public Option<Signature> get(String val) {
-            return Option.none();
-        }
-    };
-    private final Map<String, Signature> values = new HashMap<>();
-    private final ParserScope parent;
+    public ParserScope(Map<String, Signature> values) {
+        this.values = values;
+    }
 
     public ParserScope() {
-        this.parent = NULL;
+        this(HashMap.empty());
     }
 
-    public ParserScope(ParserScope parent) {
-        this.parent = parent;
-    }
-
-    public void register(String val, Signature signature) {
-        if (values.containsKey(val) || parent.values.containsKey(val))
+    public ParserScope register(String val, Signature signature) {
+        if (values.containsKey(val))
             throw new IllegalArgumentException("Value " + val + " already exists in this scope.");
-        values.put(val, signature);
+        return new ParserScope(values.put(val, signature));
     }
 
     public boolean contains(String val) {
-        return values.containsKey(val) || parent.contains(val);
+        return values.containsKey(val);
     }
 
     public Option<Signature> get(String val) {
-        if (values.containsKey(val)) return Option.of(values.get(val));
-        return parent.get(val);
-    }
-
-    public ParserScope sub() {
-        return new ParserScope(this);
+        return values.get(val);
     }
 }

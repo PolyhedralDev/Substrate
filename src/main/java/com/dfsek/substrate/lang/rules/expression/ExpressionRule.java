@@ -5,6 +5,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
+import com.dfsek.substrate.lang.node.expression.LetNode;
 import com.dfsek.substrate.lang.node.expression.NumberInverseNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanAndNode;
@@ -71,6 +72,8 @@ public class ExpressionRule {
         } else if (test.isType()) {
             node = CastRule.assemble(lexer, data, scope);
             possibleFunctionSite = false;
+        } else if(test.getType() == TokenType.LET) {
+            node = LetRule.assemble(lexer, data, scope);
         } else if (test.getType() == TokenType.IF) {
             node = IfExpressionRule.assemble(lexer, data, scope);
         } else if (test.getType() == TokenType.LIST_BEGIN) {

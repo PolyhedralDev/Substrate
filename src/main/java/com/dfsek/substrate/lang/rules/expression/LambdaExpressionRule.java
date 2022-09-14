@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class LambdaExpressionRule {
     public static Unchecked<LambdaExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
-        ParserScope lambda = scope.sub();
+        ParserScope lambda = scope;
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<Tuple2<String, Signature>> types = List.empty();
@@ -37,7 +37,7 @@ public class LambdaExpressionRule {
             argSig = argSig.and(argSignature);
             types = types.append(new Tuple2<>(argName, argSignature));
 
-            lambda.register(argName, argSignature);
+            lambda = lambda.register(argName, argSignature);
 
             args.add(id.getContent());
             if (ParserUtil.checkType(lexer.peek(), TokenType.SEPARATOR, TokenType.GROUP_END).getType() == TokenType.SEPARATOR) {
@@ -57,7 +57,7 @@ public class LambdaExpressionRule {
         }
 
         if (variableName != null) {
-            lambda.register(variableName, Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType));
+            lambda = lambda.register(variableName, Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType));
         }
 
         ParserUtil.checkType(lexer.consume(), TokenType.ARROW);

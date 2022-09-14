@@ -19,6 +19,7 @@ import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConstantValueNode extends ExpressionNode {
@@ -26,12 +27,9 @@ public class ConstantValueNode extends ExpressionNode {
 
     private final ConstantExpressionNode<?> value;
 
-    private final ExpressionNode next;
-
-    public ConstantValueNode(Token id, ConstantExpressionNode<?> value, ExpressionNode next) {
+    public ConstantValueNode(Token id, ConstantExpressionNode<?> value) {
         this.id = id;
         this.value = value;
-        this.next = next;
     }
 
     @Override
@@ -40,18 +38,17 @@ public class ConstantValueNode extends ExpressionNode {
             throw new ParseException("Value \"" + id.getContent() + "\" already exists in this scope.", id.getPosition());
         }
         LinkedHashMap<String, Value> newValues = values.put(id.getContent(), new BakedValue(value));
-        return value.apply(data, newValues)
-                .appendAll(next.apply(data, newValues));
+        return value.apply(data, newValues);
     }
 
     @Override
     public Signature reference() {
-        return next.reference();
+        return value.reference();
     }
 
     @Override
     protected Collection<? extends Node> contents() {
-        return Stream.concat(Stream.of(value), next.streamContents()).collect(Collectors.toList());
+        return Set.of(value);
     }
 
     @Override
