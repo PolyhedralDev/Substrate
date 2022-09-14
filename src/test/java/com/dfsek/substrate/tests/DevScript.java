@@ -12,7 +12,7 @@ public class DevScript {
         new Parser<>(In.class, Out.class).parse(s);
     }
 
-    public record In() {
+    public record In(boolean b) {
 
     }
 
