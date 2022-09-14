@@ -15,6 +15,9 @@ import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import static io.vavr.API.*;
 
 public class BasicExpressionRule {
@@ -51,10 +54,13 @@ public class BasicExpressionRule {
                                         () -> ParserUtil.checkTypeFunctional(token, TokenType.IDENTIFIER)
                                                 .fold(ErrorNode::of,
                                                         id -> scope.get(lexer.consume().getContent())
-                                                                .map(signature -> (Unchecked) ValueReferenceNode.of(
+                                                                .map(signature -> ValueReferenceNode.of(
                                                                         id,
                                                                         signature
-                                                                )).getOrElse(ErrorNode.of(token.getPosition(), "No such value: " + token.getContent()))
+                                                                )).fold(
+                                                                        () -> ErrorNode.of(token.getPosition(), "No such value: " + token.getContent()),
+                                                                        Function.identity()
+                                                                )
                                                 ))
                         ));
     }
