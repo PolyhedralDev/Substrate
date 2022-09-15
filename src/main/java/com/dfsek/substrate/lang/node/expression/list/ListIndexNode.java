@@ -10,7 +10,6 @@ import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -32,11 +31,11 @@ public class ListIndexNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         return listReference
-                .simplify().apply(data, , values)
+                .simplify().apply(data)
                 .appendAll(index
-                        .simplify().apply(data, , values))
+                        .simplify().apply(data))
                 .append(Op.invokeInterface(Classes.LIST, "get", "(I)L" + Classes.OBJECT + ";"))
                 .appendAll(CompilerUtil.unbox(listReference.reference().getGenericReturn(0)));
     }

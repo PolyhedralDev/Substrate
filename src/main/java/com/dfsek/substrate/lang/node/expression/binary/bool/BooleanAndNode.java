@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -49,12 +48,12 @@ public class BooleanAndNode extends BooleanOperationNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Label shortFalse = new Label();
         Label end = new Label();
-        return left.apply(data, scope)
+        return left.apply(data)
                 .append(Op.ifEQ(shortFalse))
-                .appendAll(right.apply(data, scope))
+                .appendAll(right.apply(data))
                 .append(Op.ifEQ(shortFalse))
                 .append(Op.pushTrue())
                 .append(Op.goTo(end))

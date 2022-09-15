@@ -8,7 +8,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -31,12 +30,12 @@ public class LambdaInvocationNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature returnType = lambda.reference().getSimpleReturn();
 
         Signature args = lambda.reference().getGenericArguments(0);
 
-        return lambda.simplify().apply(data, scope)
+        return lambda.simplify().apply(data)
                 .append(Op.aLoad(data.getImplArgsOffset()))
                 .append(data.lambdaFactory().invoke(args, returnType, data));
     }

@@ -6,10 +6,10 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -19,18 +19,19 @@ import java.util.Collections;
 
 public class ValueReferenceNode extends ExpressionNode {
     private final Token id;
-    private final Signature signature;
 
     private boolean isLambdaArgument = false;
     private boolean isLocal = false;
 
-    private ValueReferenceNode(Token id, Signature signature) {
+    private final Value value;
+
+    private ValueReferenceNode(Token id, Value value) {
         this.id = id;
-        this.signature = signature;
+        this.value = value;
     }
 
-    public static Unchecked<ValueReferenceNode> of(Token id, Signature signature) {
-        return Unchecked.of(new ValueReferenceNode(id, signature));
+    public static Unchecked<ValueReferenceNode> of(Token id, Value value) {
+        return Unchecked.of(new ValueReferenceNode(id, value));
     }
 
     public boolean isLocal() {
@@ -50,8 +51,8 @@ public class ValueReferenceNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
-        return Op.getValue(values, data, id.getContent(), id.getPosition());
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return value.load(data);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return signature;
+        return value.reference();
     }
 
     public Token getId() {

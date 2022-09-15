@@ -5,7 +5,6 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lexer.read.Position;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -19,7 +18,7 @@ public record ThisReferenceValue(
     }
 
     @Override
-    public List<Either<CompileError, Op>> load(BuildData data, LinkedHashMap<String, Value> values) {
+    public List<Either<CompileError, Op>> load(BuildData data) {
         return List.of(ref
                 .loadInsn()
                 .bimap(

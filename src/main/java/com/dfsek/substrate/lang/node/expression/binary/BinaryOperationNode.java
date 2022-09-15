@@ -8,7 +8,6 @@ import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -29,9 +28,9 @@ public abstract class BinaryOperationNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
-        return left.apply(data, scope)
-                .appendAll(right.apply(data, scope))
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return left.apply(data)
+                .appendAll(right.apply(data))
                 .appendAll(applyOp(data));
     }
 

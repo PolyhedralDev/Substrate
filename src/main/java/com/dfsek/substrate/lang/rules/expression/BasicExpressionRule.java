@@ -54,9 +54,9 @@ public class BasicExpressionRule {
                                         () -> ParserUtil.checkTypeFunctional(token, TokenType.IDENTIFIER)
                                                 .fold(ErrorNode::of,
                                                         id -> scope.get(lexer.consume().getContent())
-                                                                .map(signature -> ValueReferenceNode.of(
+                                                                .map(value -> ValueReferenceNode.of(
                                                                         id,
-                                                                        signature
+                                                                        value
                                                                 )).fold(
                                                                         () -> ErrorNode.of(token.getPosition(), "No such value: " + token.getContent()),
                                                                         Function.identity()

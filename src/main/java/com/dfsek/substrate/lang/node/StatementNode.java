@@ -8,7 +8,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.NodeHolder;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -26,9 +25,9 @@ public class StatementNode extends NodeHolder {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature ref = content.reference();
-        return content.simplify().apply(data, scope)
+        return content.simplify().apply(data)
                 .append(ref.equals(Signature.empty()) ? Op.nothing() : Op.pop(ref));
     }
 

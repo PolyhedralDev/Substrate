@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -25,8 +24,8 @@ public abstract class TypeCastNode<C, R> extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
-        return value.apply(data, , values)
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return value.apply(data)
                 .appendAll(applyCast(data));
     }
 

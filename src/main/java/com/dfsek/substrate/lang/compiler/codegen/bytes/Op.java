@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Position;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
-import io.vavr.collection.Map;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -366,7 +365,7 @@ public interface Op {
 
     static List<Either<CompileError, Op>> getValue(LinkedHashMap<String, Value> valueMap, BuildData data, String name, Position position) {
         return valueMap.get(name)
-                .fold(() -> List.of(error("No such value \"" + name + "\"", position)), value -> value.load(data, valueMap));
+                .fold(() -> List.of(error("No such value \"" + name + "\"", position)), value -> value.load(data));
     }
 
     static Either<CompileError, Op> error(String message, Position position) {

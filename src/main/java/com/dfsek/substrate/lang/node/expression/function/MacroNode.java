@@ -10,7 +10,6 @@ import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -31,7 +30,7 @@ public class MacroNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Signature argSignature = CompilerUtil.expandArguments(args);
         Signature expected = macro.getArgumentSignature(argSignature);
         if (!expected.equals(argSignature)) {
@@ -39,7 +38,7 @@ public class MacroNode extends ExpressionNode {
         }
 
         return macro.prepare()
-                .appendAll(macro.invoke(data, argSignature, args, values));
+                .appendAll(macro.invoke(data, argSignature, args));
     }
 
     @Override

@@ -9,7 +9,6 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -34,11 +33,9 @@ public class RangeNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
-
-
-        return lower.simplify().apply(data, , values)
-                .appendAll(upper.simplify().apply(data, , values))
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return lower.simplify().apply(data)
+                .appendAll(upper.simplify().apply(data))
                 .append(Op.invokeStaticInterface(Classes.LIST, "range", "(II)L" + Classes.LIST + ";"));
     }
 

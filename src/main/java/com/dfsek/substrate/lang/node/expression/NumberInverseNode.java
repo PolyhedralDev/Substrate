@@ -7,7 +7,6 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -31,8 +30,8 @@ public class NumberInverseNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data, ParserScope scope) throws ParseException {
-        return node.simplify().apply(data, , values)
+    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+        return node.simplify().apply(data)
                 .append(Match(node.reference()).of(
                         Case($(Signature.integer()), Op.iNeg()),
                         Case($(Signature.decimal()), Op.dNeg()),

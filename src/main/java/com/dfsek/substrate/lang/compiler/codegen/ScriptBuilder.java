@@ -60,7 +60,7 @@ public class ScriptBuilder implements Opcodes {
         absMethod.visitCode();
 
         List<CompileError> errors = node
-                .apply(data, , values)
+                .apply(data)
                 .flatMap(result -> result
                         .fold(List::of, op -> {
                             op.apply(absMethod);
