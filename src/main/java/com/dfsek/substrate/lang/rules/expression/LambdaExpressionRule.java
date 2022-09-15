@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class LambdaExpressionRule {
     public static Unchecked<LambdaExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
-        ParserScope lambda = scope;
+        ParserScope lambda = new ParserScope();
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<Tuple2<String, Signature>> types = List.empty();
@@ -31,7 +31,7 @@ public class LambdaExpressionRule {
 
         Signature argSig = Signature.empty();
 
-        int i = 1; // 0 = this
+        int i = 2; // 0 = this, 1 = Environment
         while (lexer.peek().getType() != TokenType.GROUP_END) {
             Token id = ParserUtil.checkType(lexer.consume(), TokenType.IDENTIFIER);
             ParserUtil.checkType(lexer.consume(), TokenType.TYPE);
