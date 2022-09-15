@@ -7,7 +7,7 @@ import com.dfsek.substrate.lang.node.expression.tuple.TupleNode;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;

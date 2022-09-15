@@ -11,12 +11,11 @@ import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static io.vavr.API.*;
 

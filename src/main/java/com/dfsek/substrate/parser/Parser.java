@@ -1,8 +1,6 @@
 package com.dfsek.substrate.parser;
 
 import com.dfsek.substrate.Script;
-import com.dfsek.substrate.lang.compiler.api.Function;
-import com.dfsek.substrate.lang.compiler.api.Macro;
 import com.dfsek.substrate.lang.compiler.api.MathUtils;
 import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
@@ -10,15 +8,13 @@ import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.RecordValue;
 import com.dfsek.substrate.lang.rules.BaseRule;
-import com.dfsek.substrate.lang.std.function.Bind;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
-
-import java.lang.reflect.RecordComponent;
 
 public class Parser<P extends Record, R extends Record> {
     private static final Map<String, StaticFunction> STATIC_FUNCTIONS;

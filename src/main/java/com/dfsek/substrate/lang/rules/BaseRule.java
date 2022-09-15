@@ -7,7 +7,7 @@ import com.dfsek.substrate.lang.node.expression.ReturnNode;
 import com.dfsek.substrate.lang.rules.expression.ExpressionRule;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.exception.ParseException;
 
 public class BaseRule {

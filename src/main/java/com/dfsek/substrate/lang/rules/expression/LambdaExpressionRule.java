@@ -12,7 +12,7 @@ import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.Tuple2;
@@ -22,8 +22,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LambdaExpressionRule {
+    private LambdaExpressionRule() {
+
+    }
     public static Unchecked<LambdaExpressionNode> assemble(Lexer lexer, ParseData data, ParserScope scope, String variableName) throws ParseException {
-        ParserScope lambda = new ParserScope();
+        ParserScope lambda = scope;
         Token begin = ParserUtil.checkType(lexer.consume(), TokenType.GROUP_BEGIN);
 
         List<Tuple2<String, Signature>> types = List.empty();

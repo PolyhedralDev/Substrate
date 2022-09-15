@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final List<Tuple2<String, Signature>> types;
     private final Set<String> closureIDs;
     private final Position start;
     private final Signature parameters;
@@ -35,7 +34,6 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     private LambdaExpressionNode(Unchecked<? extends ExpressionNode> content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
         this.content = content.get(returnType);
-        this.types = types;
         this.start = start;
         this.returnType = returnType;
         this.argRefs = argRefs;
@@ -64,9 +62,9 @@ public class LambdaExpressionNode extends ExpressionNode {
     public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
         Stream<Tuple2<String, Signature>> closureTypes = content
                 .streamContents()
-                .filter(node -> node instanceof ValueReferenceNode)
+                .filter(ValueReferenceNode.class::isInstance)
                 .filter(node -> !((ValueReferenceNode) node).isLocal())
-                .map(node -> (ValueReferenceNode) node)
+                .map(ValueReferenceNode.class::cast)
                 .flatMap(valueReferenceNode -> {
                     String id = valueReferenceNode.getId().getContent();
                     boolean isArg = argRefs.contains(id);

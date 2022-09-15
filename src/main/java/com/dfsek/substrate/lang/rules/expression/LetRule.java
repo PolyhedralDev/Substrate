@@ -1,7 +1,6 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
@@ -12,15 +11,11 @@ import com.dfsek.substrate.lang.node.expression.value.ValueAssignmentNode;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashMap;
 import io.vavr.collection.LinkedHashMap;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class LetRule {

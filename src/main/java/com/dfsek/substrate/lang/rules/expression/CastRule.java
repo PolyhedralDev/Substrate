@@ -2,7 +2,6 @@ package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.cast.IntToNumCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.NumToIntCastNode;
 import com.dfsek.substrate.lang.node.expression.cast.ToStringNode;
@@ -10,7 +9,7 @@ import com.dfsek.substrate.lang.node.expression.cast.TypeCastNode;
 import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 

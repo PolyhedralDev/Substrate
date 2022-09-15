@@ -1,11 +1,9 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.node.expression.BooleanNotNode;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
-import com.dfsek.substrate.lang.node.expression.LetNode;
 import com.dfsek.substrate.lang.node.expression.NumberInverseNode;
 import com.dfsek.substrate.lang.node.expression.binary.arithmetic.*;
 import com.dfsek.substrate.lang.node.expression.binary.bool.BooleanAndNode;
@@ -19,7 +17,7 @@ import com.dfsek.substrate.lexer.Lexer;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.lexer.token.TokenType;
-import com.dfsek.substrate.parser.ParserScope;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.List;
