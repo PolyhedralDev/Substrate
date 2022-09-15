@@ -2,5 +2,5 @@
 
 let {
   test = !b,
-  f = (test: bool): bool -> test
-} in test
+  f = (h: bool): bool -> test
+} in f(test)

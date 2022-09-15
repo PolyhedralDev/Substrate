@@ -23,6 +23,10 @@ public class ErrorNode extends ExpressionNode {
 
     private final Exception e;
 
+    public String getMessage() {
+        return message;
+    }
+
     public ErrorNode(Position position, String message, Signature signature) {
         this.position = position;
         this.message = message;
