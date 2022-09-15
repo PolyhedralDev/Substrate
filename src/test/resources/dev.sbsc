@@ -1,6 +1,6 @@
 // dev script
 
 let {
-  test = b,
-  test2 = !b
-} in b && !b
+  test = !b,
+  test2 = !test
+} in test && test2

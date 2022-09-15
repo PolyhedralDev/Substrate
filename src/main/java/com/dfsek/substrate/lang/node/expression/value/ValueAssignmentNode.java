@@ -51,7 +51,6 @@ public class ValueAssignmentNode extends ExpressionNode {
 
 
         return value.apply(data)
-                .append(dup(ref))
                 .append(ref
                         .storeInsn()
                         .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))
