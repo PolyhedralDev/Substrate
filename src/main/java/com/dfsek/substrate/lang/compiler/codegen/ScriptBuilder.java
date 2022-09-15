@@ -5,24 +5,13 @@ import com.dfsek.substrate.lang.Node;
 import com.dfsek.substrate.lang.compiler.api.Function;
 import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
-import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.codegen.ops.Access;
 import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
-import com.dfsek.substrate.lang.compiler.type.DataType;
-import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.FunctionValue;
-import com.dfsek.substrate.lang.compiler.value.RecordValue;
-import com.dfsek.substrate.lang.compiler.value.Value;
-import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
-import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import io.vavr.collection.Array;
-import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
-import io.vavr.control.Either;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -31,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.RecordComponent;
 import java.util.zip.ZipOutputStream;
 
 public class ScriptBuilder implements Opcodes {
@@ -48,13 +36,9 @@ public class ScriptBuilder implements Opcodes {
 
         BuildData data = new BuildData(classLoader, builder, zipOutputStream, List.of(parseData.getParameterClass(), parseData.getReturnClass()));
 
-        RecordComponent[] recordComponents = parseData.getParameterClass().getRecordComponents();
 
         MethodVisitor staticInitializer = builder.method("<clinit>", "()V", Access.PUBLIC, Access.STATIC);
         staticInitializer.visitCode();
-
-        LinkedHashMap<String, Value> values = buildInitialiser(parseData, implementationClassName, builder, data, recordComponents, staticInitializer, functions);
-
 
         MethodVisitor absMethod = builder.method("execute", "(L" + Classes.RECORD + ";L" + Classes.ENVIRONMENT + ";)L" + Classes.RECORD + ";", Access.PUBLIC);
         absMethod.visitCode();
@@ -114,46 +98,6 @@ public class ScriptBuilder implements Opcodes {
             zipOutputStream = null;
         }
         return zipOutputStream;
-    }
-
-    private static LinkedHashMap<String, Value> buildInitialiser(ParseData parseData, String implementationClassName, ClassBuilder builder, BuildData data, RecordComponent[] recordComponents, MethodVisitor staticInitializer, List<Tuple2<String, Function>> functions) {
-        return (LinkedHashMap<String, Value>) Array.of(recordComponents)
-                .zipWithIndex()
-                .toLinkedMap(tuple2 -> new Tuple2<>(tuple2._1.getName(), (Value) new RecordValue(Signature.fromType(tuple2._1.getType()), parseData.getParameterClass(), tuple2._2)))
-                .merge(functions.toMap(stringFunctionPair -> {
-                    Function function = stringFunctionPair._2;
-                    String functionName = "wrap$" + stringFunctionPair._1;
-
-                    return Tuple.of(stringFunctionPair._1, new FunctionValue(function, implementationClassName, functionName, () -> {
-                        Signature ref = function.reference();
-
-                        String delegate = data.lambdaFactory().implement(function.arguments(), ref.getSimpleReturn(), Signature.empty(), clazz -> {
-                            List<Either<CompileError, Op>> ops = function.prepare();
-                            Signature args = function.arguments();
-                            int frame = 2;
-                            for (int arg = 0; arg < args.size(); arg++) {
-                                ops = ops.append(Op.varInsn(args.getType(arg).loadInsn(), frame));
-                                frame += (args.getType(arg) == DataType.NUM) ? 2 : 1;
-                            }
-                            Signature functionReturn = function.reference().getGenericReturn(0);
-                            return ops.appendAll(function.invoke(data, args))
-                                    .append(functionReturn.retInsn()
-                                            .mapLeft(m -> Op.errorUnwrapped(m, Position.getNull()))
-                                            .map(Op::insnUnwrapped));
-                        })._2.getName();
-
-                        builder.field(functionName,
-                                "L" + delegate + ";",
-                                Access.PUBLIC, Access.STATIC, Access.STATIC);
-
-                        staticInitializer.visitTypeInsn(NEW, delegate);
-                        staticInitializer.visitInsn(DUP);
-                        staticInitializer.visitMethodInsn(INVOKESPECIAL, delegate, "<init>", "()V", false);
-                        staticInitializer.visitFieldInsn(PUTSTATIC, implementationClassName, functionName, "L" + delegate + ";");
-
-                        return delegate;
-                    }));
-                }));
     }
 
     private static <P extends Record, R extends Record> Script<P, R> dumpClass(DynamicClassLoader classLoader, ZipOutputStream zipOutputStream, ClassBuilder builder) {
