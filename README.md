@@ -1,4 +1,4 @@
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/PolyhedralDev/Substrate/Java%20CI?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/PolyhedralDev/Substrate/gradle.yml?branch=master&style=for-the-badge)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 
 # Substrate
