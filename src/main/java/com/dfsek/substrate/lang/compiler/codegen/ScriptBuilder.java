@@ -10,7 +10,9 @@ import com.dfsek.substrate.lang.compiler.codegen.ops.ClassBuilder;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.parser.DynamicClassLoader;
 import com.dfsek.substrate.parser.exception.ParseException;
+import com.dfsek.substrate.parser.scope.ParserScope;
 import io.vavr.Tuple2;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -25,7 +27,7 @@ import java.util.zip.ZipOutputStream;
 public class ScriptBuilder implements Opcodes {
     private static int builds = 0;
 
-    public static  <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Node node, List<Tuple2<String, Function>> functions) throws ParseException {
+    public static  <P extends Record, R extends Record> Script<P, R> build(ParseData parseData, Node node, List<Tuple2<String, Function>> functions, ParserScope scope) throws ParseException {
         DynamicClassLoader classLoader = new DynamicClassLoader();
 
         ZipOutputStream zipOutputStream = createOutputStream();
@@ -44,7 +46,7 @@ public class ScriptBuilder implements Opcodes {
         absMethod.visitCode();
 
         List<CompileError> errors = node
-                .apply(data)
+                .apply(data, scope.getValues())
                 .flatMap(result -> result
                         .fold(List::of, op -> {
                             op.apply(absMethod);

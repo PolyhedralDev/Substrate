@@ -1,6 +1,5 @@
 // dev script
 
 let {
-  test = !b,
-  f = (h: bool): bool -> test
-} in f(test)
+  f = (h: bool): bool -> b
+} in f(false)

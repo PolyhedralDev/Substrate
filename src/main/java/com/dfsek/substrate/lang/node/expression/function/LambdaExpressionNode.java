@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
@@ -61,7 +62,7 @@ public class LambdaExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
         Stream<Tuple2<String, Signature>> closureTypes = content
                 .streamContents()
                 .filter(ValueReferenceNode.class::isInstance)
@@ -82,13 +83,12 @@ public class LambdaExpressionNode extends ExpressionNode {
                 });
 
         Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
-
         return data
                 .lambdaFactory()
                 .implement(parameters, reference().getSimpleReturn(), closure, clazz ->
                         content
                                 .simplify()
-                                .apply(data)
+                                .apply(data, valueMap)
                                 .append(returnType.retInsn()
                                         .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
                                         .map(Op::insnUnwrapped)))
@@ -101,7 +101,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                                 .flatMap(pair -> {
                                     if (pair._1.equals(self))
                                         return List.empty(); // dont load self into closure.
-                                    return List.<Either<CompileError, Op>>empty(); //Op.getValue(values, data, pair._1, getPosition()); TODO: fix
+                                    return Op.getValue(valueMap, data, pair._1, getPosition());
                                 })
                                 .collect(Collectors.toList()))
                         .append(Op.invokeSpecial(CompilerUtil.internalName(clazz.getName()),

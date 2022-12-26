@@ -6,8 +6,10 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
@@ -32,14 +34,14 @@ public class ReturnNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
         if (record != null && record.size() == 1) {
             return List.of(record.equals(value.reference()) ? Op.nothing() : Op.error("Invalid return type: " + value.reference(), value.getPosition()))
-                    .appendAll(data.tupleFactory().construct(record, value.simplify().apply(data)))
+                    .appendAll(data.tupleFactory().construct(record, value.simplify().apply(data, valueMap)))
                     .append(Op.aReturn());
         } else {
             Signature ret = value.reference();
-            return value.simplify().apply(data)
+            return value.simplify().apply(data, valueMap)
                     .append(ret
                             .retInsn()
                             .mapLeft(m -> Op.errorUnwrapped(m, value.getPosition()))

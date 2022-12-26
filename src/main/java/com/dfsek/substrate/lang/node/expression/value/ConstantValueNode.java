@@ -5,12 +5,10 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
-import com.dfsek.substrate.lang.compiler.value.BakedValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lexer.read.Position;
-import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
@@ -28,8 +26,8 @@ public class ConstantValueNode extends ExpressionNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
-        return value.apply(data);
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
+        return value.apply(data, valueMap);
     }
 
     @Override

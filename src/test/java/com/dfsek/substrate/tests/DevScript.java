@@ -1,6 +1,7 @@
 package com.dfsek.substrate.tests;
 
 import com.dfsek.substrate.Script;
+import com.dfsek.substrate.environment.Environment;
 import com.dfsek.substrate.parser.Parser;
 import org.apache.commons.io.IOUtils;
 
@@ -12,7 +13,8 @@ public class DevScript {
         String s = IOUtils.resourceToString("/dev.sbsc", Charset.defaultCharset());
         Script<In, Out> script = new Parser<>(In.class, Out.class).parse(s);
 
-        System.out.println(script.execute(new In(false), null));
+        System.out.println(script.execute(new In(false), new Environment() {
+        }));
     }
 
     public record In(boolean b) {

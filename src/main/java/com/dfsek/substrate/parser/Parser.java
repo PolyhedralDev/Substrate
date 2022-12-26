@@ -88,6 +88,6 @@ public class Parser<P extends Record, R extends Record> {
         Lexer lexer = new Lexer(data);
         ExpressionNode node = BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret));
         System.out.println(node);
-        return ScriptBuilder.build(parseData, node, List.empty());
+        return ScriptBuilder.build(parseData, node, List.empty(), scope);
     }
 }

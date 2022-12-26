@@ -1,6 +1,7 @@
 package com.dfsek.substrate.lang.rules.expression;
 
 import com.dfsek.substrate.lang.compiler.build.ParseData;
+import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.value.PrimitiveValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
@@ -15,6 +16,7 @@ import com.dfsek.substrate.parser.scope.ParserScope;
 import com.dfsek.substrate.parser.ParserUtil;
 import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
+import io.vavr.control.Either;
 
 import java.util.function.Function;
 
@@ -34,24 +36,25 @@ public class LetRule {
                 .fold(ErrorNode::of, Function.identity());
     }
 
-    private static Tuple2<ParserScope, LinkedHashMap<String, ExpressionNode>> assignmentNode(LinkedHashMap<String, ExpressionNode> start, Lexer lexer, ParseData data, ParserScope scope) {
+    private static Tuple2<ParserScope, LinkedHashMap<String, Either<ErrorNode, ValueAssignmentNode>>> assignmentNode(LinkedHashMap<String, Either<ErrorNode, ValueAssignmentNode>> start, Lexer lexer, ParseData data, ParserScope scope) {
         System.out.println("Checking");
         if (lexer.peek().getType() != TokenType.IDENTIFIER) return new Tuple2<>(scope, start);
-        System.out.println("hhh");
         Token id = lexer.consume();
 
-        ExpressionNode valueNode = ParserUtil.check(lexer.consume(), TokenType.ASSIGNMENT)
+        Either<ErrorNode, ValueAssignmentNode> valueNode = ParserUtil.check(lexer.consume(), TokenType.ASSIGNMENT)
                 .getP(() -> ExpressionRule.assemble(lexer, data, scope))
-                .map(node -> (ValueAssignmentNode.of(id, node, scope.getLocalWidth())))
+                .map(node -> ValueAssignmentNode.of(id, node, scope.getLocalWidth(), new PrimitiveValue(node.reference(), id.getContent(), scope.getLocalWidth(), node.reference().frames())))
                 .get()
-                .fold(ErrorNode::of, Function.identity()).unchecked();
-        LinkedHashMap<String, ExpressionNode> put = start.put(id.getContent(), valueNode);
+                .bimap(ErrorNode::of, Function.identity())
+                .bimap(Unchecked::unchecked, Unchecked::unchecked);
+        LinkedHashMap<String, Either<ErrorNode, ValueAssignmentNode>> put = start.put(id.getContent(), valueNode);
 
-        Value value = new PrimitiveValue(valueNode.reference(), id.getContent(), scope.getLocalWidth(), valueNode.reference().frames());
+        ParserScope newScope = valueNode.fold(ignore -> scope, assignment -> scope.register(id.getContent(), assignment.getReference()));
+
         if (lexer.peek().getType() == TokenType.SEPARATOR) {
             lexer.consume();
-            return assignmentNode(put, lexer, data, scope.register(id.getContent(), value));
+            return assignmentNode(put, lexer, data, newScope);
         }
-        return new Tuple2<>(scope.register(id.getContent(), value), put);
+        return new Tuple2<>(newScope, put);
     }
 }

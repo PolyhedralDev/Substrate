@@ -5,11 +5,13 @@ import com.dfsek.substrate.lang.compiler.build.BuildData;
 import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
+import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.BooleanNode;
 import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.token.Token;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.objectweb.asm.Label;
@@ -48,12 +50,12 @@ public class BooleanAndNode extends BooleanOperationNode {
     }
 
     @Override
-    public List<Either<CompileError, Op>> apply(BuildData data) throws ParseException {
+    public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
         Label shortFalse = new Label();
         Label end = new Label();
-        return left.apply(data)
+        return left.apply(data, valueMap)
                 .append(Op.ifEQ(shortFalse))
-                .appendAll(right.apply(data))
+                .appendAll(right.apply(data, valueMap))
                 .append(Op.ifEQ(shortFalse))
                 .append(Op.pushTrue())
                 .append(Op.goTo(end))
