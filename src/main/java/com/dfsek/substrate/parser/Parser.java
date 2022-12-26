@@ -87,7 +87,7 @@ public class Parser<P extends Record, R extends Record> {
                 .foldLeft(new ParserScope(), ((parserScope, recordComponent) -> parserScope.register(recordComponent._1.getName(), new RecordValue(Signature.fromType(recordComponent._1.getType()), parameters, recordComponent._2, recordComponent._1().getName()))));
         Lexer lexer = new Lexer(data);
         ExpressionNode node = BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret));
-        System.out.println(node);
+        System.out.println("COMP: " + node);
         return ScriptBuilder.build(parseData, node, List.empty(), scope);
     }
 }

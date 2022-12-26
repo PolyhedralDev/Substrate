@@ -25,40 +25,35 @@ public class ErrorNode extends ExpressionNode {
 
     private final Exception e;
 
+    private final List<? extends Node> extra;
+
     public String getMessage() {
         return message;
     }
 
-    public ErrorNode(Position position, String message, Signature signature) {
+    public ErrorNode(Position position, String message, Signature signature, List<? extends Node> extra) {
         this.position = position;
         this.message = message;
         this.signature = signature;
+        this.extra = extra;
         this.e = new Exception();
     }
 
     public static Unchecked<ErrorNode> of(Position position, String message, Signature signature) {
-        return Unchecked.of(new ErrorNode(position, message, signature));
+        return Unchecked.of(new ErrorNode(position, message, signature, List.empty()));
     }
 
     public static Unchecked<ErrorNode> of(Position position, String message) {
-        return Unchecked.of(new ErrorNode(position, message));
+        return Unchecked.of(new ErrorNode(position, message, Signature.empty(), List.empty()));
     }
 
     public static Unchecked<ErrorNode> of(Tuple2<String, Position> tuple) {
         return of(tuple._2, tuple._1);
     }
 
-    public ErrorNode(Position position, String message) {
-        System.out.println("ERR: " + message);
-        this.position = position;
-        this.message = message;
-        this.signature = Signature.empty();
-        this.e = new Exception();
-    }
-
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
-        return List.of(Op.error(message, position, e));
+        return extra.foldLeft(List.of(Op.error(message, position, e)), (comp, a) -> comp.appendAll(a.apply(data, valueMap)));
     }
 
     @Override
@@ -74,5 +69,10 @@ public class ErrorNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return position;
+    }
+
+    @Override
+    public String toString() {
+        return "(@ERROR: " + message + " @" + position + ")";
     }
 }
