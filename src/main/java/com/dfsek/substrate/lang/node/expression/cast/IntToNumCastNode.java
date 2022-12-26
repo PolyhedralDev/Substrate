@@ -42,4 +42,9 @@ public class IntToNumCastNode extends TypeCastNode<Integer, Double> {
     public Signature reference() {
         return Signature.decimal();
     }
+
+    @Override
+    public String toString() {
+        return "num(" + value.toString() + ")";
+    }
 }

@@ -59,4 +59,9 @@ public class IfExpressionNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return Arrays.asList(predicate, caseTrueNode, caseFalseNode);
     }
+
+    @Override
+    public String toString() {
+        return "(if(" + predicate.toString() + ") " + caseTrueNode.toString() + " else " + caseFalseNode.toString() + ")";
+    }
 }

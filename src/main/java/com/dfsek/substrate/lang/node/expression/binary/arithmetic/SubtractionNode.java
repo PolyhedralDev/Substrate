@@ -33,4 +33,9 @@ public class SubtractionNode extends NumericBinaryNode {
     public int apply(int left, int right) {
         return left - right;
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " - " + right.toString() + ")";
+    }
 }

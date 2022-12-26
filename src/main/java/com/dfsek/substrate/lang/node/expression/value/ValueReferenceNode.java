@@ -74,4 +74,9 @@ public class ValueReferenceNode extends ExpressionNode {
     public Token getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return id.getContent();
+    }
 }

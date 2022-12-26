@@ -61,4 +61,9 @@ public class ReturnNode extends ExpressionNode {
     public Collection<Node> contents() {
         return Collections.singleton(value);
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }

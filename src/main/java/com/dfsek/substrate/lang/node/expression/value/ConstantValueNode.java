@@ -46,4 +46,9 @@ public class ConstantValueNode extends ExpressionNode {
     public Position getPosition() {
         return value.getPosition();
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }

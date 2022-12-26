@@ -53,4 +53,9 @@ public class MultiplyNode extends NumericBinaryNode {
 
         return super.simplify();
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " * " + right.toString() + ")";
+    }
 }

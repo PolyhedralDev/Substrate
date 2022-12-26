@@ -21,4 +21,9 @@ public class LessThanOrEqualsNode extends ComparisonBinaryNode {
     protected int doubleInsn() {
         return IFGT;
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " <= " + right.toString() + ")";
+    }
 }

@@ -54,4 +54,9 @@ public class ListIndexNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return Arrays.asList(listReference, index);
     }
+
+    @Override
+    public String toString() {
+        return listReference.toString() + "[" + index.toString() + "]";
+    }
 }

@@ -38,4 +38,9 @@ public class NotEqualsNode extends ComparisonBinaryNode {
     protected boolean string() {
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " != " + right.toString() + ")";
+    }
 }

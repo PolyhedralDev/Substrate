@@ -8,6 +8,7 @@ import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Either;
@@ -49,5 +50,10 @@ public class LetNode extends ExpressionNode {
     @Override
     public Position getPosition() {
         return node.getPosition();
+    }
+
+    @Override
+    public String toString() {
+        return "let { " + localValues.map(Tuple2::_2).mkString(", ") + " } in " + node;
     }
 }

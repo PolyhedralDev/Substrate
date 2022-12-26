@@ -57,4 +57,9 @@ public class ListNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return elements.map(Tuple2::_1).asJava();
     }
+
+    @Override
+    public String toString() {
+        return "[" + elements.mkString(", ") + "]";
+    }
 }

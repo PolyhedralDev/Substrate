@@ -58,4 +58,9 @@ public class FunctionInvocationNode extends ExpressionNode {
     public Iterable<? extends Node> contents() {
         return arguments.append(function);
     }
+
+    @Override
+    public String toString() {
+        return function.toString() + "(" + arguments.mkString(", ") + ")";
+    }
 }

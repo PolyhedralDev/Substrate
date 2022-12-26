@@ -60,4 +60,9 @@ public class ToStringNode extends TypeCastNode<Object, String> {
     public Signature reference() {
         return Signature.string();
     }
+
+    @Override
+    public String toString() {
+        return "str(" + value.toString() + ")";
+    }
 }

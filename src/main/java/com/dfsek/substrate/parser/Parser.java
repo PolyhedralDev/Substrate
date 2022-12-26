@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.value.RecordValue;
+import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.BaseRule;
 import com.dfsek.substrate.lang.std.function.StaticFunction;
 import com.dfsek.substrate.lexer.Lexer;
@@ -85,6 +86,8 @@ public class Parser<P extends Record, R extends Record> {
                 .zipWithIndex()
                 .foldLeft(new ParserScope(), ((parserScope, recordComponent) -> parserScope.register(recordComponent._1.getName(), new RecordValue(Signature.fromType(recordComponent._1.getType()), parameters, recordComponent._2))));
         Lexer lexer = new Lexer(data);
-        return ScriptBuilder.build(parseData, BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret)), List.empty());
+        ExpressionNode node = BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret));
+        System.out.println(node);
+        return ScriptBuilder.build(parseData, node, List.empty());
     }
 }

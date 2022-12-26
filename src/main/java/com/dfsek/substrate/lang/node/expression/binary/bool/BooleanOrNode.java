@@ -64,4 +64,9 @@ public class BooleanOrNode extends BooleanOperationNode {
                 .append(Op.pushFalse())
                 .append(Op.label(end));
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " || " + right.toString() + ")";
+    }
 }

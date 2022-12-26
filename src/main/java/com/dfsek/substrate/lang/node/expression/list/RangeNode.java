@@ -53,4 +53,9 @@ public class RangeNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return Arrays.asList(lower, upper);
     }
+
+    @Override
+    public String toString() {
+        return "(" + lower.toString() + " .. " + upper.toString() + ")";
+    }
 }

@@ -49,4 +49,9 @@ public class BooleanNotNode extends ExpressionNode {
     public Collection<? extends Node> contents() {
         return Collections.singleton(node);
     }
+
+    @Override
+    public String toString() {
+        return "(!" + node.toString() + ")";
+    }
 }

@@ -21,4 +21,9 @@ public class GreaterThanNode extends ComparisonBinaryNode {
     protected int doubleInsn() {
         return IFLE;
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " > " + right.toString() + ")";
+    }
 }

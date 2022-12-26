@@ -49,4 +49,9 @@ public class TupleNode extends ExpressionNode {
     public Iterable<? extends Node> contents() {
         return args;
     }
+
+    @Override
+    public String toString() {
+        return "(" + args.mkString(", ") + ")";
+    }
 }

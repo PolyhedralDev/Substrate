@@ -42,4 +42,9 @@ public class NumToIntCastNode extends TypeCastNode<Double, Integer> {
     public Signature reference() {
         return Signature.integer();
     }
+
+    @Override
+    public String toString() {
+        return "int(" + value.toString() + ")";
+    }
 }

@@ -92,4 +92,9 @@ public class AdditionNode extends NumericBinaryNode {
         }
         return super.simplify();
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " + " + right.toString() + ")";
+    }
 }

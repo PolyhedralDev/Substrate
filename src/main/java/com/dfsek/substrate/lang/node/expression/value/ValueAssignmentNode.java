@@ -6,7 +6,6 @@ import com.dfsek.substrate.lang.compiler.codegen.CompileError;
 import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
-import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.constant.ConstantExpressionNode;
 import com.dfsek.substrate.lang.node.expression.function.LambdaExpressionNode;
@@ -18,8 +17,6 @@ import io.vavr.control.Either;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import static com.dfsek.substrate.lang.compiler.codegen.bytes.Op.dup;
 
 public class ValueAssignmentNode extends ExpressionNode {
     private final Token id;
@@ -79,5 +76,10 @@ public class ValueAssignmentNode extends ExpressionNode {
     @Override
     public Collection<Node> contents() {
         return Collections.singleton(value);
+    }
+
+    @Override
+    public String toString() {
+        return id.getContent() + " = " + value.toString();
     }
 }

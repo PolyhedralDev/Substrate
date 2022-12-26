@@ -33,4 +33,9 @@ public class DivisionNode extends NumericBinaryNode {
     protected int doubleOp() {
         return DDIV;
     }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " / " + right.toString() + ")";
+    }
 }

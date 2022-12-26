@@ -30,6 +30,7 @@ public class LambdaExpressionNode extends ExpressionNode {
 
     private final Signature ref;
     private final Set<String> argRefs;
+    private final List<Tuple2<String, Signature>> types;
     private String self;
 
     private LambdaExpressionNode(Unchecked<? extends ExpressionNode> content, List<Tuple2<String, Signature>> types, Position start, Signature returnType, Set<String> argRefs) {
@@ -37,6 +38,7 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.start = start;
         this.returnType = returnType;
         this.argRefs = argRefs;
+        this.types = types;
 
         Tuple2<HashSet<String>, Signature> parameterData = types
                 .foldLeft(
@@ -121,5 +123,15 @@ public class LambdaExpressionNode extends ExpressionNode {
     @Override
     public Collection<? extends Node> contents() {
         return Collections.singleton(content);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder lambda = new StringBuilder("(");
+
+        types.forEach(t -> lambda.append(t._1).append(": ").append(t._2.toString().toLowerCase()));
+        lambda.append("): ").append(returnType.toString().toLowerCase()).append(" -> ").append(content.toString());
+
+        return lambda.toString();
     }
 }
