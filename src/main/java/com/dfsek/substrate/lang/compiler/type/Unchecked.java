@@ -19,23 +19,25 @@ public final class Unchecked<T extends ExpressionNode> implements Typed {
 
     public ExpressionNode get(Signature... signatures) {
         ExpressionNode simplified = value.simplify();
-        System.out.println("NODE:::" + value);
+        if(simplified instanceof ErrorNode) {
+            return simplified; // error nodes pretend to be any type.
+        }
         Signature ref = simplified.reference();
-        for (Signature type : signatures) if (ref.equals(type)) return simplified;
-
-
-        String err = "";
-
-        if(value instanceof ErrorNode errorNode) {
-            System.out.println("ERROR: " + errorNode.getMessage());
-            err = " due to error: " + errorNode.getMessage();
+        System.out.println(ref);
+        for (Signature type : signatures) {
+            if (ref.equals(type)) {
+                return simplified;
+            }
         }
 
-        return new ErrorNode(simplified.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref + err, ref, value.streamContents().filter(ErrorNode.class::isInstance).toList());
+        return new ErrorNode(simplified.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref, value.streamContents().filter(ErrorNode.class::isInstance).toList());
     }
 
     public ExpressionNode weak(Signature... signatures) {
         ExpressionNode simplified = value.simplify();
+        if(simplified instanceof ErrorNode) {
+            return simplified; // error nodes pretend to be any type.
+        }
         Signature ref = simplified.reference();
         for (Signature type : signatures) if (ref.weakEquals(type)) return simplified;
         return new ErrorNode(simplified.getPosition(), "Expected type(s) " + Arrays.toString(signatures) + " but found " + ref, ref, value.streamContents().filter(ErrorNode.class::isInstance).toList());

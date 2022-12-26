@@ -6,6 +6,7 @@ import com.dfsek.substrate.lang.compiler.api.StringUtils;
 import com.dfsek.substrate.lang.compiler.build.ParseData;
 import com.dfsek.substrate.lang.compiler.codegen.ScriptBuilder;
 import com.dfsek.substrate.lang.compiler.type.Signature;
+import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.value.RecordValue;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.rules.BaseRule;
@@ -86,7 +87,10 @@ public class Parser<P extends Record, R extends Record> {
                 .zipWithIndex()
                 .foldLeft(new ParserScope(), ((parserScope, recordComponent) -> parserScope.register(recordComponent._1.getName(), new RecordValue(Signature.fromType(recordComponent._1.getType()), parameters, recordComponent._2, recordComponent._1().getName()))));
         Lexer lexer = new Lexer(data);
-        ExpressionNode node = BaseRule.assemble(lexer, parseData, scope).get(Signature.fromRecord(ret));
+        Unchecked<? extends ExpressionNode> assemble = BaseRule.assemble(lexer, parseData, scope);
+        System.out.println("DONE" + assemble.unchecked());
+        System.out.println();
+        ExpressionNode node = assemble.get(Signature.fromRecord(ret));
         System.out.println("COMP: " + node);
         return ScriptBuilder.build(parseData, node, List.empty(), scope);
     }

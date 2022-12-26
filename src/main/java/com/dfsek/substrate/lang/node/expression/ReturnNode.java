@@ -7,6 +7,7 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.node.expression.error.ErrorNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
 import io.vavr.collection.LinkedHashMap;
@@ -67,5 +68,13 @@ public class ReturnNode extends ExpressionNode {
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public ExpressionNode simplify() {
+        if(value instanceof ErrorNode) {
+            return value;
+        }
+        return this;
     }
 }

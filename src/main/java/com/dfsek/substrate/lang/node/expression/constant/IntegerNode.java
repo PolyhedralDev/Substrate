@@ -27,7 +27,7 @@ public class IntegerNode extends ConstantExpressionNode<Integer> {
         try {
             return Unchecked.of(new IntegerNode(Integer.parseInt(value), position));
         } catch (NumberFormatException e) {
-            return ErrorNode.of(position, "Malformed integer literal: " + value);
+            return ErrorNode.of(position, "Malformed integer literal: " + value, Signature.integer());
         }
     }
 
