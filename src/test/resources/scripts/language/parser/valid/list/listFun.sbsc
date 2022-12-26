@@ -1,5 +1,5 @@
 // declare a list of functions
 let {
-  b = () -> {},
-  d = [() -> {}, b, () -> {}]
+  b = () -> 5,
+  d = [() -> 4, b, () -> 5]
 } in true

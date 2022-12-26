@@ -1,22 +1,7 @@
 // use external value in if block
 
-e = "bazinga";
-f = "not bazinga";
-
-a = if(true) {
-    return e;
-} else {
-    return f;
-};
-
-assert(a == "bazinga");
-
-b = if(false) {
-    return e;
-} else {
-    return f;
-};
-
-assert(b == "not bazinga");
-
-return true;
+let {
+  a = false,
+  b = 4,
+  c = 5
+} in (if(a) b else c) == 5

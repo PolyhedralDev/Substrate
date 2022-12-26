@@ -1,5 +1,5 @@
 // test basic if expression
 
-if(true) 5 else 4 == 5
+(if(true) 5 else 4) == 5
 &&
-if(false) 5 else 4 == 4
+(if(false) 5 else 4) == 4
