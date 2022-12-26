@@ -55,7 +55,7 @@ public class BasicExpressionRule {
                                                         id -> scope.get(lexer.consume().getContent())
                                                                 .map(value -> ValueReferenceNode.of(
                                                                         id,
-                                                                        value
+                                                                        value.reference()
                                                                 )).fold(
                                                                         () -> ErrorNode.of(token.getPosition(), "No such value: " + token.getContent()),
                                                                         Function.identity()

@@ -14,7 +14,8 @@ import io.vavr.control.Either;
 public record RecordValue(
         Signature ref,
         Class<? extends Record> inputClass,
-        int index
+        int index,
+        String id
 ) implements Value {
 
     @Override

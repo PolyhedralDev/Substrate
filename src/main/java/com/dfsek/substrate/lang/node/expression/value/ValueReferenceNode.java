@@ -24,15 +24,15 @@ public class ValueReferenceNode extends ExpressionNode {
     private boolean isLambdaArgument = false;
     private boolean isLocal = false;
 
-    private final Value value;
+    private final Signature reference;
 
-    private ValueReferenceNode(Token id, Value value) {
+    private ValueReferenceNode(Token id, Signature reference) {
         this.id = id;
-        this.value = value;
+        this.reference = reference;
     }
 
-    public static Unchecked<ValueReferenceNode> of(Token id, Value value) {
-        return Unchecked.of(new ValueReferenceNode(id, value));
+    public static Unchecked<ValueReferenceNode> of(Token id, Signature reference) {
+        return Unchecked.of(new ValueReferenceNode(id, reference));
     }
 
     public boolean isLocal() {
@@ -53,7 +53,7 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public List<Either<CompileError, Op>> apply(BuildData data, LinkedHashMap<String, Value> valueMap) throws ParseException {
-        return value.load(data);
+        return valueMap.get(id.getContent()).getOrElseThrow(() -> new IllegalStateException("No such value: " + id)).load(data);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ValueReferenceNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
-        return value.reference();
+        return reference;
     }
 
     public Token getId() {

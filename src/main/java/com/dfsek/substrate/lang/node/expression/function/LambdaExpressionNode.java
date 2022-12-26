@@ -7,6 +7,9 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
+import com.dfsek.substrate.lang.compiler.value.InvalidValue;
+import com.dfsek.substrate.lang.compiler.value.RecordValue;
+import com.dfsek.substrate.lang.compiler.value.ShadowValue;
 import com.dfsek.substrate.lang.compiler.value.Value;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class LambdaExpressionNode extends ExpressionNode {
     private final ExpressionNode content;
-    private final Set<String> closureIDs;
+    private final List<String> closureIDs;
     private final Position start;
     private final Signature parameters;
 
@@ -41,10 +44,10 @@ public class LambdaExpressionNode extends ExpressionNode {
         this.argRefs = argRefs;
         this.types = types;
 
-        Tuple2<HashSet<String>, Signature> parameterData = types
+        Tuple2<List<String>, Signature> parameterData = types
                 .foldLeft(
-                        new Tuple2<>(HashSet.empty(),
-                                Signature.empty()), (t, type) -> new Tuple2<>(t._1.add(type._1), t._2.and(type._2))
+                        new Tuple2<>(List.empty(),
+                                Signature.empty()), (t, type) -> new Tuple2<>(t._1.append(type._1), t._2.and(type._2))
                 );
         this.closureIDs = parameterData._1;
         this.parameters = parameterData._2;
@@ -73,7 +76,7 @@ public class LambdaExpressionNode extends ExpressionNode {
                     boolean isArg = argRefs.contains(id);
                     if (!isArg && !valueReferenceNode.isLambdaArgument()) {
                         if (!closureIDs.contains(id) && !id.equals(self)) {
-                            closureIDs.add(id);
+                            closureIDs.append(id);
                             return List.of(new Tuple2<>(valueReferenceNode.getId().getContent(),
                                     valueReferenceNode.getId().getContent().equals(self) ? Signature.empty() : valueReferenceNode.reference())
                             );
@@ -82,13 +85,22 @@ public class LambdaExpressionNode extends ExpressionNode {
                     return List.empty();
                 });
 
+        Stream<String> closureParameters = closureTypes.map(t -> t._1);
+
         Signature closure = closureTypes.foldRight(Signature.empty(), (pair, signature) -> pair._2.and(signature));
         return data
                 .lambdaFactory()
                 .implement(parameters, reference().getSimpleReturn(), closure, clazz ->
                         content
                                 .simplify()
-                                .apply(data, valueMap)
+                                .apply(data, valueMap.mapValues(value -> {
+                                    int index = closureParameters.indexOf(value.id());
+                                    if(index > -1) {
+                                        System.out.println("Shadowing " + value.id());
+                                        return new ShadowValue(value.reference(), index, value.id(), clazz.getName());
+                                    }
+                                    return new InvalidValue(value.reference(), value.id());
+                                }))
                                 .append(returnType.retInsn()
                                         .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
                                         .map(Op::insnUnwrapped)))

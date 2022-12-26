@@ -9,7 +9,8 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 
 public record ThisReferenceValue(
-        Signature ref
+        Signature ref,
+        String id
 ) implements Value {
 
     @Override

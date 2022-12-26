@@ -64,7 +64,7 @@ public class LambdaExpressionRule {
         }
 
         if (variableName != null) {
-            lambda = lambda.register(variableName, new ThisReferenceValue(Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType)));
+            lambda = lambda.register(variableName, new ThisReferenceValue(Signature.fun().applyGenericArgument(0, argSig).applyGenericReturn(0, returnType), variableName));
         }
 
         ParserUtil.checkType(lexer.consume(), TokenType.ARROW);

@@ -6,16 +6,10 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-import org.objectweb.asm.Opcodes;
 
-public interface Value extends Opcodes {
-    Signature reference();
-
-    String id();
-
-    List<Either<CompileError, Op>> load(BuildData data);
-
-    default int getLVWidth() {
-        return 0;
+public record InvalidValue(Signature reference, String id) implements Value{
+    @Override
+    public List<Either<CompileError, Op>> load(BuildData data) {
+        throw new IllegalStateException("Invalid value: " + id);
     }
 }
