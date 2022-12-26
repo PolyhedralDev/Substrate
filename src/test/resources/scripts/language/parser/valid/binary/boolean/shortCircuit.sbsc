@@ -1,8 +1,6 @@
-a = (): bool -> {
+let {
+  a = (): bool -> {
     fail();
     return false;
-};
-
-b = false && a();
-
-return true;
+  }
+in !(false && a());

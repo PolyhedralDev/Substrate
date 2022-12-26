@@ -1,11 +1,1 @@
-assert(true || true);
-
-assert(true || false);
-
-
-assert(false || true);
-
-a = false || false;
-assert(!a);
-
-return true;
+true || true

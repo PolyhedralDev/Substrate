@@ -1,6 +1,3 @@
 // test the equals operator ==
 
-a = 2.1;
-b = 2.1;
-
-return a == b;
+2.1 == 2.1

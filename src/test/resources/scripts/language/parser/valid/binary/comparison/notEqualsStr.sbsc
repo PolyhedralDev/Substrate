@@ -1,6 +1,3 @@
 // test the not equals operator !=
 
-a = "test";
-b = "test2";
-
-return a != b;
+"leonard" != "bazinga"

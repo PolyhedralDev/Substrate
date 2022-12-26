@@ -19,12 +19,16 @@ public final class Unchecked<T extends ExpressionNode> implements Typed {
 
     public ExpressionNode get(Signature... signatures) {
         ExpressionNode simplified = value.simplify();
+        System.out.println("NODE:::" + value);
         Signature ref = simplified.reference();
-        for (Signature type : signatures) if (ref.equals(type)) return simplified;
+        if(!(simplified instanceof ErrorNode)) {
+            for (Signature type : signatures) if (ref.equals(type)) return simplified;
+        }
 
         String err = "";
 
         if(value instanceof ErrorNode errorNode) {
+            System.out.println("ERROR: " + errorNode.getMessage());
             err = " due to error: " + errorNode.getMessage();
         }
 

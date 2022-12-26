@@ -1,6 +1,3 @@
 // test the less than operator
 
-a = 2;
-b = 3;
-
-return a < b;
+2 < 3

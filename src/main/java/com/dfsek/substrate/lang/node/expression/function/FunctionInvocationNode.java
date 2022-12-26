@@ -53,6 +53,7 @@ public class FunctionInvocationNode extends ExpressionNode {
 
     @Override
     public Signature reference() {
+        System.out.println("Function ref is: " + function.reference().getSimpleReturn());
         return function.reference().getSimpleReturn();
     }
 

@@ -49,6 +49,7 @@ public class ErrorNode extends ExpressionNode {
     }
 
     public ErrorNode(Position position, String message) {
+        System.out.println("ERR: " + message);
         this.position = position;
         this.message = message;
         this.signature = Signature.empty();

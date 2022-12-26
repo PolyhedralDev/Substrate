@@ -1,7 +1,4 @@
 // test string concatenation
 
-a = "bazinga";
 
-b = "Sheldon says: " + a;
-
-return b == "Sheldon says: bazinga";
+"Sheldon says: " + "bazinga" == "Sheldon says: bazinga"

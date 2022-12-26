@@ -7,14 +7,12 @@ import com.dfsek.substrate.lang.compiler.codegen.bytes.Op;
 import com.dfsek.substrate.lang.compiler.type.Signature;
 import com.dfsek.substrate.lang.compiler.type.Unchecked;
 import com.dfsek.substrate.lang.compiler.util.CompilerUtil;
-import com.dfsek.substrate.lang.compiler.value.InvalidValue;
-import com.dfsek.substrate.lang.compiler.value.RecordValue;
-import com.dfsek.substrate.lang.compiler.value.ShadowValue;
-import com.dfsek.substrate.lang.compiler.value.Value;
+import com.dfsek.substrate.lang.compiler.value.*;
 import com.dfsek.substrate.lang.node.expression.ExpressionNode;
 import com.dfsek.substrate.lang.node.expression.value.ValueReferenceNode;
 import com.dfsek.substrate.lexer.read.Position;
 import com.dfsek.substrate.parser.exception.ParseException;
+import io.vavr.Function2;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Either;
@@ -93,14 +91,16 @@ public class LambdaExpressionNode extends ExpressionNode {
                 .implement(parameters, reference().getSimpleReturn(), closure, clazz ->
                         content
                                 .simplify()
-                                .apply(data, valueMap.mapValues(value -> {
+                                .apply(data, types.foldLeft(new Tuple2<>(valueMap.mapValues(value -> {
                                     int index = closureParameters.indexOf(value.id());
-                                    if(index > -1) {
+                                    if (index > -1) {
                                         System.out.println("Shadowing " + value.id());
                                         return new ShadowValue(value.reference(), index, value.id(), clazz.getName());
                                     }
                                     return new InvalidValue(value.reference(), value.id());
-                                }))
+                                }), 0),
+                                        (Function2<Tuple2<LinkedHashMap<String, Value>, Integer>, Tuple2<String, Signature>, Tuple2<LinkedHashMap<String, Value>, Integer>>)
+                                                (run, var) -> run.map2(i -> i + var._2().frames()).map1(m -> m.put(var._1(), new PrimitiveValue(var._2(), var._1(), run._2() + 2, var._2().frames()))))._1())
                                 .append(returnType.retInsn()
                                         .mapLeft(m -> Op.errorUnwrapped(m, getPosition()))
                                         .map(Op::insnUnwrapped)))

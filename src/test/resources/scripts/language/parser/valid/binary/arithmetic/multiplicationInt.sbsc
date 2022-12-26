@@ -1,5 +1,1 @@
-// Test multiplication
-
-a = 4 * 2;
-
-return a == 8;
+4 * 2 == 8

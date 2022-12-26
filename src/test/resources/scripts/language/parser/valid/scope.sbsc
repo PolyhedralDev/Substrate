@@ -1,16 +1,10 @@
 // test variable scopes
 
-foo = "foo";
-
-{
-  bar = "bar";
-  println(foo);
-  println(bar);
-}
-
-{
-  bar = "bar2";
-  println(bar);
-}
-
-return true;
+let {
+  f = (foo: bool): bool -> let {
+    bar = true
+  } in foo || bar,
+  g = (foo: bool): bool -> let {
+    bar = true
+  } in foo && bar
+} in g(f(false))
