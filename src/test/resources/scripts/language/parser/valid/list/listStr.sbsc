@@ -1,5 +1,5 @@
 // declare a list of strs
 
-a = ["Sheldon", "Leonard", "Penny"];
-
-return true;
+let {
+  a = ["Sheldon", "Leonard", "Penny"]
+} in true

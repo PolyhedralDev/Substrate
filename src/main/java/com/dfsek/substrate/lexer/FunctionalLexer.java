@@ -93,7 +93,8 @@ public class FunctionalLexer {
     }
 
     private static boolean isNumberLike(Stream<Char> chars) {
-        if (chars.get().is('.') && chars.get(1).is('.')) return false; // range
+        if(chars.isEmpty()) return false;
+        if (chars.get().is('.') && chars.size() > 1 && chars.get(1).is('.')) return false; // range
         return chars.get().isDigit()
                 || chars.get().is('_', '.', 'E');
     }

@@ -1,11 +1,5 @@
 // test basic if expression
 
-a = if(true) 5 else 4;
-
-assert(a == 5);
-
-b = if(false) 5 else 4;
-
-assert(b == 4);
-
-return true;
+if(true) 5 else 4 == 5
+&&
+if(false) 5 else 4 == 4

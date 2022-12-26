@@ -1,9 +1,8 @@
 // a list of tuples
+let {
+  a = (1, "Sheldon"),
+  b = (2, "Leonard"),
+  c = (3, "Penny"),
 
-a = (1, "Sheldon");
-b = (2, "Leonard");
-c = (3, "Penny");
-
-d = [a, b, c];
-
-return true;
+  d = [a, b, c]
+} in true

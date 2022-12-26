@@ -1,14 +1,8 @@
 // test parsing tuples
-
-h = (2.4, "bazinga");
-foo = ("hello", ((((1.2, false)), (h))));
-
-
-bar = ("hello", 1.2);
-bar2 = (2.4, "bazinga");
-
-
-baz = (1.2, false);
-
-
-return true;
+let {
+  h = (2.4, "bazinga"),
+  foo = ("hello", ((((1.2, false)), (h)))),
+  bar = ("hello", 1.2),
+  bar2 = (2.4, "bazinga"),
+  baz = (1.2, false),
+} in true

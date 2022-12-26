@@ -1,5 +1,4 @@
 // declare a list of muns
-
-a = [1.0, 2.0, 3.0];
-
-return true;
+let {
+  a = [1.0, 2.0, 3.0]
+} in true

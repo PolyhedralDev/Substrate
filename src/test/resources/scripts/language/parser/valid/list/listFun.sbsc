@@ -1,9 +1,5 @@
 // declare a list of functions
-
-b = () -> {};
-
-d = [() -> {
-    println("bazinga");
-}, b, () -> {}];
-
-return true;
+let {
+  b = () -> {},
+  d = [() -> {}, b, () -> {}]
+} in true

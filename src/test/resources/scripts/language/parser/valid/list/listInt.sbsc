@@ -1,5 +1,4 @@
 // declare a list of ints
-
-a = [1, 2, 3];
-
-return true;
+let {
+  a = [1, 2, 3]
+} in true
